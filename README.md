@@ -1,45 +1,169 @@
-# mkdocs-asyncapi-plugin
+# asyncapi-tag
 
-The `mkdocs-asyncapi-tag-plugin` helps render AsyncAPI schemas in your MkDocs markdown pages. It uses the AsyncAPI Standalone React component to render your AsyncAPI schema files. This plugin supports both `.json` and `.yml` files.
+Render [AsyncAPI](https://www.asyncapi.com/) documents inside Markdown pages with a single element:
 
-## Installation
+```html
+<asyncapi-tag src="asyncapi.yaml"></asyncapi-tag>
+```
 
-To install the plugin, run:
+`asyncapi-tag` is a [Python-Markdown](https://python-markdown.github.io/) extension, so it works in
+any tool built on Python-Markdown. It ships with a plugin for [MkDocs](https://www.mkdocs.org/)
+that resolves document paths the same way MkDocs resolves links. Rendering in the browser is done
+by the official [AsyncAPI React component](https://github.com/asyncapi/asyncapi-react), pinned to
+an exact version and loaded with Subresource Integrity. JSON and YAML documents both work.
+
+> Formerly published as `mkdocs-asyncapi-tag-plugin`. See [Migrating](#migrating-from-mkdocs-asyncapi-tag-plugin).
+
+## MkDocs
 
 ```sh
-pip install mkdocs-asyncapi-tag-plugin
+pip install asyncapi-tag
 ```
 
-Then, include the plugin in the `plugins` property of your `mkdocs.yml` file:
-
-```sh
-    plugins:
-        - asyncapi-tag
+```yaml
+# mkdocs.yml
+plugins:
+  - asyncapi-tag
 ```
 
-## Usage
+Put your AsyncAPI file anywhere under `docs/` and reference it from a page. Paths are relative to
+the Markdown file, or relative to `docs/` when they start with `/`. Absolute `http(s)://` URLs are
+passed through unchanged.
 
-To render your schema, use the <asyncapi-tag> in your markdown files:
+```markdown
+<!-- docs/api/events.md -->
+# Events API
 
-```HTML
-    <asyncapi-tag src="/path/to/schema.json"/>
+<asyncapi-tag src="events.yaml" sidebar="false"></asyncapi-tag>
 ```
 
-## Accepted values
-In addition to the `src` attribute, the following attributes can be used with the `<asyncapi-tag>`:
+A missing document or an invalid attribute is reported as a MkDocs warning, so `mkdocs build
+--strict` fails instead of shipping a broken page.
 
-| Action | Attribute | Accepted values |
+### Plugin options
+
+```yaml
+plugins:
+  - asyncapi-tag:
+      load_assets: true              # emit the viewer script and stylesheet (default: true)
+      viewer_js: https://unpkg.com/@asyncapi/react-component@3.2.1/browser/standalone/index.js
+      viewer_js_integrity: sha384-…  # set to '' to omit the integrity attribute
+      viewer_css: https://unpkg.com/@asyncapi/react-component@3.2.1/styles/default.min.css
+      viewer_css_integrity: sha384-…
+```
+
+To self-host the viewer, copy the two files into `docs/` and point the options at them.
+Relative paths are resolved per page like `src` is:
+
+```yaml
+plugins:
+  - asyncapi-tag:
+      viewer_js: assets/asyncapi/index.js
+      viewer_js_integrity: ''
+      viewer_css: assets/asyncapi/default.min.css
+      viewer_css_integrity: ''
+```
+
+Or set `load_assets: false` and load the files yourself through `extra_javascript` and
+`extra_css`. The page-side runner script is still needed in that case; copy it from
+`asyncapi_tag.assets.RUNNER_JS`.
+
+## Plain Python-Markdown
+
+```python
+import markdown
+
+html = markdown.markdown(text, extensions=["asyncapi_tag"])
+```
+
+Extension options (pass them as `extension_configs={"asyncapi_tag": {...}}`):
+
+| Option | Default | Description |
 |---|---|---|
-| Show or hide | `sidebar` | `true` or `false` |
-| Show or hide | `info` | `true` or `false` |
-| Show or hide | `servers` | `true` or `false` |
-| Show or hide | `operations` | `true` or `false` |
-| Show or hide | `messages` | `true` or `false` |
-| Show or hide | `schemas` | `true` or `false` |
-| Show or hide | `errors` | `true` or `false` |
-| expand or collapse | `messageExamples` | `true` or `false` |
-| sidebar configuration| `showServers` | `byDefault` or `bySpecTags` or `byServersTags` |
-| sidebar configuration| `showOperations` | `byDefault` or `bySpecTags` or `byServersTags` |
-| asyncapi parser configuration | `parserOptions` | See available [options here](https://github.com/asyncapi/parser-js/blob/master/API.md#module_@asyncapi/parser..parse) |
-| label customization | `publishLabel` | Any string value |
-| label customization | `subscribeLabel` | Any string value |
+| `viewer_js`, `viewer_css` | pinned unpkg URLs | Where to load the viewer from |
+| `viewer_js_integrity`, `viewer_css_integrity` | matching SRI hashes | Empty string omits the attribute |
+| `load_assets` | `True` | Emit the loader with the first tag on a page |
+| `url_resolver` | identity | Callable mapping `src` (and relative asset URLs) to what the browser fetches |
+| `warn` | `logging` | Callable receiving warning messages |
+
+## Attributes
+
+Only `src` is required. Attribute names are case-insensitive. Boolean attributes accept
+`true`/`false`, `1`/`0`, `yes`/`no`, `on`/`off`; a bare attribute means `true`.
+
+| Attribute | Values | Default | Effect |
+|---|---|---|---|
+| `src` | path or URL | required | The AsyncAPI document (JSON or YAML) |
+| `id` | string | `asyncapi-tag-N` | HTML id of the container element |
+| `sidebar` | boolean | `true` | Show the navigation sidebar |
+| `info` | boolean | `true` | Show the info section |
+| `servers` | boolean | `true` | Show servers |
+| `operations` | boolean | `true` | Show operations |
+| `messages` | boolean | `true` | Show messages |
+| `schemas` | boolean | `true` | Show schemas |
+| `errors` | boolean | `true` | Show parser errors |
+| `showMessageExamples` | boolean | viewer default | Show examples for standalone messages |
+| `messageExamples` | boolean | `true` | Expand message examples |
+| `showServers` | `byDefault`, `bySpecTags`, `byServersTags` | `byDefault` | How the sidebar groups servers |
+| `showOperations` | `byDefault`, `bySpecTags`, `byOperationsTags` | `byDefault` | How the sidebar groups operations |
+| `useChannelAddressAsIdentifier` | boolean | viewer default | AsyncAPI v3: label operations by channel address |
+| `publishLabel`, `subscribeLabel` | string | `PUB`, `SUB` | Operation labels for AsyncAPI v2 |
+| `sendLabel`, `receiveLabel`, `requestLabel`, `replyLabel` | string | `SEND`, `RECEIVE`, `REQUEST`, `REPLY` | Operation labels for AsyncAPI v3 |
+| `parserOptions` | JSON object | viewer default | Passed to the AsyncAPI parser, e.g. `parserOptions='{"applyTraits": false}'` |
+| `schemaID` | string | container id | The viewer's `schemaID` option |
+
+These map onto the React component's
+[configuration](https://github.com/asyncapi/asyncapi-react/blob/master/docs/configuration/config-modification.md).
+Defaults for `sidebar` and `messageExamples` follow earlier releases of this plugin rather than the
+viewer, so existing pages keep their look.
+
+## How it works
+
+Each tag becomes a `<div class="asyncapi-tag">` carrying the document URL and the viewer
+configuration as HTML-escaped data attributes. The first tag on a page also emits the viewer's
+stylesheet and script and a short runner script. The runner fetches each document as text, hands it
+to `AsyncApiStandalone.render`, and prints a visible error inside the container if fetching or
+rendering fails. No content from the Markdown source is interpolated into JavaScript.
+
+Tags inside fenced or indented code blocks are left alone, so you can document the syntax.
+
+Material for MkDocs users with `navigation.instant` enabled are covered: the runner re-scans the
+page on Material's `document$` event.
+
+## Migrating from mkdocs-asyncapi-tag-plugin
+
+1. Replace `mkdocs-asyncapi-tag-plugin` with `asyncapi-tag` in your requirements. The plugin id in
+   `mkdocs.yml` is unchanged (`asyncapi-tag`).
+2. Remove the `asyncapi_file` plugin option. MkDocs already copies every non-Markdown file under
+   `docs/` into the site; the option now only prints a deprecation warning.
+3. Use a path relative to the page (or `/`-prefixed relative to `docs/`) in `src`. Earlier versions
+   emitted the build machine's filesystem path, so only `/`-prefixed paths ever worked; those still work.
+4. String attributes such as `publishLabel="PUBLISH"` and `showServers="bySpecTags"` now take
+   effect. Earlier versions silently discarded them.
+
+`mkdocs-asyncapi-tag-plugin` 1.0.0 is a deprecated shim that only depends on this package, so
+upgrading it also works, but no further releases will be made under the old name.
+
+## Updating the pinned viewer
+
+```sh
+python scripts/update_viewer.py          # latest @asyncapi/react-component
+python scripts/update_viewer.py 3.2.1    # specific version
+```
+
+The script rewrites the version, URLs and SRI hashes in `src/asyncapi_tag/assets.py`.
+
+## Development
+
+```sh
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[test]"
+pytest
+```
+
+The JavaScript runner is syntax-checked with `node` when it is installed. See `AGENTS.md` for the
+repository layout and release procedure.
+
+## License
+
+MIT
