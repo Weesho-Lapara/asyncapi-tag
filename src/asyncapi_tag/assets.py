@@ -22,9 +22,11 @@ CONTAINER_CLASS = "asyncapi-tag"
 # The viewer is designed for a full-width page. Inside a documentation column it
 # switches to its compact layout (container queries), whose sidebar toggle and
 # sidebar overlay are position: fixed and whose centre panel refuses to shrink
-# below its content. This keeps all of it inside the container.
+# below its content, and its panels carry z-index 10-30, which beats a theme's
+# sticky header (Material's is 4). This keeps all of it inside the container:
+# z-index: 0 on the container opens a stacking context that confines them.
 EMBED_CSS = """\
-.asyncapi-tag { position: relative; max-width: 100%; }
+.asyncapi-tag { position: relative; z-index: 0; max-width: 100%; }
 .asyncapi-tag .aui-root .panel--center { min-width: 0; }
 .asyncapi-tag .aui-root pre { overflow-x: auto; }
 .asyncapi-tag .aui-root .fixed { position: absolute; }

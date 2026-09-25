@@ -62,7 +62,8 @@ pip install zensical && zensical build             # same site under Zensical
   `expand.messageExamples` default to on. Changing defaults is a breaking change.
 - `assets.EMBED_CSS` keeps the viewer inside its container: the component uses container queries
   and, in a docs column, a `position: fixed` sidebar toggle/overlay and a non-shrinking centre
-  panel. Re-check those class names (`.fixed`, `.burger-menu`, `.panel--center`) on viewer bumps.
+  panel, plus z-index 10-30 panels that beat a sticky header; the container's `z-index: 0` confines
+  them. Re-check those class names (`.fixed`, `.burger-menu`, `.panel--center`) on viewer bumps.
 - The legacy shim must not declare a `mkdocs.plugins` entry point; MkDocs lets the last duplicate
   entry point win silently.
 - Warnings in the MkDocs plugin go through `get_plugin_logger` so `--strict` fails on them.

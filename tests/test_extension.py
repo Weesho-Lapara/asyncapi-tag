@@ -51,6 +51,9 @@ def test_embed_css_is_emitted_once_and_can_be_disabled():
     assert out.count(assets.EMBED_CSS) == 1
     assert out.index("<style>") < out.index(assets.VIEWER_CSS_URL)
     assert "</style>" not in assets.EMBED_CSS
+    # the container must open its own stacking context, or the viewer's z-10..z-30 panels
+    # paint over a theme's sticky header (Material's header is z-index 4)
+    assert ".asyncapi-tag { position: relative; z-index: 0;" in assets.EMBED_CSS
     out = render('<asyncapi-tag src="a.yaml"/>', embed_css=False)
     assert assets.EMBED_CSS not in out and "data-asyncapi-src" in out
 

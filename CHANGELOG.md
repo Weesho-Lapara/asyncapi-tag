@@ -11,7 +11,7 @@
 ### Fixed
 - The viewer spilled over the right-hand table of contents in Material and floated its sidebar toggle
   and overlay over the page. A small stylesheet (`embed_css`, on by default) now keeps the viewer,
-  its toggle and its sidebar inside the container.
+  its toggle and its sidebar inside the container, and below the theme's sticky header.
 - Only the first viewer on a page rendered on a full page load.
 
 ### Added
