@@ -11,6 +11,9 @@ pinned `@asyncapi/react-component` standalone bundle.
 The repository is also home to the deprecated `mkdocs-asyncapi-tag-plugin` PyPI package, which is
 now a shim under `legacy/` that only depends on `asyncapi-tag`.
 
+Direction, future plans and evaluations of other ecosystems (Docusaurus, Zensical, MkDocs 2.0)
+are in [ROADMAP.md](ROADMAP.md); keep this file to how the repository works.
+
 ## Layout
 
 ```
@@ -21,6 +24,7 @@ src/asyncapi_tag/
   mkdocs_plugin.py   MkDocs plugin: config options, registers the extension, resolves src per page
 legacy/mkdocs-asyncapi-tag-plugin/   deprecated shim package (own pyproject, no entry point)
 scripts/update_viewer.py             bumps the pinned viewer, rewrites assets.py, adds a CHANGELOG line
+prototypes/docusaurus/               unpublished proof of concept, see ROADMAP.md
 tests/                               pytest; test_mkdocs_plugin.py builds real sites in tmp_path
 docs/ + mkdocs.yml                   documentation site, built with the plugin (Material theme);
                                      docs/examples/ holds the AsyncAPI 2 and 3 demo documents

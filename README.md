@@ -193,6 +193,11 @@ The JavaScript runner is syntax-checked with `node` when it is installed. Build 
 `pip install -e ".[docs]" && mkdocs build --strict`. See `AGENTS.md` for the repository layout and
 release procedure.
 
+## Roadmap
+
+Plans and evaluations of other ecosystems (Docusaurus, Zensical, MkDocs 2.0) are in
+[ROADMAP.md](https://github.com/Weesho-Lapara/asyncapi-tag/blob/main/ROADMAP.md).
+
 ## License
 
 MIT
