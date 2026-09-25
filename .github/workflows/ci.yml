@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test]"
+      - name: Test
+        run: python -m pytest
+
+  package:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build tools
+        run: python -m pip install --upgrade pip build twine
+      - name: Build asyncapi-tag
+        run: python -m build --outdir dist/asyncapi-tag
+      - name: Build mkdocs-asyncapi-tag-plugin (deprecated shim)
+        run: python -m build --outdir dist/mkdocs-asyncapi-tag-plugin legacy/mkdocs-asyncapi-tag-plugin
+      - name: Check metadata
+        run: python -m twine check dist/*/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distributions
+          path: dist/
