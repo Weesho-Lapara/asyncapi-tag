@@ -1,0 +1,80 @@
+{
+  "asyncapi": "2.6.0",
+  "info": {
+    "title": "Accounts service",
+    "version": "1.4.0",
+    "description": "User lifecycle events. This document is an **AsyncAPI 2.6** example used by the asyncapi-tag documentation."
+  },
+  "tags": [
+    { "name": "accounts", "description": "Account lifecycle" },
+    { "name": "security", "description": "Authentication events" }
+  ],
+  "servers": {
+    "production": {
+      "url": "mqtt://broker.example.com:1883",
+      "protocol": "mqtt",
+      "description": "Production broker",
+      "tags": [{ "name": "accounts" }]
+    },
+    "audit": {
+      "url": "mqtt://audit.example.com:1883",
+      "protocol": "mqtt",
+      "description": "Audit trail broker",
+      "tags": [{ "name": "security" }]
+    }
+  },
+  "channels": {
+    "user/signedup": {
+      "subscribe": {
+        "operationId": "onUserSignedUp",
+        "summary": "A new user registered",
+        "tags": [{ "name": "accounts" }],
+        "message": { "$ref": "#/components/messages/UserSignedUp" }
+      }
+    },
+    "user/login-failed": {
+      "publish": {
+        "operationId": "reportLoginFailure",
+        "summary": "Report a failed login attempt",
+        "tags": [{ "name": "security" }],
+        "message": { "$ref": "#/components/messages/LoginFailed" }
+      }
+    }
+  },
+  "components": {
+    "messages": {
+      "UserSignedUp": {
+        "name": "UserSignedUp",
+        "title": "User signed up",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "required": ["userId", "email"],
+          "properties": {
+            "userId": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "displayName": { "type": "string" },
+            "createdAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "examples": [
+          { "name": "typical", "payload": { "userId": "usr_8842", "email": "ada@example.com", "displayName": "Ada", "createdAt": "2026-09-25T10:15:00Z" } }
+        ]
+      },
+      "LoginFailed": {
+        "name": "LoginFailed",
+        "title": "Login failed",
+        "contentType": "application/json",
+        "payload": {
+          "type": "object",
+          "required": ["email", "reason"],
+          "properties": {
+            "email": { "type": "string", "format": "email" },
+            "reason": { "type": "string", "enum": ["bad-password", "locked", "unknown-user"] },
+            "ip": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

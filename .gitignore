@@ -31,3 +31,6 @@ site/
 # Local scratch (demo sites, notes, agent working files)
 scratch/
 .claude/
+
+# Docs site build output (any --site-dir name used in CI)
+site-*/

@@ -1,0 +1,3 @@
+/* Give the viewer some breathing room inside Material's content column. */
+.asyncapi-tag { margin: 1.5rem 0; }
+.asyncapi-tag-error { padding: .75rem 1rem; border-left: .25rem solid #ef5552; background: rgba(239, 85, 82, .1); }

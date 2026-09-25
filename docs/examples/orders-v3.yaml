@@ -1,0 +1,111 @@
+asyncapi: 3.0.0
+info:
+  title: Orders service
+  version: 2.1.0
+  description: |
+    Events emitted and consumed by the orders service. This document is an
+    **AsyncAPI 3** example used by the asyncapi-tag documentation.
+  license:
+    name: MIT
+servers:
+  production:
+    host: broker.example.com:9092
+    protocol: kafka
+    description: Production Kafka cluster
+    tags:
+      - name: env:production
+  staging:
+    host: broker.staging.example.com:9092
+    protocol: kafka
+    tags:
+      - name: env:staging
+channels:
+  orderPlaced:
+    address: orders.placed
+    description: A customer completed checkout.
+    messages:
+      OrderPlaced:
+        $ref: '#/components/messages/OrderPlaced'
+  orderShipped:
+    address: orders.shipped
+    messages:
+      OrderShipped:
+        $ref: '#/components/messages/OrderShipped'
+operations:
+  emitOrderPlaced:
+    action: send
+    channel:
+      $ref: '#/channels/orderPlaced'
+    summary: Emit when an order is placed
+    tags:
+      - name: orders
+  onOrderShipped:
+    action: receive
+    channel:
+      $ref: '#/channels/orderShipped'
+    summary: React to shipments from the fulfilment service
+    tags:
+      - name: fulfilment
+components:
+  messages:
+    OrderPlaced:
+      name: OrderPlaced
+      title: Order placed
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/Order'
+      examples:
+        - name: two-items
+          payload:
+            orderId: ord_01HZ3
+            customerId: cus_4711
+            items:
+              - sku: mug-teal
+                quantity: 2
+                unitPrice: 12.5
+            total: 25
+    OrderShipped:
+      name: OrderShipped
+      title: Order shipped
+      contentType: application/json
+      payload:
+        type: object
+        required: [orderId, carrier, trackingNumber]
+        properties:
+          orderId:
+            type: string
+          carrier:
+            type: string
+            enum: [dhl, ups, fedex]
+          trackingNumber:
+            type: string
+          shippedAt:
+            type: string
+            format: date-time
+  schemas:
+    Order:
+      type: object
+      required: [orderId, customerId, items, total]
+      properties:
+        orderId:
+          type: string
+          description: Unique order identifier
+        customerId:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            required: [sku, quantity, unitPrice]
+            properties:
+              sku:
+                type: string
+              quantity:
+                type: integer
+                minimum: 1
+              unitPrice:
+                type: number
+                minimum: 0
+        total:
+          type: number
+          minimum: 0

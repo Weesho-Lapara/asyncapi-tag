@@ -34,10 +34,12 @@ dependencies = ["Markdown>=3.4"]
 
 [project.optional-dependencies]
 mkdocs = ["mkdocs>=1.5"]
-test = ["mkdocs>=1.5", "pytest>=7"]
+test = ["mkdocs>=1.5", "pytest>=7", "certifi"]
+docs = ["mkdocs>=1.5", "mkdocs-material>=9.5"]
 
 [project.urls]
 Homepage = "https://github.com/Weesho-Lapara/asyncapi-tag"
+Documentation = "https://weesho-lapara.github.io/asyncapi-tag/"
 Changelog = "https://github.com/Weesho-Lapara/asyncapi-tag/blob/main/CHANGELOG.md"
 Issues = "https://github.com/Weesho-Lapara/asyncapi-tag/issues"
 

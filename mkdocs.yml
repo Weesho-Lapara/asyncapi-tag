@@ -1,0 +1,67 @@
+# Documentation site for asyncapi-tag. It is built with the plugin itself, so a
+# strict build of this site is an end-to-end test. Both the MkDocs plugin and
+# the bare Markdown extension are listed so the same file builds under MkDocs
+# and under Zensical (which ignores `plugins` but honours `markdown_extensions`).
+site_name: asyncapi-tag
+site_description: Render AsyncAPI documents in Markdown and MkDocs with a single <asyncapi-tag> element.
+site_url: https://weesho-lapara.github.io/asyncapi-tag/
+repo_url: https://github.com/Weesho-Lapara/asyncapi-tag
+repo_name: Weesho-Lapara/asyncapi-tag
+edit_uri: edit/main/docs/
+copyright: MIT licensed. Made by Weesho Lapara.
+
+nav:
+  - Overview: index.md
+  - Live demo: demo.md
+  - Attributes: attributes.md
+  - Configuration: configuration.md
+  - Other tools: other-tools.md
+  - Migration: migration.md
+  - Changelog: changelog.md
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+plugins:
+  - search
+  - asyncapi-tag
+
+markdown_extensions:
+  - asyncapi_tag
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.snippets:
+      check_paths: true
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Weesho-Lapara/asyncapi-tag
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/asyncapi-tag/
