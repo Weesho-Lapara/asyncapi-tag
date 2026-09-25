@@ -79,11 +79,13 @@ pip install zensical && zensical build             # same site under Zensical
 
 ## Releasing
 
-1. Update `__version__` in `src/asyncapi_tag/__init__.py` and `CHANGELOG.md`.
-2. Merge to `main`, then create a GitHub release with tag `v<version>`.
-3. `publish.yml` builds and publishes with PyPI trusted publishing. One-time setup per project on
-   PyPI: add a GitHub publisher (repo `Weesho-Lapara/asyncapi-tag`, workflow
-   `publish.yml`, environment `pypi`). The shim job only runs for the `v1.0.0` tag.
+1. Update `__version__` in `src/asyncapi_tag/__init__.py` and turn the `## Unreleased` section of
+   `CHANGELOG.md` into `## asyncapi-tag <version> (<date>)`. Commit and push to `main`.
+2. Tag and push: `git tag v<version> && git push origin v<version>`.
+3. `publish.yml` builds, publishes to PyPI with trusted publishing (both projects have a GitHub
+   publisher configured: repo `Weesho-Lapara/asyncapi-tag`, workflow `publish.yml`, environment
+   `pypi`) and then creates the GitHub release with that version's changelog section as notes.
+   The shim job only runs for the `v1.0.0` tag.
 4. After a release, close any issues it resolves with a note pointing at the release.
    The repository was renamed from `mkdocs-asyncapi-tag-plugin` to `asyncapi-tag`; GitHub
    redirects the old URL.

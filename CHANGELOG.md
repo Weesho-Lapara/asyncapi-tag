@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## asyncapi-tag 1.1.0 (2026-09-25)
 
 ### Changed
 - `sidebar` now defaults to `false`, matching the viewer. Inside a documentation column the viewer

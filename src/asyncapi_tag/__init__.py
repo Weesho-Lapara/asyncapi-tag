@@ -14,7 +14,7 @@ from asyncapi_tag.assets import (
 )
 from asyncapi_tag.extension import AsyncAPITagExtension, makeExtension
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 __all__ = [
     "AsyncAPITagExtension",

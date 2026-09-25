@@ -1,14 +1,17 @@
-# Publishes to PyPI with trusted publishing (no API tokens). One-time setup on
-# PyPI for EACH project (asyncapi-tag and mkdocs-asyncapi-tag-plugin):
-#   Manage project -> Publishing -> Add a GitHub publisher
-#   owner: Weesho-Lapara, repository: asyncapi-tag,
-#   workflow: publish.yml, environment: pypi
-# Then create a GitHub release with tag v<version> to trigger this workflow.
+# Publishes to PyPI with trusted publishing (no API tokens) whenever a version
+# tag is pushed, then creates the GitHub release with the matching CHANGELOG
+# section as notes:
+#   git tag v1.2.3 && git push origin v1.2.3
+#
+# One-time setup on PyPI for EACH project (asyncapi-tag and
+# mkdocs-asyncapi-tag-plugin): Manage project -> Publishing -> Add a GitHub
+# publisher with owner Weesho-Lapara, repository asyncapi-tag, workflow
+# publish.yml, environment pypi. (Already done for both.)
 name: Publish
 
 on:
-  release:
-    types: [published]
+  push:
+    tags: ["v*"]
 
 permissions:
   contents: read
@@ -44,6 +47,35 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/asyncapi-tag
+
+  github-release:
+    needs: publish-asyncapi-tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: distributions
+          path: dist/
+      - name: Extract this version's changelog section
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            /^## / { on = index($0, "asyncapi-tag " v " ") == 4 }
+            on && !/^## / { print }
+          ' CHANGELOG.md > notes.md
+          if ! grep -q . notes.md; then
+            echo "No CHANGELOG.md section for asyncapi-tag $version" >&2; exit 1
+          fi
+          { echo "Install: \`pip install asyncapi-tag==$version\`"; echo; cat notes.md; } > release-notes.md
+          cat release-notes.md
+      - uses: softprops/action-gh-release@v3
+        with:
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: dist/asyncapi-tag/*
 
   publish-legacy-shim:
     # Publishes the deprecated shim only for the 1.0.0 release; later releases
