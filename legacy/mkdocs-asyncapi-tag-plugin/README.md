@@ -21,5 +21,5 @@ pip uninstall mkdocs-asyncapi-tag-plugin
 pip install asyncapi-tag
 ```
 
-See the [asyncapi-tag README](https://github.com/Weesho-Lapara/mkdocs-asyncapi-tag-plugin#readme)
+See the [asyncapi-tag README](https://github.com/Weesho-Lapara/asyncapi-tag#readme)
 for the full attribute reference and migration notes.

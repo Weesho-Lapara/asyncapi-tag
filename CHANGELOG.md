@@ -1,6 +1,6 @@
 # Changelog
 
-## asyncapi-tag 1.0.0 (unreleased)
+## asyncapi-tag 1.0.0 (2026-09-25)
 
 First release under the new name. The project was previously published as
 `mkdocs-asyncapi-tag-plugin`; that package is now a deprecated shim depending on this one.
@@ -24,9 +24,9 @@ First release under the new name. The project was previously published as
 - `src` is resolved relative to the page like MkDocs links, or relative to `docs_dir` when it starts
   with `/`. Earlier versions emitted the build machine's absolute filesystem path.
 - YAML documents work: the document is passed to the viewer as text and parsed there.
-  Supersedes [#1](https://github.com/Weesho-Lapara/mkdocs-asyncapi-tag-plugin/pull/1)
+  Supersedes [#1](https://github.com/Weesho-Lapara/asyncapi-tag/pull/1)
   (thanks @mistermelphin) and fixes the JavaScript syntax error in 0.9.0 reported in
-  [#2](https://github.com/Weesho-Lapara/mkdocs-asyncapi-tag-plugin/issues/2) (thanks @busches).
+  [#2](https://github.com/Weesho-Lapara/asyncapi-tag/issues/2) (thanks @busches).
 - String and enum attributes (`publishLabel`, `showServers`, `parserOptions`, ...) are passed
   through instead of being turned into booleans. Added the AsyncAPI v3 labels
   (`sendLabel`, `receiveLabel`, `requestLabel`, `replyLabel`), `showMessageExamples`,
@@ -39,7 +39,7 @@ First release under the new name. The project was previously published as
 ### Deprecated
 - Plugin option `asyncapi_file` is ignored with a warning; MkDocs copies non-Markdown files itself.
 
-## mkdocs-asyncapi-tag-plugin 1.0.0 (unreleased)
+## mkdocs-asyncapi-tag-plugin 1.0.0 (2026-09-25)
 
 - Deprecated shim: contains no code and depends on `asyncapi-tag>=1.0.0,<2`.
 

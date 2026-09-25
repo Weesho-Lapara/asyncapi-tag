@@ -61,7 +61,8 @@ python scripts/update_viewer.py [version]
 1. Update `__version__` in `src/asyncapi_tag/__init__.py` and `CHANGELOG.md`.
 2. Merge to `main`, then create a GitHub release with tag `v<version>`.
 3. `publish.yml` builds and publishes with PyPI trusted publishing. One-time setup per project on
-   PyPI: add a GitHub publisher (repo `Weesho-Lapara/mkdocs-asyncapi-tag-plugin`, workflow
+   PyPI: add a GitHub publisher (repo `Weesho-Lapara/asyncapi-tag`, workflow
    `publish.yml`, environment `pypi`). The shim job only runs for the `v1.0.0` tag.
-4. After 1.0.0 is on PyPI, close #1 and #2 with a note pointing at the release, and consider
-   renaming the GitHub repository to `asyncapi-tag` (GitHub redirects the old URL).
+4. After a release, close any issues it resolves with a note pointing at the release.
+   The repository was renamed from `mkdocs-asyncapi-tag-plugin` to `asyncapi-tag`; GitHub
+   redirects the old URL.

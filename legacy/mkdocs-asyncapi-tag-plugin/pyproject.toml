@@ -22,7 +22,7 @@ classifiers = [
 dependencies = ["asyncapi-tag[mkdocs]>=1.0.0,<2"]
 
 [project.urls]
-Homepage = "https://github.com/Weesho-Lapara/mkdocs-asyncapi-tag-plugin"
+Homepage = "https://github.com/Weesho-Lapara/asyncapi-tag"
 Replacement = "https://pypi.org/project/asyncapi-tag/"
 
 # Deliberately no mkdocs.plugins entry point: the 'asyncapi-tag' plugin id is

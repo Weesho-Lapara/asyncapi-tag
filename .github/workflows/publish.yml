@@ -1,7 +1,7 @@
 # Publishes to PyPI with trusted publishing (no API tokens). One-time setup on
 # PyPI for EACH project (asyncapi-tag and mkdocs-asyncapi-tag-plugin):
 #   Manage project -> Publishing -> Add a GitHub publisher
-#   owner: Weesho-Lapara, repository: mkdocs-asyncapi-tag-plugin,
+#   owner: Weesho-Lapara, repository: asyncapi-tag,
 #   workflow: publish.yml, environment: pypi
 # Then create a GitHub release with tag v<version> to trigger this workflow.
 name: Publish
