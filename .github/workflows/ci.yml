@@ -32,6 +32,28 @@ jobs:
       - name: Test
         run: python -m pytest
 
+  docs:
+    name: Docs site (strict build, MkDocs and Zensical)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[docs]" zensical
+      - name: MkDocs strict build
+        run: mkdocs build --strict --site-dir site-mkdocs
+      - name: Zensical build
+        run: zensical build
+      - name: Both outputs contain the rendered demo
+        run: |
+          for site in site-mkdocs site; do
+            test "$(grep -o 'data-asyncapi-src="[^"]*"' "$site/demo/index.html" | wc -l)" -ge 3 || { echo "no viewer markup in $site"; exit 1; }
+            grep -q 'integrity="sha384-' "$site/demo/index.html" || { echo "no SRI attributes in $site"; exit 1; }
+          done
+
   package:
     name: Build distributions
     runs-on: ubuntu-latest
