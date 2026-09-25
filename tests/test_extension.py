@@ -185,6 +185,16 @@ def test_runner_javascript_is_valid():
     node_check(assets.RUNNER_JS)
 
 
+def test_runner_renders_containers_that_appear_after_the_script():
+    # The loader is emitted right after the first container, so containers further down the
+    # page do not exist yet when the runner first executes. It must run again when the DOM is
+    # complete, and subscribe to Material's document$ then (the theme bundle loads later too).
+    assert 'document.addEventListener("DOMContentLoaded"' in assets.RUNNER_JS
+    assert "document$" in assets.RUNNER_JS
+    assert "__asyncapiTagSubscribed" in assets.RUNNER_JS
+    assert "</script>" not in assets.RUNNER_JS
+
+
 @pytest.mark.parametrize("value", [assets.VIEWER_JS_INTEGRITY, assets.VIEWER_CSS_INTEGRITY])
 def test_integrity_hashes_look_like_sri(value):
     assert re.fullmatch(r"sha384-[A-Za-z0-9+/]{64}", value)

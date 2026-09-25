@@ -28,6 +28,7 @@ RUNNER_JS = """\
   "use strict";
   var SELECTOR = ".asyncapi-tag[data-asyncapi-src]";
   function showError(el, message) {
+    el.setAttribute("data-asyncapi-state", "error");
     el.textContent = "";
     var p = document.createElement("p");
     p.className = "asyncapi-tag-error";
@@ -67,10 +68,21 @@ RUNNER_JS = """\
     var nodes = document.querySelectorAll(SELECTOR);
     for (var i = 0; i < nodes.length; i++) { render(nodes[i]); }
   }
+  function subscribe() {
+    /* Material for MkDocs instant navigation swaps page content without a reload. */
+    if (window.__asyncapiTagSubscribed) { return; }
+    if (window.document$ && typeof window.document$.subscribe === "function") {
+      window.__asyncapiTagSubscribed = true;
+      window.document$.subscribe(renderAll);
+    }
+  }
+  /* This script sits right after the first container, so on a full page load the
+     later containers and the theme's own scripts are not parsed yet. Render what is
+     there now, then again once the document is complete. */
   renderAll();
-  /* Material for MkDocs instant navigation swaps page content without a reload. */
-  if (window.document$ && typeof window.document$.subscribe === "function") {
-    window.document$.subscribe(renderAll);
+  subscribe();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { renderAll(); subscribe(); });
   }
 })();
 """
