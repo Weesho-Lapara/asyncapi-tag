@@ -27,6 +27,7 @@ docs/ + mkdocs.yml                   documentation site, built with the plugin (
 .github/workflows/ci.yml             tests on Python 3.9-3.14, strict docs build under MkDocs and
                                      Zensical, builds both distributions
 .github/workflows/docs.yml           deploys the docs site to GitHub Pages on push to main
+                                     (Pages source must be set to "GitHub Actions" once, in Settings)
 .github/workflows/publish.yml        PyPI trusted publishing on GitHub release
 .github/workflows/update-viewer.yml  weekly viewer re-pin, tests, opens a PR
 .github/workflows/compat.yml         weekly informational run against MkDocs 2.0 pre-release and
