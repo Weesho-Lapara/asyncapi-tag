@@ -57,3 +57,8 @@ instead of shipping a blank viewer.
 - [Configuration](configuration.md) covers plugin options, self-hosting and Content Security Policy.
 - [Other tools](other-tools.md) covers Zensical, plain Python-Markdown and Material's instant navigation.
 - [Migration](migration.md) is for users of the old `mkdocs-asyncapi-tag-plugin` package.
+
+---
+
+Built and maintained by [Weesho Lapara](https://weesholapara.com). Found it useful?
+[Buy me a coffee](https://github.com/Weesho-Lapara/asyncapi-tag?sponsor=1).

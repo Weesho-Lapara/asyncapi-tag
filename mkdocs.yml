@@ -8,7 +8,7 @@ site_url: https://weesho-lapara.github.io/asyncapi-tag/
 repo_url: https://github.com/Weesho-Lapara/asyncapi-tag
 repo_name: Weesho-Lapara/asyncapi-tag
 edit_uri: edit/main/docs/
-copyright: MIT licensed. Made by Weesho Lapara.
+copyright: MIT licensed. Made by <a href="https://weesholapara.com" target="_blank" rel="noopener">Weesho Lapara</a>.
 
 nav:
   - Overview: index.md
@@ -61,6 +61,9 @@ extra_css:
 
 extra:
   social:
+    - icon: material/web
+      link: https://weesholapara.com
+      name: weesholapara.com
     - icon: fontawesome/brands/github
       link: https://github.com/Weesho-Lapara/asyncapi-tag
     - icon: fontawesome/brands/python
