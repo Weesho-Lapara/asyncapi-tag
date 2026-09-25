@@ -1,73 +1,141 @@
 # Roadmap and evaluations
 
-Living notes on where the project could go next and what has been tried. Conventions and the
-release procedure live in [AGENTS.md](AGENTS.md); this file is about direction. Dates are when the
-note was written; re-verify anything time-sensitive.
+Living notes on direction. Conventions and the release procedure live in [AGENTS.md](AGENTS.md).
+Dates are when a note was written; re-verify anything time-sensitive.
 
-## Status of the original roadmap (2026-09-25)
+## Top priority: our own viewer (2.0)
 
-Near term, done:
+Decision (2026-09-25): replace the wrapped `@asyncapi/react-component` with a viewer of our own, a
+Lit web component, following [specs/viewer-spec.md](specs/viewer-spec.md). The Python side keeps its
+architecture (extension first, MkDocs plugin as a thin layer); only the renderer and asset model change.
 
-- Weekly viewer bump PRs (`update-viewer.yml`).
-- Compatibility early warning (`compat.yml`); Zensical promoted to a required CI check.
-- Documentation site on GitHub Pages, built with the plugin. It surfaced three real bugs on the
-  first day (only the first viewer rendering, overflow into the table of contents with floating
-  sidebar controls, header painted over), so keep treating it as the end-to-end test.
-- Fenced-block syntax (```` ```asyncapi ````).
+Why: a bundle around a tenth of today's 3 MB, no third-party CDN, CSP-clean, container-native
+layout instead of CSS patches, dark mode, full control of the design. Cost: we maintain spec
+coverage ourselves; see "Risks" below.
 
-Not started, in suggested order:
+### Amendments to the spec
 
-1. **Bundled viewer option.** Ship the standalone bundle and stylesheet inside the wheel and add an
-   `assets: bundled` plugin option, so air-gapped builds and strict Content Security Policy sites
-   work with zero configuration. Everything needed exists: the resolver handles relative asset paths
-   and the loader omits integrity attributes for local files. Also the right answer for users whose
-   content blockers block `unpkg.com`.
-2. **Build-time validation.** A lightweight check that the referenced file parses as JSON or YAML and
-   has an `asyncapi` version key, reported through the MkDocs logger so strict builds fail early.
-   The real AsyncAPI parser is Node only, so full validation would need the Node toolchain.
-3. **Config-level defaults.** Let `mkdocs.yml` set default attributes (`sidebar`, labels) so pages
-   don't repeat them; per-tag attributes override.
-4. **Server-side rendering (opt-in).** Generate static HTML at build time via the AsyncAPI HTML
-   template so pages show content without JavaScript and search can index operations. Introduces a
-   Node dependency, so keep it optional.
-5. **Material polish.** Dark mode by mapping the viewer's CSS variables onto Material's palette, and a
-   Playwright test that exercises `navigation.instant` in a real browser.
-6. **Other ecosystems.** Docusaurus is evaluated below; Sphinx would follow the same pattern
-   (directive plus the shared runner and pinning).
+These override the imported spec where they differ:
+
+1. **Option naming.** Do not redefine `viewer_css`. Add `viewer_theme` for the theme file and keep
+   `viewer_css` as a deprecated alias that warns.
+2. **Asset default.** The wheel ships the built viewer, so the default is serve-from-the-site (copied
+   into the build like any static file). CDN URLs remain an option, not the default.
+3. **Generated files.** `options.schema.json` and the built viewer are never committed. CI and local
+   test runs execute the Node build first (`npm --prefix viewer run build`), then the Python tests.
+   A `make`/script target wraps this so `pytest` alone tells you what to run if the files are missing.
+4. **Escape hatch.** 2.0 keeps the 1.x renderer selectable for one major version
+   (`renderer: legacy`), so a user hit by a coverage gap can flip back without downgrading.
+5. **Coverage gate.** Phase 1 is not done until the normaliser has been run over the AsyncAPI
+   example corpus (asyncapi/spec repository examples plus our fixtures) and the report of what lands
+   in `problems[]` has been reviewed.
+6. **Names.** Element `<asyncapi-viewer>`, npm package `asyncapi-viewer`, PyPI `asyncapi-viewer`
+   (see "Rename" below). The spec's `<asyncapi-tag-viewer>` is superseded.
+
+### Work plan in session-sized chunks
+
+Each chunk is 1 to 3 hours, has its own acceptance check, and ends in a green CI run on `main`
+(feature flags or unused code are fine between chunks). Do them in order unless noted.
+
+**Phase 0: groundwork**
+
+| # | Chunk | Depends on | Done when |
+|---|---|---|---|
+| 0.1 | Rename to `asyncapi-viewer` (repo, packages, docs, shim for the old name). See "Rename". | | Old configs still work; new name on PyPI |
+| 0.2 | `viewer/` skeleton: Vite library mode, Lit, TypeScript, Vitest, ESLint. An empty `<asyncapi-viewer>` that renders its `src` attribute as text. `demo/index.html`. CI job: Node build, then Python tests. | 0.1 | `npm run build` yields one ESM and one IIFE file; CI green |
+
+**Phase 1: the viewer**
+
+| # | Chunk | Depends on | Done when |
+|---|---|---|---|
+| 1.1 | `options.schema.json` and `options.ts`: every option, kebab-case and lowercased forms, boolean rules identical to Python, one `console.warn` per bad value. | 0.2 | Vitest covers every option and the Python boolean table |
+| 1.2 | Loader: fetch as text, JSON-then-YAML parse, error model naming URL and reason. | 0.2 | Vitest with good, malformed and missing documents |
+| 1.3 | `$ref` resolver: internal, relative file, absolute URL, per-document cache, cycle detection producing a "Circular reference" leaf. | 1.2 | Fixtures: external ref, circular ref, six-level nesting |
+| 1.4 | Model types and the v3 normaliser: info, servers, channels, operations, messages, reply, tags, external docs. | 1.3 | Snapshot of `orders-v3.yaml` plus request/reply and multi-message fixtures |
+| 1.5 | v2 normaliser: direction mapping, labels, headings, location hints, parameters with schema, message `oneOf`. | 1.4 | Snapshot of `accounts-v2.json` plus parameter and oneOf fixtures |
+| 1.6 | Schema tree builder: required from parent arrays, type plus format, unions, `allOf` merge, `oneOf`/`anyOf` variants, constraints, enum/const/default, `RawSchema` for Avro/Protobuf. | 1.4 | Fixtures for each rule; Avro payload renders as raw block in the model |
+| 1.7 | Traits (`applyTraits`), bindings (all scopes), security, `problems[]` for skipped or suspicious input. | 1.5, 1.6 | Trait and missing-channel fixtures; problems listed |
+| 1.8a | Coverage gate, part 1: script that pulls the AsyncAPI example corpus, runs the normaliser, writes a report of problems per document. | 1.7 | Report checked into `viewer/test/coverage/REPORT.md` |
+| 1.8b | Coverage gate, part 2: fix the gaps the report shows (repeat until the residue is acceptable and documented). | 1.8a | Reviewed report; residue explained |
+| 1.9 | UI foundation: tokens, theme resolution (`auto`, Material scheme, `html[data-theme]`, media query, MutationObserver), header (logo slot rule, title, pills), Info section. | 1.1, 1.4 | Demo shows header and Info for both docs in light and dark |
+| 1.10 | Operation block, part 1: badge, location hint, heading, channel row with parameter links, summary and description via markdown-it (`html: false`). | 1.9 | Both docs render their operations |
+| 1.11 | Payload tree: rows, guide lines, path line from level four, expand/collapse with `aria-expanded`, toolbar, default depth, `oneOf` segmented control, constraints line. | 1.6, 1.10 | Six-level and oneOf fixtures render; keyboard operable |
+| 1.12 | Example panel: Payload/Headers tabs, copy with live region, line numbers, multi-example select, collapsed mode, correlation id. | 1.10 | Examples from fixtures render; `messageExamples=false` collapses |
+| 1.13 | Operation block, part 2: parameters table, multi-message tabs, headers tree, reply block, bindings chips, security list. | 1.11, 1.12 | Request/reply and bindings fixtures render |
+| 1.14 | Remaining sections: Servers (cards, variables), Messages, Schemas (collapsible), Problems; server selector with filtering; Download spec. | 1.13 | Selector filters operations; download returns original bytes |
+| 1.15 | Sidebar and drawer: grouping modes, search, current-item highlight via IntersectionObserver, drawer with focus trap, Escape, `inert`, focus return. | 1.14 | Keyboard walkthrough passes; grouping fixtures |
+| 1.16 | Container breakpoints and spacing (1100, 700), header reflow, phone tweaks; anchors `#<id>--<section>--<item>`; multiple viewers per page; late insertion. | 1.15 | Three widths look right; two viewers on one page independent |
+| 1.17 | Accessibility and CSP: axe-core in Playwright, contrast checks, badge text colour rule, CSP test page under `script-src 'self'; style-src 'self'` in Chromium, Firefox, WebKit (write down the result). | 1.16 | No serious/critical axe issues; CSP page renders in all three |
+| 1.18 | Playwright screenshot suite (1280/820/380 × light/dark × two docs), bundle size report, final demo page. | 1.17 | Suite green; gzipped IIFE size recorded in `viewer/README.md` |
+
+**Phase 2: Python-Markdown extension**
+
+| # | Chunk | Depends on | Done when |
+|---|---|---|---|
+| 2.1 | Emit `<asyncapi-viewer ...>` (kebab-case, escaped), validate against the copied schema, deprecations (`schemaID`, `embed_css`, unsupported `parserOptions`), `renderer: legacy` switch keeping the 1.x path. | 1.1 | Existing tests pass with minimal updates; new tests for every option |
+| 2.2 | Assets: built files in the wheel, `copy_assets(dest)`, serve-from-site default, `viewer_theme` plus deprecated `viewer_css`, module vs IIFE decision written down, `RUNNER_JS` deprecation shim. | 1.18, 2.1 | Wheel contains viewer; MkDocs and Zensical builds serve it locally |
+| 2.3 | `search_fallback`: hidden list of headings/addresses/messages for local files only (PyYAML optional dependency), removed by the viewer on render. | 2.1 | Tests on and off; remote `src` never fetched at build |
+| 2.4 | Playwright test: a page produced by plain Python-Markdown renders both example documents. | 2.2 | Test in CI |
+
+**Phase 3: MkDocs plugin, Zensical, docs, release**
+
+| # | Chunk | Depends on | Done when |
+|---|---|---|---|
+| 3.1 | Plugin: local `src` existence check through the MkDocs logger, option pass-through, drop `document$` reliance; Playwright instant-navigation test on the built docs site. | 2.2 | `--strict` fails on a missing local file; instant nav test green |
+| 3.2 | Docs site: demo on the new viewer with a "Customise" example, attributes (`theme`, `themeToggle`, deprecations), configuration and CSP rewrite, new Customising page, migration guide, changelog. | 3.1 | Strict build green under MkDocs and Zensical |
+| 3.3 | Release pipeline: one version for npm and PyPI, Node build then wheel, SRI generation for the CDN option, retire `update-viewer.yml`. Publish 2.0.0. | 3.2 | Tag push publishes both; 2.0.0 installable |
+| 3.4 | Follow-up: close issues, announce, watch for coverage reports for two weeks before removing anything legacy. | 3.3 | |
+
+Estimate: about 35 to 45 hours of implementation across roughly 30 sessions; Phase 1 is three
+quarters of it, and 1.8b is the chunk most likely to grow.
+
+### Risks
+
+- **Spec coverage.** The upstream component leans on the official parser for the long tail of
+  real documents. Our normaliser will be right on the examples quickly and then meet unusual specs.
+  Mitigations: the coverage gate (amendment 5), the Problems panel so nothing fails silently, and
+  the legacy renderer switch (amendment 4).
+- **Spec evolution.** CSS and the theme file are insulated: they style the internal model, not spec
+  fields. Only the normaliser knows spec field names, so a new AsyncAPI minor version is a normaliser
+  change and a release; a future 4.0 is a larger job, as it will be for everyone. Bindings render as
+  generic chips, so new binding fields appear without code changes.
+- **Maintenance surface.** A Node toolchain, Playwright in three browsers and a two-registry release
+  join the repo. Keep chunks small and CI green so the surface stays manageable.
+
+## Rename to asyncapi-viewer (2026-09-25, in progress)
+
+The fenced-block syntax made "tag" a misnomer; the new viewer makes the name wrong twice. Target
+names, all checked free on 2026-09-25: PyPI `asyncapi-viewer`, npm `asyncapi-viewer`, GitHub
+`Weesho-Lapara/asyncapi-viewer`, import package `asyncapi_viewer`, MkDocs plugin id
+`asyncapi-viewer`, Markdown extension `asyncapi_viewer`, authoring element `<asyncapi-viewer>`.
+
+Compatibility kept for one major version: plugin id `asyncapi-tag`, extension name `asyncapi_tag`,
+element `<asyncapi-tag>`, and a PyPI shim `asyncapi-tag` depending on `asyncapi-viewer`. The fence
+language `asyncapi` does not change. Steps are in the session log below and, once done, in AGENTS.md.
+
+## Later ideas (after 2.0)
+
+- Build-time validation of local documents through the normaliser (Node) or a light JSON/YAML check.
+- Config-level default attributes in `mkdocs.yml`.
+- Server-side rendering of the model to static HTML for no-JavaScript readers and search indexing.
+- Sphinx adapter; Docusaurus adapter (evaluation below).
 
 ## Docusaurus support (evaluated 2026-09-25, parked)
 
 Decision: not pursued for now. A working prototype exists under [prototypes/docusaurus/](prototypes/docusaurus/).
+Once the new viewer exists as a web component, a Docusaurus adapter shrinks to a remark plugin that
+emits the element; the React wrapper in the prototype becomes unnecessary.
 
 What was learned:
 
 - **Same syntax works.** A ~60-line remark plugin rewrites ```` ```asyncapi ```` fences and
-  `<asyncapi-tag>` elements into an `<AsyncApiTag src options />` JSX node and injects the import,
-  so `.md` and `.mdx` both work with one config line and no swizzling.
+  `<asyncapi-tag>` elements into a JSX node and injects the import, so `.md` and `.mdx` both work.
 - **Do not bundle `@asyncapi/react-component` through webpack.** Its parser depends on Node core
-  modules (`util`, `buffer`, `crypto`) that webpack 5 no longer polyfills; the Docusaurus build fails
-  out of the box. Loading the prebuilt standalone bundle at runtime (same version pin and SRI as the
-  Python package) avoids that and keeps one pinning story. A "bundled" mode would import the
-  prebuilt standalone file instead of the package entry point.
-- **Wrap in `BrowserOnly`.** The viewer must not run during server-side rendering.
-- **Paths are simpler than MkDocs.** Docusaurus serves `static/` at the site root and `useBaseUrl`
-  handles the base path, so site-root-relative `src` values just work. Page-relative paths would need
-  the doc's route, which the remark plugin can read from the vfile if wanted.
-- **Containment CSS is identical.** The eight `EMBED_CSS` rules keep the viewer inside the article
-  column in the Docusaurus theme too.
-
-What shipping would take (about two hours of implementation plus npm account setup):
-
-- `packages/docusaurus/` npm package (`docusaurus-remark-asyncapi-tag` or similar) with the plugin
-  and component as entry points, TypeScript declarations, README.
-- Share the viewer pin: have `scripts/update_viewer.py` rewrite the JS constants too, so the weekly
-  PR bumps both ecosystems.
-- Jest tests mirroring the Python suite (fence, element, nested fence, info-line path, config
-  mapping), and a minimal Docusaurus build in CI as the end-to-end check.
-- Publish job on tag via npm trusted publishing; the package name and the GitHub publisher link must
-  be created on npmjs.com by the maintainer.
-- Gaps in the prototype to close: page-relative `src`, `<asyncapi-tag>` inside a paragraph
-  (mdxJsxTextElement is handled but untested), build-time warnings for unknown options.
+  modules that webpack 5 no longer polyfills; the build fails out of the box. Loading a prebuilt
+  bundle at runtime avoids that. Moot once our own viewer ships without the parser.
+- **Wrap in `BrowserOnly`**; the viewer must not run during server-side rendering.
+- **Paths are simpler than MkDocs**: `static/` is served at the site root and `useBaseUrl` handles
+  the base path.
 
 ## Ecosystem notes
 
@@ -76,10 +144,8 @@ What shipping would take (about two hours of implementation plus npm account set
   Build-time "document not found" warnings are MkDocs-only.
 - **MkDocs 2.0** (`2.0.dev6` on PyPI) removes the plugin system according to the Material team. The
   Markdown-extension design is the hedge; `compat.yml` runs the suite against the pre-release weekly.
-- **The viewer** (`@asyncapi/react-component`) sizes itself with container queries. Below roughly
-  1024px of container width it uses a compact layout: sidebar hidden behind a `position: fixed`
-  toggle, `fixed` overlay sidebar, centre panel that does not shrink below its content, panels at
-  z-index 10-30. `EMBED_CSS` neutralises all of that; re-check the class names on viewer bumps.
-- **Material `navigation.instant`** re-executes content scripts after swapping the page; the runner
-  additionally subscribes to `document$` once per window and re-renders on `DOMContentLoaded`,
-  because on a full load it executes before later containers and the theme bundle exist.
+- **The current viewer** (`@asyncapi/react-component`) sizes itself with container queries. Below
+  roughly 1024px of container width it uses a compact layout with `position: fixed` controls and a
+  non-shrinking centre panel; `EMBED_CSS` neutralises that. Goes away with 2.0.
+- **Material `navigation.instant`** re-executes content scripts after swapping the page; the 1.x
+  runner also subscribes to `document$`. Custom element upgrades make this unnecessary in 2.0.
