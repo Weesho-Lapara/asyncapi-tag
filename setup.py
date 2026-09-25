@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mkdocs-asyncapi-tag-plugin',
-    version='0.8.0',
+    version='0.9.0',
     description='MkDocs plugin to embed AsyncAPI HTML viewer in your markdown file.',
     author='Weesho Lapara',
     author_email='support@weesholapara.com',

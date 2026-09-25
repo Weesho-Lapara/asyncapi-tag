@@ -84,6 +84,7 @@ class AsyncAPIPlugin(BasePlugin):
             
             asyncapi_viewer = f'''
             <div id="asyncapi"></div>
+            <script src="https://unpkg.com/js-yaml@4.0.0/dist/js-yaml.min.js"></script>
             <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
             <script>
 
@@ -97,9 +98,21 @@ class AsyncAPIPlugin(BasePlugin):
                     if (!response.ok) {{
                         throw new Error(`Failed to fetch schema. Status: ${{response.status}}`);
                     }}
-                    return response.json();
-                }}).then(schemaDoc => {{
-                
+                    return response.text();
+                }}).then(schemaText => {{
+                    
+                    let schemaDoc;
+                    // Check if the schema is in JSON or YAML format based on the file extension or content
+                    if (schemaPath.endWith('.yaml') || (schemaPath.endWith('.yml') {{
+                        // Parse YAML to JSON
+                        schemaDoc = jsyaml.load(schemaText);
+                        console.log('YAML schema parsed:', schemaDoc);
+                    }} else {{
+                        // Parse JSON
+                        schemaDoc = JSON.parse(schemaText);
+                        console.log('JSON schema parsed:', schemaDoc);
+                    }}
+
                     console.log('Schema fetched successfully:', schemaDoc);
                     AsyncApiStandalone.render({{
                         schema: schemaDoc,
