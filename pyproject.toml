@@ -34,7 +34,7 @@ dependencies = ["Markdown>=3.4"]
 
 [project.optional-dependencies]
 mkdocs = ["mkdocs>=1.5"]
-test = ["mkdocs>=1.5", "pytest>=7", "certifi"]
+test = ["mkdocs>=1.5", "pytest>=7", "certifi", "pymdown-extensions>=10"]
 docs = ["mkdocs>=1.5", "mkdocs-material>=9.5"]
 
 [project.urls]

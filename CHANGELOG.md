@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Fenced-block syntax: a fence with language `asyncapi` whose body is `key: value` lines using the
+  attribute names (the path may also follow the language). Works with `fenced_code` and
+  `pymdownx.superfences`, needs no configuration, and an `asyncapi` fence nested inside a longer
+  fence stays a code sample.
+
+### Fixed
+- An `<asyncapi-tag>` written inside an inline code span (backticks) was rendered instead of being
+  shown as code.
+
 ## asyncapi-tag 1.1.0 (2026-09-25)
 
 ### Changed

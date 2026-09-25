@@ -1,6 +1,26 @@
 # Attributes
 
-Only `src` is required. Attribute names are case-insensitive. Boolean attributes accept
+Two syntaxes are accepted and take the same names:
+
+=== "Element"
+
+    ```html
+    <asyncapi-tag src="events.yaml" sidebar="false" publishLabel="PUBLISH"></asyncapi-tag>
+    ```
+
+=== "Fenced block"
+
+    ````markdown
+    ```asyncapi
+    src: events.yaml
+    sidebar: false
+    publishLabel: PUBLISH
+    ```
+    ````
+
+In the fenced form each line is `key: value`; quotes around a value are optional, a bare key means
+`true`, `#` starts a comment, and the path may follow the language instead
+(```` ```asyncapi events.yaml ````). Only `src` is required. Attribute names are case-insensitive. Boolean attributes accept
 `true`/`false`, `1`/`0`, `yes`/`no`, `on`/`off`; a bare attribute means `true`.
 
 | Attribute | Values | Default | Effect |
@@ -69,4 +89,6 @@ Unknown attributes and invalid values are reported as warnings and skipped; the 
 attributes still apply. Under MkDocs the warnings go through the MkDocs logger, so
 `mkdocs build --strict` fails on them. A tag without `src` renders a visible error in place.
 
-Tags inside fenced or indented code blocks are left alone, which is how this page shows the syntax.
+Elements inside fenced or indented code blocks and inline code spans are left alone, and an
+`asyncapi` fence nested inside a longer fence (four backticks around three) stays a code sample,
+which is how this page shows the syntax.

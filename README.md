@@ -39,6 +39,16 @@ passed through unchanged.
 <asyncapi-tag src="events.yaml" sidebar="false"></asyncapi-tag>
 ```
 
+Prefer plain Markdown over raw HTML? The same thing as a fenced block, with the attribute names as
+`key: value` lines (the path may also follow the language):
+
+````markdown
+```asyncapi
+src: events.yaml
+sidebar: false
+```
+````
+
 A missing document or an invalid attribute is reported as a MkDocs warning, so `mkdocs build
 --strict` fails instead of shipping a broken page.
 
@@ -105,6 +115,7 @@ Extension options (pass them as `extension_configs={"asyncapi_tag": {...}}`):
 
 ## Attributes
 
+The same names work as element attributes and as `key: value` lines in an `asyncapi` fence.
 Only `src` is required. Attribute names are case-insensitive. Boolean attributes accept
 `true`/`false`, `1`/`0`, `yes`/`no`, `on`/`off`; a bare attribute means `true`.
 
@@ -141,7 +152,8 @@ stylesheet and script and a short runner script. The runner fetches each documen
 to `AsyncApiStandalone.render`, and prints a visible error inside the container if fetching or
 rendering fails. No content from the Markdown source is interpolated into JavaScript.
 
-Tags inside fenced or indented code blocks are left alone, so you can document the syntax.
+Elements inside fenced or indented code blocks and inline code spans are left alone, and an
+`asyncapi` fence nested in a longer fence stays code, so you can document the syntax.
 
 Material for MkDocs users with `navigation.instant` enabled are covered: the runner re-scans the
 page on Material's `document$` event.

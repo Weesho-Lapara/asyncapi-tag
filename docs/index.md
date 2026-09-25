@@ -37,12 +37,21 @@ through unchanged.
 <asyncapi-tag src="events.yaml" sidebar="false"></asyncapi-tag>
 ```
 
+Or, without raw HTML, as a fenced block whose body uses the same names as the attributes:
+
+````markdown title="docs/api/events.md"
+```asyncapi
+src: events.yaml
+sidebar: false
+```
+````
+
 A missing document or an invalid attribute is a MkDocs warning, so `mkdocs build --strict` fails
 instead of shipping a blank viewer.
 
 ## What you get
 
-- **One element, any document.** JSON or YAML, AsyncAPI 2.x or 3.x, local file or URL.
+- **One element or one fence, any document.** JSON or YAML, AsyncAPI 2.x or 3.x, local file or URL.
 - **Rendered in place.** The viewer appears where you put the tag, and every tag on a page renders.
 - **Pinned and verified assets.** The viewer script and stylesheet are loaded from a fixed version
   with `integrity` hashes. Self-host them with two config lines. See [Configuration](configuration.md).

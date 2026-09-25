@@ -56,8 +56,10 @@ pip install zensical && zensical build             # same site under Zensical
   `CHANGELOG.md`.
 - `url_resolver` and `warn` extension options must have non-`None`, non-bool defaults:
   Python-Markdown coerces `None`-default config values with `parseBoolValue`.
-- The preprocessor runs at priority 22: after `fenced_code` (25) stashes fences, before
-  `html_block` (20). Indented code is skipped by checking the line's leading whitespace.
+- The preprocessor runs at priority 26, before `fenced_code`/`superfences` (25) stash fences, and
+  tracks fences itself: a top-level ```` ```asyncapi ```` fence becomes a viewer, any other fence is
+  passed through untouched (so tags inside it stay code), and tags in indented code or inline code
+  spans are skipped. Both syntaxes share `_block()` (numbering, loader emission).
 - `show.sidebar` defaults to off (the viewer's own default); the other `show.*` flags and
   `expand.messageExamples` default to on. Changing defaults is a breaking change.
 - `assets.EMBED_CSS` keeps the viewer inside its container: the component uses container queries

@@ -1,15 +1,33 @@
-"""Python-Markdown extension that turns ``<asyncapi-tag>`` into an AsyncAPI viewer.
+"""Python-Markdown extension that renders AsyncAPI documents from Markdown.
+
+Two syntaxes are recognised:
+
+* an HTML-like element, self-closing or paired::
+
+      <asyncapi-tag src="events.yaml" sidebar="false"></asyncapi-tag>
+
+* a fenced block with the language ``asyncapi``, whose body is ``key: value``
+  lines using the same names as the element's attributes (the path may also be
+  given right after the language)::
+
+      ```asyncapi
+      src: events.yaml
+      sidebar: false
+      ```
 
 Usage outside MkDocs::
 
     import markdown
     html = markdown.markdown(text, extensions=["asyncapi_tag"])
 
-The extension runs as a preprocessor: every ``<asyncapi-tag ...>`` (self-closing
-or paired) that is not inside a code block is replaced by a container ``<div>``
-carrying the document URL and the viewer configuration as data attributes. The
-first tag on a page also emits the viewer's stylesheet, script and a small
-runner script (see :mod:`asyncapi_tag.assets`).
+The extension runs as a single preprocessor before fenced code is stashed. It
+walks the document line by line, tracking fences itself, so ``asyncapi``
+fences are recognised only at the top level (a fence nested inside a longer
+fence stays code) and elements inside fenced blocks, indented code and inline
+code spans are left alone. Each match becomes a container ``<div>`` carrying
+the document URL and the viewer configuration as data attributes. The first
+match on a page also emits the viewer's stylesheet, script and a small runner
+script (see :mod:`asyncapi_tag.assets`).
 """
 
 from __future__ import annotations
@@ -37,6 +55,11 @@ ATTR_RE = re.compile(
     r"""(?P<name>[A-Za-z_:][-A-Za-z0-9_:.]*)"""
     r"""(?:\s*=\s*(?:"(?P<dq>[^"]*)"|'(?P<sq>[^']*)'|(?P<uq>[^\s"'=<>`]+)))?"""
 )
+
+FENCE_OPEN_RE = re.compile(r"^ {0,3}(?P<fence>`{3,}|~{3,})[ \t]*(?P<info>[^`]*)$")
+# A run of backticks, its content, and the same run again: an inline code span.
+CODE_SPAN_RE = re.compile(r"(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)", re.S)
+FENCE_LANG = "asyncapi"
 
 # ``show.sidebar`` follows the viewer's own default (off): inside a documentation
 # column the viewer uses its compact layout, where the sidebar hides behind a
@@ -167,6 +190,39 @@ def build_viewer_config(
     return config
 
 
+def parse_fence_body(
+    lines: List[str], info_arg: str = "", warn: WarnFn = _default_warn
+) -> Dict[str, Optional[str]]:
+    """Parse the body of an ``asyncapi`` fence into the same shape as tag attributes.
+
+    Each non-empty line is ``key: value`` (quotes around the value are optional
+    and stripped); a line with a bare key means ``true``; ``#`` starts a comment.
+    ``info_arg`` is anything after the language on the opening fence and is
+    taken as ``src``.
+    """
+    attrs: Dict[str, Optional[str]] = {}
+    src = info_arg.strip().strip("\"'")
+    if src:
+        attrs["src"] = src
+    for raw in lines:
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        key, sep, value = line.partition(":")
+        key = key.strip()
+        if not key or " " in key or "\t" in key:
+            warn(f"```{FENCE_LANG} block: cannot parse line '{line}'; expected 'key: value'.")
+            continue
+        if not sep:
+            attrs[key.lower()] = None  # bare key, treated as true
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        attrs[key.lower()] = value
+    return attrs
+
+
 class AsyncAPITagPreprocessor(Preprocessor):
     def __init__(self, md: Markdown, extension: "AsyncAPITagExtension") -> None:
         super().__init__(md)
@@ -189,11 +245,11 @@ class AsyncAPITagPreprocessor(Preprocessor):
         container_id = attrs.get("id") or f"{assets.CONTAINER_CLASS}-{self.counter}"
         src = attrs.get("src")
         if not src:
-            self._warn("<asyncapi-tag>: missing required 'src' attribute; nothing was rendered.")
+            self._warn("asyncapi-tag: missing required 'src'; nothing was rendered.")
             return (
                 f'<div class="{assets.CONTAINER_CLASS} {assets.CONTAINER_CLASS}-error" '
                 f'id="{html.escape(container_id, quote=True)}">'
-                "<p>AsyncAPI viewer: the &lt;asyncapi-tag&gt; is missing its src attribute.</p></div>"
+                "<p>AsyncAPI viewer: no document given (missing src).</p></div>"
             )
         config = build_viewer_config(attrs, self._warn)
         config.setdefault("schemaID", container_id)
@@ -213,25 +269,67 @@ class AsyncAPITagPreprocessor(Preprocessor):
             embed_css=cfg("embed_css"),
         )
 
-    # -- Preprocessor API ----------------------------------------------------
-    def run(self, lines: List[str]) -> List[str]:
-        text = "\n".join(lines)
+    def _block(self, attrs: Dict[str, Optional[str]]) -> str:
+        """Container (plus the loader for the first one on the page) as a stash placeholder."""
+        block = self._container(attrs)
+        if self.extension.getConfig("load_assets") and not self.assets_emitted:
+            self.assets_emitted = True
+            block += "\n" + self._loader()
+        return self.md.htmlStash.store(block)
+
+    def _replace_tags(self, text: str) -> str:
+        """Replace <asyncapi-tag> elements in prose, skipping indented code and code spans."""
         if "<asyncapi-tag" not in text.lower():
-            return lines
+            return text
+        spans = [m.span() for m in CODE_SPAN_RE.finditer(text)]
 
         def replace(match: "re.Match[str]") -> str:
-            line_start = text.rfind("\n", 0, match.start()) + 1
-            indent = text[line_start : match.start()]
+            pos = match.start()
+            if any(a <= pos < b for a, b in spans):
+                return match.group(0)  # inside `inline code`
+            line_start = text.rfind("\n", 0, pos) + 1
+            indent = text[line_start:pos]
             if indent.startswith("\t") or indent.startswith("    "):
-                return match.group(0)  # indented code block: leave untouched
-            attrs = parse_attributes(match.group("attrs"))
-            block = self._container(attrs)
-            if self.extension.getConfig("load_assets") and not self.assets_emitted:
-                self.assets_emitted = True
-                block += "\n" + self._loader()
-            return self.md.htmlStash.store(block)
+                return match.group(0)  # indented code block
+            return self._block(parse_attributes(match.group("attrs")))
 
-        return TAG_RE.sub(replace, text).split("\n")
+        return TAG_RE.sub(replace, text)
+
+    # -- Preprocessor API ----------------------------------------------------
+    def run(self, lines: List[str]) -> List[str]:
+        if FENCE_LANG not in "\n".join(lines).lower():
+            return lines  # neither "<asyncapi-tag" nor an "asyncapi" fence can be present
+        out: List[str] = []
+        prose: List[str] = []
+
+        def flush() -> None:
+            if prose:
+                out.extend(self._replace_tags("\n".join(prose)).split("\n"))
+                prose.clear()
+
+        i, n = 0, len(lines)
+        while i < n:
+            match = FENCE_OPEN_RE.match(lines[i])
+            if match is None:
+                prose.append(lines[i])
+                i += 1
+                continue
+            fence, info = match.group("fence"), match.group("info").strip()
+            close_re = re.compile(rf"^ {{0,3}}{re.escape(fence[0])}{{{len(fence)},}}[ \t]*$")
+            j = i + 1
+            while j < n and not close_re.match(lines[j]):
+                j += 1
+            lang, _, info_arg = info.partition(" ")
+            flush()
+            if lang.lower() == FENCE_LANG:
+                attrs = parse_fence_body(lines[i + 1 : j], info_arg, self._warn)
+                # blank lines keep the placeholder out of a neighbouring paragraph
+                out.extend(["", self._block(attrs), ""])
+            else:
+                out.extend(lines[i : j + 1])  # some other fence: leave it for fenced_code
+            i = j + 1
+        flush()
+        return out
 
 
 class AsyncAPITagExtension(Extension):
@@ -270,8 +368,9 @@ class AsyncAPITagExtension(Extension):
     def extendMarkdown(self, md: Markdown) -> None:
         md.registerExtension(self)
         self.preprocessor = AsyncAPITagPreprocessor(md, self)
-        # After fenced_code (25) has stashed code fences, before html_block (20).
-        md.preprocessors.register(self.preprocessor, "asyncapi_tag", 22)
+        # Before fenced_code / superfences (25) stash fences, so ```asyncapi blocks are
+        # still visible; the preprocessor tracks other fences itself.
+        md.preprocessors.register(self.preprocessor, "asyncapi_tag", 26)
 
     def reset(self) -> None:
         self.preprocessor.reset()

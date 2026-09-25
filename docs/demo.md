@@ -3,15 +3,23 @@
 Everything on this page is rendered by `asyncapi-tag` from the two example documents in
 `docs/examples/`. The Markdown for each section is shown above its viewer.
 
-## AsyncAPI 3 document (YAML)
+## AsyncAPI 3 document (YAML), fenced-block syntax
 
-```markdown
-<asyncapi-tag src="examples/orders-v3.yaml" sendLabel="EMIT" receiveLabel="ON"></asyncapi-tag>
+````markdown
+```asyncapi
+src: examples/orders-v3.yaml
+sendLabel: EMIT
+receiveLabel: ON
+```
+````
+
+```asyncapi
+src: examples/orders-v3.yaml
+sendLabel: EMIT
+receiveLabel: ON
 ```
 
-<asyncapi-tag src="examples/orders-v3.yaml" sendLabel="EMIT" receiveLabel="ON"></asyncapi-tag>
-
-## AsyncAPI 2 document (JSON) with a sidebar grouped by tags
+## AsyncAPI 2 document (JSON), element syntax, sidebar grouped by tags
 
 The sidebar is off by default. With `sidebar="true"` in a narrow column it sits behind the round
 toggle button at the top right of the viewer.

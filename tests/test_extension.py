@@ -8,7 +8,12 @@ import markdown
 import pytest
 
 from asyncapi_tag import assets
-from asyncapi_tag.extension import AsyncAPITagExtension, build_viewer_config, parse_attributes
+from asyncapi_tag.extension import (
+    AsyncAPITagExtension,
+    build_viewer_config,
+    parse_attributes,
+    parse_fence_body,
+)
 from tests.conftest import node_check
 
 
@@ -164,7 +169,7 @@ def test_invalid_values_warn_and_are_skipped(warnings_list):
 def test_missing_src_renders_visible_error(warnings_list):
     out = render("<asyncapi-tag></asyncapi-tag>", warnings_list)
     assert "asyncapi-tag-error" in out
-    assert "missing its src attribute" in out
+    assert "no document given" in out
     assert any("missing required 'src'" in w for w in warnings_list)
 
 
@@ -218,3 +223,97 @@ def test_extension_loads_by_name_and_via_makeExtension():
     from asyncapi_tag import makeExtension
 
     assert isinstance(makeExtension(load_assets=False), AsyncAPITagExtension)
+
+
+# --- fenced block syntax -------------------------------------------------------------------
+
+FENCE = """\
+Intro.
+
+```asyncapi
+src: api/events.yaml
+sidebar: true
+publishLabel: "PUBLISH"
+# a comment
+showServers: bySpecTags
+```
+
+Outro.
+"""
+
+
+def test_fenced_block_renders_container():
+    out = render(FENCE)
+    assert out.count('class="asyncapi-tag"') == 1
+    assert 'data-asyncapi-src="api/events.yaml"' in out
+    cfg = container_config(out)
+    assert cfg["show"]["sidebar"] is True
+    assert cfg["publishLabel"] == "PUBLISH"
+    assert cfg["sidebar"]["showServers"] == "bySpecTags"
+    assert "<p>Intro.</p>" in out and "<p>Outro.</p>" in out
+    assert "<code" not in out  # the fence did not survive as a code block
+    assert out.index("Intro.") < out.index('class="asyncapi-tag"') < out.index("Outro.")
+
+
+def test_fenced_block_variants():
+    # tildes, path on the info line, bare key, no blank lines around, indented up to 3 spaces
+    out = render("Text\n~~~asyncapi ../spec.yaml\nsidebar\n~~~\nMore text")
+    assert 'data-asyncapi-src="../spec.yaml"' in out
+    assert container_config(out)["show"]["sidebar"] is True
+    assert "<p>Text</p>" in out and "<p>More text</p>" in out
+    out = render("   ```asyncapi\n   src: a.yaml\n   ```")
+    assert 'data-asyncapi-src="a.yaml"' in out
+    out = render("````asyncapi\nsrc: a.yaml\n````")
+    assert 'data-asyncapi-src="a.yaml"' in out
+
+
+def test_fenced_block_without_src_and_bad_lines_warn(warnings_list):
+    out = render("```asyncapi\nsidebar: false\nthis is not a key value\n```", warnings_list)
+    assert "asyncapi-tag-error" in out
+    assert any("missing required 'src'" in w for w in warnings_list)
+    assert any("cannot parse line" in w for w in warnings_list)
+
+
+def test_fence_nested_in_a_longer_fence_stays_code():
+    doc = "````markdown\n```asyncapi\nsrc: a.yaml\n```\n````\n"
+    out = render(doc)
+    assert "data-asyncapi-src" not in out
+    assert "asyncapi" in out and "<code" in out
+    # and the same for a tilde fence around a backtick fence
+    out = render("~~~\n```asyncapi\nsrc: a.yaml\n```\n~~~\n")
+    assert "data-asyncapi-src" not in out
+
+
+def test_other_fences_and_indented_code_are_untouched():
+    out = render("```yaml\nasyncapi: 3.0.0\n```\n\n    ```asyncapi\n    src: a.yaml\n    ```\n")
+    assert "data-asyncapi-src" not in out
+    assert "asyncapi: 3.0.0" in out
+
+
+def test_tag_inside_inline_code_span_is_left_alone():
+    out = render('Use `<asyncapi-tag src="a.yaml"/>` in a page, or ``<asyncapi-tag>`` bare.')
+    assert "data-asyncapi-src" not in out
+    assert "&lt;asyncapi-tag" in out
+    # but a real tag on the same page still works
+    out = render('See `<asyncapi-tag>`.\n\n<asyncapi-tag src="a.yaml"/>')
+    assert out.count('class="asyncapi-tag"') == 1
+
+
+def test_fence_and_tag_share_numbering_and_assets():
+    out = render('<asyncapi-tag src="a.yaml"/>\n\n```asyncapi\nsrc: b.yaml\n```')
+    assert 'id="asyncapi-tag-1"' in out and 'id="asyncapi-tag-2"' in out
+    assert out.count(assets.VIEWER_JS_URL) == 1
+
+
+def test_fenced_block_works_with_superfences():
+    pytest.importorskip("pymdownx")
+    out = markdown.markdown(FENCE, extensions=[AsyncAPITagExtension(), "pymdownx.superfences"])
+    assert 'data-asyncapi-src="api/events.yaml"' in out and "<code" not in out
+    out = markdown.markdown("```python\nprint(1)\n```", extensions=[AsyncAPITagExtension(), "pymdownx.superfences"])
+    assert "<code" in out
+
+
+def test_parse_fence_body():
+    attrs = parse_fence_body(["src: 'x y.yaml'", "Sidebar: false", "", "# c", "messageExamples"], "")
+    assert attrs == {"src": "x y.yaml", "sidebar": "false", "messageexamples": None}
+    assert parse_fence_body([], ' "a.yaml" ')["src"] == "a.yaml"

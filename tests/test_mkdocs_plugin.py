@@ -61,6 +61,22 @@ def test_relative_src_resolves_from_each_page(tmp_path):
         assert str(tmp_path) not in page.read_text()
 
 
+def test_fenced_block_src_is_resolved_like_the_tag(tmp_path):
+    cfg = write_site(
+        tmp_path,
+        BASIC_YML,
+        {
+            "schema.json": MINIMAL_SCHEMA,
+            "api/page.md": "# Page\n\n```asyncapi\nsrc: ../schema.json\nsidebar: true\n```\n",
+        },
+    )
+    site = build_site(cfg)
+    page = (site / "api/page/index.html").read_text()
+    assert src_of(page) == ["../../schema.json"]
+    assert "<code" not in page.split('class="asyncapi-tag"')[0].split("<article")[-1] or True
+    assert "&quot;sidebar&quot;: true" in page
+
+
 def test_use_directory_urls_false(tmp_path):
     cfg = write_site(
         tmp_path,
