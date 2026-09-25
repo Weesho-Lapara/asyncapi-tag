@@ -20,10 +20,17 @@ src/asyncapi_tag/
   extension.py       Markdown extension: tag regex, attribute parsing, config building, preprocessor
   mkdocs_plugin.py   MkDocs plugin: config options, registers the extension, resolves src per page
 legacy/mkdocs-asyncapi-tag-plugin/   deprecated shim package (own pyproject, no entry point)
-scripts/update_viewer.py             bumps the pinned viewer and rewrites assets.py
+scripts/update_viewer.py             bumps the pinned viewer, rewrites assets.py, adds a CHANGELOG line
 tests/                               pytest; test_mkdocs_plugin.py builds real sites in tmp_path
-.github/workflows/ci.yml             tests on Python 3.9-3.14 + builds both distributions
+docs/ + mkdocs.yml                   documentation site, built with the plugin (Material theme);
+                                     docs/examples/ holds the AsyncAPI 2 and 3 demo documents
+.github/workflows/ci.yml             tests on Python 3.9-3.14, strict docs build under MkDocs and
+                                     Zensical, builds both distributions
+.github/workflows/docs.yml           deploys the docs site to GitHub Pages on push to main
 .github/workflows/publish.yml        PyPI trusted publishing on GitHub release
+.github/workflows/update-viewer.yml  weekly viewer re-pin, tests, opens a PR
+.github/workflows/compat.yml         weekly informational run against MkDocs 2.0 pre-release and
+                                     newest Markdown/Material (continue-on-error)
 ```
 
 ## Commands
@@ -34,7 +41,9 @@ pip install -e ".[test]"
 pytest                                   # node on PATH enables the JS syntax test
 python -m build                          # asyncapi-tag
 python -m build legacy/mkdocs-asyncapi-tag-plugin
-python scripts/update_viewer.py [version]
+python scripts/update_viewer.py [version]   # --check exits 1 when a newer viewer exists
+pip install -e ".[docs]" && mkdocs build --strict   # docs site; `mkdocs serve` to preview
+pip install zensical && zensical build             # same site under Zensical
 ```
 
 ## Conventions and constraints
@@ -55,6 +64,13 @@ python scripts/update_viewer.py [version]
 - Warnings in the MkDocs plugin go through `get_plugin_logger` so `--strict` fails on them.
 - Do not commit build output, virtualenvs, `site/`, or agent working files; `.gitignore` covers them.
   Use a `scratch/` directory (ignored) for demo sites.
+- `mkdocs.yml` lists both `plugins: [asyncapi-tag]` and `markdown_extensions: [asyncapi_tag]` on
+  purpose: Zensical ignores `plugins` and honours `markdown_extensions`; the plugin does not
+  duplicate an extension the user already listed. Keep both.
+- The docs site is the end-to-end test. New behaviour should be visible on `docs/demo.md` when it
+  makes sense, and `mkdocs build --strict` must stay clean.
+- Viewer bumps arrive as PRs from `update-viewer.yml`. PRs opened with `GITHUB_TOKEN` do not trigger
+  CI, so that workflow runs the tests itself before opening the PR; re-run CI manually if in doubt.
 
 ## Releasing
 

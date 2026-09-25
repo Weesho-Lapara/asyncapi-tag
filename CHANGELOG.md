@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Documentation site at https://weesho-lapara.github.io/asyncapi-tag/, built with the plugin itself
+  (Material theme with instant navigation) and deployed from CI. A strict build of it runs on every
+  pull request, under MkDocs and under Zensical.
+- Zensical support documented: enable `markdown_extensions: [asyncapi_tag]`; Zensical resolves
+  relative `src` paths per page on its own.
+- Weekly `update-viewer` workflow that re-pins `@asyncapi/react-component`, runs the tests and opens
+  a pull request. `scripts/update_viewer.py` gained `--check` and now records the bump in this file.
+- Weekly `compat` workflow that runs the suite against the MkDocs 2.0 pre-release and the newest
+  Python-Markdown and Material, as an early warning.
+- `docs` extra (`pip install asyncapi-tag[docs]`).
+
 ## asyncapi-tag 1.0.0 (2026-09-25)
 
 First release under the new name. The project was previously published as

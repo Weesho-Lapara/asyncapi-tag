@@ -12,6 +12,8 @@ that resolves document paths the same way MkDocs resolves links. Rendering in th
 by the official [AsyncAPI React component](https://github.com/asyncapi/asyncapi-react), pinned to
 an exact version and loaded with Subresource Integrity. JSON and YAML documents both work.
 
+**Documentation and live demo:** https://weesho-lapara.github.io/asyncapi-tag/
+
 > Formerly published as `mkdocs-asyncapi-tag-plugin`. See [Migrating](#migrating-from-mkdocs-asyncapi-tag-plugin).
 
 ## MkDocs
@@ -67,6 +69,19 @@ plugins:
 Or set `load_assets: false` and load the files yourself through `extra_javascript` and
 `extra_css`. The page-side runner script is still needed in that case; copy it from
 `asyncapi_tag.assets.RUNNER_JS`.
+
+## Zensical
+
+[Zensical](https://zensical.org/) reads `mkdocs.yml` but does not run MkDocs plugins. Enable the
+extension instead; relative `src` paths are rewritten per page by Zensical itself:
+
+```yaml
+markdown_extensions:
+  - asyncapi_tag
+```
+
+Listing both the plugin and the extension lets one `mkdocs.yml` build under MkDocs and Zensical.
+A Zensical build of this project's docs runs in CI.
 
 ## Plain Python-Markdown
 
@@ -161,8 +176,9 @@ pip install -e ".[test]"
 pytest
 ```
 
-The JavaScript runner is syntax-checked with `node` when it is installed. See `AGENTS.md` for the
-repository layout and release procedure.
+The JavaScript runner is syntax-checked with `node` when it is installed. Build the docs site with
+`pip install -e ".[docs]" && mkdocs build --strict`. See `AGENTS.md` for the repository layout and
+release procedure.
 
 ## License
 
