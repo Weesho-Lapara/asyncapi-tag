@@ -46,6 +46,15 @@ def test_assets_are_emitted_once_per_page_and_pinned():
     assert out.index(assets.VIEWER_JS_URL) < out.index("querySelectorAll")
 
 
+def test_embed_css_is_emitted_once_and_can_be_disabled():
+    out = render('<asyncapi-tag src="a.yaml"/>\n\n<asyncapi-tag src="b.yaml"/>')
+    assert out.count(assets.EMBED_CSS) == 1
+    assert out.index("<style>") < out.index(assets.VIEWER_CSS_URL)
+    assert "</style>" not in assets.EMBED_CSS
+    out = render('<asyncapi-tag src="a.yaml"/>', embed_css=False)
+    assert assets.EMBED_CSS not in out and "data-asyncapi-src" in out
+
+
 def test_no_tag_means_no_assets():
     out = render("# Hello\n\nNothing to see.")
     assert "asyncapi" not in out
@@ -98,10 +107,10 @@ def test_attribute_values_cannot_break_out_of_html_or_js(warnings_list):
     assert warnings_list == []
 
 
-def test_defaults_match_previous_plugin_behaviour():
+def test_defaults():
     cfg = container_config(render('<asyncapi-tag src="a.yaml"/>'))
     assert cfg["show"] == {
-        "sidebar": True, "info": True, "servers": True, "operations": True,
+        "sidebar": False, "info": True, "servers": True, "operations": True,
         "messages": True, "schemas": True, "errors": True,
     }
     assert cfg["expand"] == {"messageExamples": True}
@@ -114,7 +123,7 @@ def test_string_and_enum_attributes_are_passed_through_not_booleanised():
         '<asyncapi-tag src="a.yaml" publishLabel="PUBLISH" subscribeLabel="SUBSCRIBE" '
         'sendLabel="S" receiveLabel="R" requestLabel="Q" replyLabel="P" '
         'showServers="bySpecTags" showOperations="byOperationsTags" '
-        'sidebar="false" messageExamples="0" useChannelAddressAsIdentifier="yes" '
+        'sidebar="true" messageExamples="0" useChannelAddressAsIdentifier="yes" '
         'parserOptions=\'{"applyTraits": false}\' id="my-api" schemaID="custom"/>'
     )
     cfg = container_config(out)
@@ -126,7 +135,7 @@ def test_string_and_enum_attributes_are_passed_through_not_booleanised():
         "showOperations": "byOperationsTags",
         "useChannelAddressAsIdentifier": True,
     }
-    assert cfg["show"]["sidebar"] is False
+    assert cfg["show"]["sidebar"] is True
     assert cfg["expand"]["messageExamples"] is False
     assert cfg["parserOptions"] == {"applyTraits": False}
     assert cfg["schemaID"] == "custom"
@@ -139,7 +148,7 @@ def test_invalid_values_warn_and_are_skipped(warnings_list):
         warnings_list,
     )
     cfg = container_config(out)
-    assert cfg["show"]["sidebar"] is True
+    assert cfg["show"]["sidebar"] is False  # invalid value: default applies
     assert "showServers" not in cfg.get("sidebar", {})
     assert "parserOptions" not in cfg
     joined = "\n".join(warnings_list)

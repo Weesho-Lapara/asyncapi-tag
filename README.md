@@ -48,6 +48,7 @@ A missing document or an invalid attribute is reported as a MkDocs warning, so `
 plugins:
   - asyncapi-tag:
       load_assets: true              # emit the viewer script and stylesheet (default: true)
+      embed_css: true                # keep the viewer inside its container (default: true)
       viewer_js: https://unpkg.com/@asyncapi/react-component@3.2.1/browser/standalone/index.js
       viewer_js_integrity: sha384-…  # set to '' to omit the integrity attribute
       viewer_css: https://unpkg.com/@asyncapi/react-component@3.2.1/styles/default.min.css
@@ -98,6 +99,7 @@ Extension options (pass them as `extension_configs={"asyncapi_tag": {...}}`):
 | `viewer_js`, `viewer_css` | pinned unpkg URLs | Where to load the viewer from |
 | `viewer_js_integrity`, `viewer_css_integrity` | matching SRI hashes | Empty string omits the attribute |
 | `load_assets` | `True` | Emit the loader with the first tag on a page |
+| `embed_css` | `True` | Emit the small stylesheet that keeps the viewer inside its container |
 | `url_resolver` | identity | Callable mapping `src` (and relative asset URLs) to what the browser fetches |
 | `warn` | `logging` | Callable receiving warning messages |
 
@@ -110,7 +112,7 @@ Only `src` is required. Attribute names are case-insensitive. Boolean attributes
 |---|---|---|---|
 | `src` | path or URL | required | The AsyncAPI document (JSON or YAML) |
 | `id` | string | `asyncapi-tag-N` | HTML id of the container element |
-| `sidebar` | boolean | `true` | Show the navigation sidebar |
+| `sidebar` | boolean | `false` | Show the navigation sidebar (a toggle button inside the viewer when the column is narrow) |
 | `info` | boolean | `true` | Show the info section |
 | `servers` | boolean | `true` | Show servers |
 | `operations` | boolean | `true` | Show operations |
@@ -129,8 +131,7 @@ Only `src` is required. Attribute names are case-insensitive. Boolean attributes
 
 These map onto the React component's
 [configuration](https://github.com/asyncapi/asyncapi-react/blob/master/docs/configuration/config-modification.md).
-Defaults for `sidebar` and `messageExamples` follow earlier releases of this plugin rather than the
-viewer, so existing pages keep their look.
+The default for `messageExamples` follows earlier releases of this plugin rather than the viewer.
 
 ## How it works
 

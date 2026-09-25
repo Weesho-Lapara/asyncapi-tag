@@ -7,7 +7,7 @@ Only `src` is required. Attribute names are case-insensitive. Boolean attributes
 |---|---|---|---|
 | `src` | path or URL | required | The AsyncAPI document (JSON or YAML) |
 | `id` | string | `asyncapi-tag-N` | HTML id of the container element |
-| `sidebar` | boolean | `true` | Show the navigation sidebar |
+| `sidebar` | boolean | `false` | Show the navigation sidebar (a toggle button inside the viewer when the column is narrow) |
 | `info` | boolean | `true` | Show the info section |
 | `servers` | boolean | `true` | Show servers |
 | `operations` | boolean | `true` | Show operations |
@@ -26,8 +26,7 @@ Only `src` is required. Attribute names are case-insensitive. Boolean attributes
 
 These map onto the React component's
 [configuration](https://github.com/asyncapi/asyncapi-react/blob/master/docs/configuration/config-modification.md).
-Defaults for `sidebar` and `messageExamples` follow earlier releases of this plugin rather than the
-viewer, so existing pages keep their look.
+The default for `messageExamples` follows earlier releases of this plugin rather than the viewer.
 
 ## Examples
 

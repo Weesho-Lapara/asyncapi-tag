@@ -43,6 +43,7 @@ Extension options, passed as `extension_configs={"asyncapi_tag": {...}}`:
 | `viewer_js`, `viewer_css` | pinned unpkg URLs | Where to load the viewer from |
 | `viewer_js_integrity`, `viewer_css_integrity` | matching SRI hashes | Empty string omits the attribute |
 | `load_assets` | `True` | Emit the loader with the first tag on a page |
+| `embed_css` | `True` | Emit the small stylesheet that keeps the viewer inside its container |
 | `url_resolver` | identity | Callable mapping `src` (and relative asset URLs) to what the browser fetches |
 | `warn` | `logging` | Callable receiving warning messages |
 

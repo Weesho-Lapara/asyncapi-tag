@@ -19,6 +19,21 @@ VIEWER_CSS_INTEGRITY = "sha384-oo9RoQcacP++XdMX6CjTucTvASEORHX3chFik0/V2kHcsHiVb
 
 CONTAINER_CLASS = "asyncapi-tag"
 
+# The viewer is designed for a full-width page. Inside a documentation column it
+# switches to its compact layout (container queries), whose sidebar toggle and
+# sidebar overlay are position: fixed and whose centre panel refuses to shrink
+# below its content. This keeps all of it inside the container.
+EMBED_CSS = """\
+.asyncapi-tag { position: relative; max-width: 100%; }
+.asyncapi-tag .aui-root .panel--center { min-width: 0; }
+.asyncapi-tag .aui-root pre { overflow-x: auto; }
+.asyncapi-tag .aui-root .fixed { position: absolute; }
+.asyncapi-tag .aui-root .burger-menu { top: 1rem; right: 1rem; bottom: auto; }
+.asyncapi-tag .aui-root .max-h-screen { max-height: none; }
+.asyncapi-tag .aui-root .h-screen { height: 100%; }
+.asyncapi-tag-error { padding: .75rem 1rem; border-left: .25rem solid #ef5552; background: rgba(239, 85, 82, .1); }
+"""
+
 # Runs once per page. It finds every container the extension emitted, fetches
 # the AsyncAPI document as text (JSON or YAML, the viewer parses both) and
 # renders it. Nothing from the Markdown source is interpolated into this
@@ -100,13 +115,17 @@ def loader_html(
     css_url: str,
     js_integrity: str = "",
     css_integrity: str = "",
+    embed_css: bool = True,
 ) -> str:
     """Return the HTML that loads the viewer and runs it on the page.
 
     Integrity attributes are emitted only when a hash is given, so the loader
-    also works for self-hosted copies of the viewer.
+    also works for self-hosted copies of the viewer. ``embed_css`` adds the
+    small stylesheet that keeps the viewer inside its container.
     """
     parts = []
+    if embed_css:
+        parts.append(f"<style>{EMBED_CSS}</style>")
     if css_url:
         attrs = _attr("rel", "stylesheet") + _attr("href", css_url)
         if css_integrity:

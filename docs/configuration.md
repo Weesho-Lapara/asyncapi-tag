@@ -6,6 +6,7 @@
 plugins:
   - asyncapi-tag:
       load_assets: true              # emit the viewer script and stylesheet (default: true)
+      embed_css: true                # keep the viewer inside its container (default: true)
       viewer_js: https://unpkg.com/@asyncapi/react-component@3.2.1/browser/standalone/index.js
       viewer_js_integrity: sha384-…  # set to '' to omit the integrity attribute
       viewer_css: https://unpkg.com/@asyncapi/react-component@3.2.1/styles/default.min.css
@@ -44,6 +45,14 @@ You can keep integrity checking for self-hosted files too: compute the hash and 
 ```sh
 openssl dgst -sha384 -binary docs/assets/asyncapi/index.js | openssl base64 -A
 ```
+
+## Layout inside a documentation column
+
+The viewer is built for a full-width page. In a narrower container it switches to a compact layout
+whose sidebar toggle and sidebar overlay are positioned relative to the browser window, and whose
+centre panel does not shrink below its content. The plugin emits a small stylesheet that keeps all
+of that inside the viewer's box (`embed_css: true`, the default). Set it to `false` if you style the
+viewer yourself; the rules are available as `asyncapi_tag.assets.EMBED_CSS`.
 
 ## Loading assets yourself
 

@@ -2,7 +2,20 @@
 
 ## Unreleased
 
+### Changed
+- `sidebar` now defaults to `false`, matching the viewer. Inside a documentation column the viewer
+  uses its compact layout, where the sidebar hides behind a toggle button; pages that want it should
+  set `sidebar="true"`.
+- Network-level load errors name the URL that failed instead of the browser's terse message.
+
+### Fixed
+- The viewer spilled over the right-hand table of contents in Material and floated its sidebar toggle
+  and overlay over the page. A small stylesheet (`embed_css`, on by default) now keeps the viewer,
+  its toggle and its sidebar inside the container.
+- Only the first viewer on a page rendered on a full page load.
+
 ### Added
+- Plugin/extension option `embed_css`.
 - Documentation site at https://weesho-lapara.github.io/asyncapi-tag/, built with the plugin itself
   (Material theme with instant navigation) and deployed from CI. A strict build of it runs on every
   pull request, under MkDocs and under Zensical.

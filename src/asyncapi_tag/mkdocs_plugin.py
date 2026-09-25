@@ -49,6 +49,7 @@ class AsyncAPIPluginConfig(Config):
     viewer_css = config_options.Type(str, default=assets.VIEWER_CSS_URL)
     viewer_css_integrity = config_options.Type(str, default=assets.VIEWER_CSS_INTEGRITY)
     load_assets = config_options.Type(bool, default=True)
+    embed_css = config_options.Type(bool, default=True)
     asyncapi_file = config_options.Deprecated(
         message=(
             "The '{}' option is no longer used: MkDocs copies every non-Markdown "
@@ -73,6 +74,7 @@ class AsyncAPIPlugin(BasePlugin[AsyncAPIPluginConfig]):
             "viewer_css": _docs_relative(self.config.viewer_css),
             "viewer_css_integrity": self.config.viewer_css_integrity,
             "load_assets": self.config.load_assets,
+            "embed_css": self.config.embed_css,
             "url_resolver": self.resolve_url,
             "warn": log.warning,
         }

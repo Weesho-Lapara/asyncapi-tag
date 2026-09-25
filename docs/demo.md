@@ -6,18 +6,21 @@ Everything on this page is rendered by `asyncapi-tag` from the two example docum
 ## AsyncAPI 3 document (YAML)
 
 ```markdown
-<asyncapi-tag src="examples/orders-v3.yaml" sidebar="false" sendLabel="EMIT" receiveLabel="ON"></asyncapi-tag>
+<asyncapi-tag src="examples/orders-v3.yaml" sendLabel="EMIT" receiveLabel="ON"></asyncapi-tag>
 ```
 
-<asyncapi-tag src="examples/orders-v3.yaml" sidebar="false" sendLabel="EMIT" receiveLabel="ON"></asyncapi-tag>
+<asyncapi-tag src="examples/orders-v3.yaml" sendLabel="EMIT" receiveLabel="ON"></asyncapi-tag>
 
 ## AsyncAPI 2 document (JSON) with a sidebar grouped by tags
 
+The sidebar is off by default. With `sidebar="true"` in a narrow column it sits behind the round
+toggle button at the top right of the viewer.
+
 ```markdown
-<asyncapi-tag src="examples/accounts-v2.json" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-tag>
+<asyncapi-tag src="examples/accounts-v2.json" sidebar="true" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-tag>
 ```
 
-<asyncapi-tag src="examples/accounts-v2.json" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-tag>
+<asyncapi-tag src="examples/accounts-v2.json" sidebar="true" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-tag>
 
 ## Error handling (this one is meant to fail)
 

@@ -127,12 +127,13 @@ def test_assets_once_per_page_and_plugin_options(tmp_path):
 def test_load_assets_false(tmp_path):
     cfg = write_site(
         tmp_path,
-        "site_name: Demo\nplugins:\n  - asyncapi-tag:\n      load_assets: false\n",
+        "site_name: Demo\nplugins:\n  - asyncapi-tag:\n      load_assets: false\n      embed_css: false\n",
         {"schema.json": MINIMAL_SCHEMA, "index.md": '<asyncapi-tag src="schema.json"/>\n'},
     )
     index = (build_site(cfg) / "index.html").read_text()
     assert "data-asyncapi-src" in index
     assert assets.VIEWER_JS_URL not in index and "querySelectorAll" not in index
+    assert assets.EMBED_CSS not in index
 
 
 def test_default_assets_are_pinned_with_integrity(tmp_path):

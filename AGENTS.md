@@ -58,8 +58,11 @@ pip install zensical && zensical build             # same site under Zensical
   Python-Markdown coerces `None`-default config values with `parseBoolValue`.
 - The preprocessor runs at priority 22: after `fenced_code` (25) stashes fences, before
   `html_block` (20). Indented code is skipped by checking the line's leading whitespace.
-- Defaults for `show.*` and `expand.messageExamples` intentionally match the pre-1.0 plugin, not the
-  viewer. Changing them is a breaking change.
+- `show.sidebar` defaults to off (the viewer's own default); the other `show.*` flags and
+  `expand.messageExamples` default to on. Changing defaults is a breaking change.
+- `assets.EMBED_CSS` keeps the viewer inside its container: the component uses container queries
+  and, in a docs column, a `position: fixed` sidebar toggle/overlay and a non-shrinking centre
+  panel. Re-check those class names (`.fixed`, `.burger-menu`, `.panel--center`) on viewer bumps.
 - The legacy shim must not declare a `mkdocs.plugins` entry point; MkDocs lets the last duplicate
   entry point win silently.
 - Warnings in the MkDocs plugin go through `get_plugin_logger` so `--strict` fails on them.

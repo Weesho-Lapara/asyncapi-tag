@@ -38,12 +38,12 @@ ATTR_RE = re.compile(
     r"""(?:\s*=\s*(?:"(?P<dq>[^"]*)"|'(?P<sq>[^']*)'|(?P<uq>[^\s"'=<>`]+)))?"""
 )
 
-# Defaults match what earlier releases of the MkDocs plugin sent, so existing
-# pages keep their appearance. They differ from the viewer's own defaults for
-# ``show.sidebar`` and ``expand.messageExamples``.
+# ``show.sidebar`` follows the viewer's own default (off): inside a documentation
+# column the viewer uses its compact layout, where the sidebar hides behind a
+# toggle button. ``expand.messageExamples`` stays on as in earlier releases.
 DEFAULT_VIEWER_CONFIG: Dict[str, Any] = {
     "show": {
-        "sidebar": True,
+        "sidebar": False,
         "info": True,
         "servers": True,
         "operations": True,
@@ -210,6 +210,7 @@ class AsyncAPITagPreprocessor(Preprocessor):
             css_url=self._resolve(cfg("viewer_css")) if cfg("viewer_css") else "",
             js_integrity=cfg("viewer_js_integrity"),
             css_integrity=cfg("viewer_css_integrity"),
+            embed_css=cfg("embed_css"),
         )
 
     # -- Preprocessor API ----------------------------------------------------
@@ -247,6 +248,10 @@ class AsyncAPITagExtension(Extension):
             "viewer_css_integrity": [
                 assets.VIEWER_CSS_INTEGRITY,
                 "Subresource Integrity hash for viewer_css; empty to omit.",
+            ],
+            "embed_css": [
+                True,
+                "Emit the small stylesheet that keeps the viewer inside its container.",
             ],
             "load_assets": [
                 True,
