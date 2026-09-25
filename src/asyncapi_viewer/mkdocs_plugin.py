@@ -3,7 +3,7 @@
 Enable it in ``mkdocs.yml``::
 
     plugins:
-      - asyncapi-tag
+      - asyncapi-viewer
 
 The plugin resolves the ``src`` attribute the same way MkDocs resolves links:
 relative to the Markdown file, and relative to ``docs_dir`` when it starts with
@@ -25,11 +25,12 @@ from mkdocs.structure.files import Files
 from mkdocs.structure.pages import Page
 from mkdocs.utils import get_relative_url
 
-from asyncapi_tag import assets
+from asyncapi_viewer import assets
 
-log = get_plugin_logger("asyncapi-tag")
+log = get_plugin_logger("asyncapi-viewer")
 
-EXTENSION_NAME = "asyncapi_tag"
+EXTENSION_NAME = "asyncapi_viewer"
+EXTENSION_ALIASES = (EXTENSION_NAME, "asyncapi_tag")  # pre-rename name still works
 
 
 def _docs_relative(url: str) -> str:
@@ -64,11 +65,13 @@ class AsyncAPIPlugin(BasePlugin[AsyncAPIPluginConfig]):
         self._files: Optional[Files] = None
 
     def on_config(self, config: MkDocsConfig) -> MkDocsConfig:
-        if EXTENSION_NAME not in config["markdown_extensions"]:
-            config["markdown_extensions"].append(EXTENSION_NAME)
+        listed = [n for n in EXTENSION_ALIASES if n in config["markdown_extensions"]]
+        name = listed[0] if listed else EXTENSION_NAME
+        if not listed:
+            config["markdown_extensions"].append(name)
         if config["mdx_configs"] is None:
             config["mdx_configs"] = {}
-        config["mdx_configs"][EXTENSION_NAME] = {
+        config["mdx_configs"][name] = {
             "viewer_js": _docs_relative(self.config.viewer_js),
             "viewer_js_integrity": self.config.viewer_js_integrity,
             "viewer_css": _docs_relative(self.config.viewer_css),

@@ -17,7 +17,8 @@ VIEWER_CSS_URL = "https://unpkg.com/@asyncapi/react-component@3.2.1/styles/defau
 VIEWER_CSS_INTEGRITY = "sha384-oo9RoQcacP++XdMX6CjTucTvASEORHX3chFik0/V2kHcsHiVboGyWZztGeq/0bum"
 # ---------------------------------------------------------------------------
 
-CONTAINER_CLASS = "asyncapi-tag"
+CONTAINER_CLASS = "asyncapi-viewer"
+LEGACY_CLASS = "asyncapi-tag"  # also set on containers so pre-rename CSS keeps applying
 
 # The viewer is designed for a full-width page. Inside a documentation column it
 # switches to its compact layout (container queries), whose sidebar toggle and
@@ -26,14 +27,14 @@ CONTAINER_CLASS = "asyncapi-tag"
 # sticky header (Material's is 4). This keeps all of it inside the container:
 # z-index: 0 on the container opens a stacking context that confines them.
 EMBED_CSS = """\
-.asyncapi-tag { position: relative; z-index: 0; max-width: 100%; }
-.asyncapi-tag .aui-root .panel--center { min-width: 0; }
-.asyncapi-tag .aui-root pre { overflow-x: auto; }
-.asyncapi-tag .aui-root .fixed { position: absolute; }
-.asyncapi-tag .aui-root .burger-menu { top: 1rem; right: 1rem; bottom: auto; }
-.asyncapi-tag .aui-root .max-h-screen { max-height: none; }
-.asyncapi-tag .aui-root .h-screen { height: 100%; }
-.asyncapi-tag-error { padding: .75rem 1rem; border-left: .25rem solid #ef5552; background: rgba(239, 85, 82, .1); }
+.asyncapi-viewer { position: relative; z-index: 0; max-width: 100%; }
+.asyncapi-viewer .aui-root .panel--center { min-width: 0; }
+.asyncapi-viewer .aui-root pre { overflow-x: auto; }
+.asyncapi-viewer .aui-root .fixed { position: absolute; }
+.asyncapi-viewer .aui-root .burger-menu { top: 1rem; right: 1rem; bottom: auto; }
+.asyncapi-viewer .aui-root .max-h-screen { max-height: none; }
+.asyncapi-viewer .aui-root .h-screen { height: 100%; }
+.asyncapi-viewer-error { padding: .75rem 1rem; border-left: .25rem solid #ef5552; background: rgba(239, 85, 82, .1); }
 """
 
 # Runs once per page. It finds every container the extension emitted, fetches
@@ -43,12 +44,12 @@ EMBED_CSS = """\
 RUNNER_JS = """\
 (function () {
   "use strict";
-  var SELECTOR = ".asyncapi-tag[data-asyncapi-src]";
+  var SELECTOR = ".asyncapi-viewer[data-asyncapi-src]";
   function showError(el, message) {
     el.setAttribute("data-asyncapi-state", "error");
     el.textContent = "";
     var p = document.createElement("p");
-    p.className = "asyncapi-tag-error";
+    p.className = "asyncapi-viewer-error";
     p.textContent = "AsyncAPI viewer: " + message;
     el.appendChild(p);
   }
@@ -81,7 +82,7 @@ RUNNER_JS = """\
       el.setAttribute("data-asyncapi-state", "rendered");
     }).catch(function (err) {
       showError(el, err && err.message ? err.message : String(err));
-      if (window.console) { console.error("asyncapi-tag:", err); }
+      if (window.console) { console.error("asyncapi-viewer:", err); }
     });
   }
   function renderAll() {

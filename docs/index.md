@@ -1,12 +1,12 @@
-# asyncapi-tag
+# asyncapi-viewer
 
 Render [AsyncAPI](https://www.asyncapi.com/) documents inside your Markdown pages with one element:
 
 ```html
-<asyncapi-tag src="asyncapi.yaml"></asyncapi-tag>
+<asyncapi-viewer src="asyncapi.yaml"></asyncapi-viewer>
 ```
 
-`asyncapi-tag` is a [Python-Markdown](https://python-markdown.github.io/) extension, so it works in
+`asyncapi-viewer` is a [Python-Markdown](https://python-markdown.github.io/) extension, so it works in
 any tool built on Python-Markdown: [MkDocs](https://www.mkdocs.org/) (with the bundled plugin),
 [Zensical](https://zensical.org/), or plain `markdown.markdown()`. Rendering happens in the
 browser through the official [AsyncAPI React component](https://github.com/asyncapi/asyncapi-react),
@@ -17,14 +17,14 @@ This site is built with the plugin. See the [live demo](demo.md).
 ## Install
 
 ```sh
-pip install asyncapi-tag
+pip install asyncapi-viewer
 ```
 
 ## MkDocs quick start
 
 ```yaml title="mkdocs.yml"
 plugins:
-  - asyncapi-tag
+  - asyncapi-viewer
 ```
 
 Put your AsyncAPI file anywhere under `docs/` and reference it from a page. Paths are relative to the
@@ -34,7 +34,7 @@ through unchanged.
 ```markdown title="docs/api/events.md"
 # Events API
 
-<asyncapi-tag src="events.yaml" sidebar="false"></asyncapi-tag>
+<asyncapi-viewer src="events.yaml" sidebar="false"></asyncapi-viewer>
 ```
 
 Or, without raw HTML, as a fenced block whose body uses the same names as the attributes:
@@ -65,9 +65,9 @@ instead of shipping a blank viewer.
 - [Attributes](attributes.md) is the full reference.
 - [Configuration](configuration.md) covers plugin options, self-hosting and Content Security Policy.
 - [Other tools](other-tools.md) covers Zensical, plain Python-Markdown and Material's instant navigation.
-- [Migration](migration.md) is for users of the old `mkdocs-asyncapi-tag-plugin` package.
+- [Migration](migration.md) is for users of the older names `asyncapi-tag` and `mkdocs-asyncapi-tag-plugin`.
 
 ---
 
 Built and maintained by [Weesho Lapara](https://weesholapara.com). Found it useful?
-[Buy me a coffee](https://github.com/Weesho-Lapara/asyncapi-tag?sponsor=1).
+[Buy me a coffee](https://github.com/Weesho-Lapara/asyncapi-viewer?sponsor=1).

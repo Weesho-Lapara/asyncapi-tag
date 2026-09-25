@@ -3,7 +3,7 @@
   "info": {
     "title": "Accounts service",
     "version": "1.4.0",
-    "description": "User lifecycle events. This document is an **AsyncAPI 2.6** example used by the asyncapi-tag documentation."
+    "description": "User lifecycle events. This document is an **AsyncAPI 2.6** example used by the asyncapi-viewer documentation."
   },
   "tags": [
     { "name": "accounts", "description": "Account lifecycle" },

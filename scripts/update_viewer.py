@@ -7,7 +7,7 @@ Usage:
     python scripts/update_viewer.py --check    # exit 1 if a newer version exists
 
 Downloads the standalone bundle and stylesheet, computes their SRI hashes,
-rewrites the constants in src/asyncapi_tag/assets.py and adds a line under
+rewrites the constants in src/asyncapi_viewer/assets.py and adds a line under
 "## Unreleased" in CHANGELOG.md. Prints "old=<v> new=<v>" on the last line so
 automation can pick the versions up. Review the upstream changelog before
 committing the result.
@@ -25,7 +25,7 @@ import sys
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-ASSETS = ROOT / "src" / "asyncapi_tag" / "assets.py"
+ASSETS = ROOT / "src" / "asyncapi_viewer" / "assets.py"
 CHANGELOG = ROOT / "CHANGELOG.md"
 CDN = "https://unpkg.com/@asyncapi/react-component@{version}/"
 JS_PATH = "browser/standalone/index.js"

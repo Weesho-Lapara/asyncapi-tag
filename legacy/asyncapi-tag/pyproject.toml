@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asyncapi-tag"
+version = "1.2.0"
+description = "DEPRECATED: renamed to 'asyncapi-viewer'. This package only depends on it and re-exports its modules."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+authors = [{ name = "Weesho Lapara", email = "support@weesholapara.com" }]
+keywords = ["asyncapi", "markdown", "mkdocs", "deprecated"]
+classifiers = [
+    "Development Status :: 7 - Inactive",
+    "Framework :: MkDocs",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Documentation",
+]
+dependencies = ["asyncapi-viewer[mkdocs]>=1.2.0,<2"]
+
+[project.urls]
+Homepage = "https://github.com/Weesho-Lapara/asyncapi-viewer"
+Replacement = "https://pypi.org/project/asyncapi-viewer/"
+
+# Deliberately no entry points: asyncapi-viewer registers both the new names and
+# the old ones (plugin id `asyncapi-tag`, extension `asyncapi_tag`).
+
+[tool.setuptools]
+packages = ["asyncapi_tag"]

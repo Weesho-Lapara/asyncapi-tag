@@ -3,9 +3,9 @@
 # section as notes:
 #   git tag v1.2.3 && git push origin v1.2.3
 #
-# One-time setup on PyPI for EACH project (asyncapi-tag and
-# mkdocs-asyncapi-tag-plugin): Manage project -> Publishing -> Add a GitHub
-# publisher with owner Weesho-Lapara, repository asyncapi-tag, workflow
+# One-time setup on PyPI for EACH project (asyncapi-viewer and the
+# deprecated asyncapi-tag shim): Manage project -> Publishing -> Add a GitHub
+# publisher with owner Weesho-Lapara, repository asyncapi-viewer, workflow
 # publish.yml, environment pypi. (Already done for both.)
 name: Publish
 
@@ -25,15 +25,15 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install --upgrade pip build twine
-      - run: python -m build --outdir dist/asyncapi-tag
-      - run: python -m build --outdir dist/mkdocs-asyncapi-tag-plugin legacy/mkdocs-asyncapi-tag-plugin
+      - run: python -m build --outdir dist/asyncapi-viewer
+      - run: python -m build --outdir dist/asyncapi-tag legacy/asyncapi-tag
       - run: python -m twine check dist/*/*
       - uses: actions/upload-artifact@v7
         with:
           name: distributions
           path: dist/
 
-  publish-asyncapi-tag:
+  publish-asyncapi-viewer:
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
@@ -46,10 +46,10 @@ jobs:
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: dist/asyncapi-tag
+          packages-dir: dist/asyncapi-viewer
 
   github-release:
-    needs: publish-asyncapi-tag
+    needs: publish-asyncapi-viewer
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -63,24 +63,24 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           awk -v v="$version" '
-            /^## / { on = index($0, "asyncapi-tag " v " ") == 4 }
+            /^## / { on = index($0, "asyncapi-viewer " v " ") == 4 }
             on && !/^## / { print }
           ' CHANGELOG.md > notes.md
           if ! grep -q . notes.md; then
-            echo "No CHANGELOG.md section for asyncapi-tag $version" >&2; exit 1
+            echo "No CHANGELOG.md section for asyncapi-viewer $version" >&2; exit 1
           fi
-          { echo "Install: \`pip install asyncapi-tag==$version\`"; echo; cat notes.md; } > release-notes.md
+          { echo "Install: \`pip install asyncapi-viewer==$version\`"; echo; cat notes.md; } > release-notes.md
           cat release-notes.md
       - uses: softprops/action-gh-release@v3
         with:
           name: ${{ github.ref_name }}
           body_path: release-notes.md
-          files: dist/asyncapi-tag/*
+          files: dist/asyncapi-viewer/*
 
   publish-legacy-shim:
-    # Publishes the deprecated shim only for the 1.0.0 release; later releases
-    # of asyncapi-tag do not need a new shim version.
-    if: startsWith(github.ref, 'refs/tags/v1.0.0')
+    # Publishes the deprecated `asyncapi-tag` shim once, with the 1.2.0 release;
+    # later releases of asyncapi-viewer do not need a new shim version.
+    if: github.ref_name == 'v1.2.0'
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
@@ -93,4 +93,4 @@ jobs:
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: dist/mkdocs-asyncapi-tag-plugin
+          packages-dir: dist/asyncapi-tag

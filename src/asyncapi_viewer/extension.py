@@ -2,9 +2,9 @@
 
 Two syntaxes are recognised:
 
-* an HTML-like element, self-closing or paired::
+* an HTML-like element, self-closing or paired (``<asyncapi-tag>`` is accepted as an alias)::
 
-      <asyncapi-tag src="events.yaml" sidebar="false"></asyncapi-tag>
+      <asyncapi-viewer src="events.yaml" sidebar="false"></asyncapi-viewer>
 
 * a fenced block with the language ``asyncapi``, whose body is ``key: value``
   lines using the same names as the element's attributes (the path may also be
@@ -18,7 +18,7 @@ Two syntaxes are recognised:
 Usage outside MkDocs::
 
     import markdown
-    html = markdown.markdown(text, extensions=["asyncapi_tag"])
+    html = markdown.markdown(text, extensions=["asyncapi_viewer"])
 
 The extension runs as a single preprocessor before fenced code is stashed. It
 walks the document line by line, tracking fences itself, so ``asyncapi``
@@ -27,7 +27,7 @@ fence stays code) and elements inside fenced blocks, indented code and inline
 code spans are left alone. Each match becomes a container ``<div>`` carrying
 the document URL and the viewer configuration as data attributes. The first
 match on a page also emits the viewer's stylesheet, script and a small runner
-script (see :mod:`asyncapi_tag.assets`).
+script (see :mod:`asyncapi_viewer.assets`).
 """
 
 from __future__ import annotations
@@ -42,13 +42,13 @@ from markdown import Markdown
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-from asyncapi_tag import assets
+from asyncapi_viewer import assets
 
-log = logging.getLogger("asyncapi_tag")
+log = logging.getLogger("asyncapi_viewer")
 
 TAG_RE = re.compile(
-    r"<asyncapi-tag\b(?P<attrs>(?:[^>'\"]|\"[^\"]*\"|'[^']*')*?)\s*/?>"
-    r"(?:\s*</asyncapi-tag\s*>)?",
+    r"<asyncapi-(?:viewer|tag)\b(?P<attrs>(?:[^>'\"]|\"[^\"]*\"|'[^']*')*?)\s*/?>"
+    r"(?:\s*</asyncapi-(?:viewer|tag)\s*>)?",
     re.IGNORECASE,
 )
 ATTR_RE = re.compile(
@@ -152,7 +152,7 @@ def build_viewer_config(
             continue
         spec = _ATTRIBUTES.get(name)
         if spec is None:
-            warn(f"<asyncapi-tag>: unknown attribute '{name}' was ignored.")
+            warn(f"<asyncapi-viewer>: unknown attribute '{name}' was ignored.")
             continue
         section, key, kind = spec
         value: Any
@@ -163,14 +163,14 @@ def build_viewer_config(
             elif text in _FALSE:
                 value = False
             else:
-                warn(f"<asyncapi-tag>: attribute '{name}' expects true or false, got '{raw}'.")
+                warn(f"<asyncapi-viewer>: attribute '{name}' expects true or false, got '{raw}'.")
                 continue
         elif kind == "enum":
             allowed = _ENUM_VALUES[key]
             matches = [a for a in allowed if a.lower() == (raw or "").strip().lower()]
             if not matches:
                 warn(
-                    f"<asyncapi-tag>: attribute '{name}' expects one of "
+                    f"<asyncapi-viewer>: attribute '{name}' expects one of "
                     f"{', '.join(allowed)}; got '{raw}'."
                 )
                 continue
@@ -179,7 +179,7 @@ def build_viewer_config(
             try:
                 value = json.loads(raw or "")
             except json.JSONDecodeError as exc:
-                warn(f"<asyncapi-tag>: attribute '{name}' is not valid JSON ({exc.msg}).")
+                warn(f"<asyncapi-viewer>: attribute '{name}' is not valid JSON ({exc.msg}).")
                 continue
         else:
             value = raw if raw is not None else ""
@@ -223,8 +223,8 @@ def parse_fence_body(
     return attrs
 
 
-class AsyncAPITagPreprocessor(Preprocessor):
-    def __init__(self, md: Markdown, extension: "AsyncAPITagExtension") -> None:
+class AsyncAPIViewerPreprocessor(Preprocessor):
+    def __init__(self, md: Markdown, extension: "AsyncAPIViewerExtension") -> None:
         super().__init__(md)
         self.extension = extension
         self.reset()
@@ -245,16 +245,16 @@ class AsyncAPITagPreprocessor(Preprocessor):
         container_id = attrs.get("id") or f"{assets.CONTAINER_CLASS}-{self.counter}"
         src = attrs.get("src")
         if not src:
-            self._warn("asyncapi-tag: missing required 'src'; nothing was rendered.")
+            self._warn("asyncapi-viewer: missing required 'src'; nothing was rendered.")
             return (
-                f'<div class="{assets.CONTAINER_CLASS} {assets.CONTAINER_CLASS}-error" '
+                f'<div class="{assets.CONTAINER_CLASS} {assets.LEGACY_CLASS} {assets.CONTAINER_CLASS}-error" '
                 f'id="{html.escape(container_id, quote=True)}">'
                 "<p>AsyncAPI viewer: no document given (missing src).</p></div>"
             )
         config = build_viewer_config(attrs, self._warn)
         config.setdefault("schemaID", container_id)
         return (
-            f'<div class="{assets.CONTAINER_CLASS}" id="{html.escape(container_id, quote=True)}"'
+            f'<div class="{assets.CONTAINER_CLASS} {assets.LEGACY_CLASS}" id="{html.escape(container_id, quote=True)}"'
             f' data-asyncapi-src="{html.escape(self._resolve(src), quote=True)}"'
             f' data-asyncapi-config="{html.escape(json.dumps(config), quote=True)}"></div>'
         )
@@ -278,8 +278,8 @@ class AsyncAPITagPreprocessor(Preprocessor):
         return self.md.htmlStash.store(block)
 
     def _replace_tags(self, text: str) -> str:
-        """Replace <asyncapi-tag> elements in prose, skipping indented code and code spans."""
-        if "<asyncapi-tag" not in text.lower():
+        """Replace <asyncapi-viewer> elements in prose, skipping indented code and code spans."""
+        if "<asyncapi-" not in text.lower():
             return text
         spans = [m.span() for m in CODE_SPAN_RE.finditer(text)]
 
@@ -298,7 +298,7 @@ class AsyncAPITagPreprocessor(Preprocessor):
     # -- Preprocessor API ----------------------------------------------------
     def run(self, lines: List[str]) -> List[str]:
         if FENCE_LANG not in "\n".join(lines).lower():
-            return lines  # neither "<asyncapi-tag" nor an "asyncapi" fence can be present
+            return lines  # neither "<asyncapi-viewer" nor an "asyncapi" fence can be present
         out: List[str] = []
         prose: List[str] = []
 
@@ -332,8 +332,8 @@ class AsyncAPITagPreprocessor(Preprocessor):
         return out
 
 
-class AsyncAPITagExtension(Extension):
-    """Markdown extension registering :class:`AsyncAPITagPreprocessor`."""
+class AsyncAPIViewerExtension(Extension):
+    """Markdown extension registering :class:`AsyncAPIViewerPreprocessor`."""
 
     def __init__(self, **kwargs: Any) -> None:
         self.config = {
@@ -367,14 +367,19 @@ class AsyncAPITagExtension(Extension):
 
     def extendMarkdown(self, md: Markdown) -> None:
         md.registerExtension(self)
-        self.preprocessor = AsyncAPITagPreprocessor(md, self)
+        self.preprocessor = AsyncAPIViewerPreprocessor(md, self)
         # Before fenced_code / superfences (25) stash fences, so ```asyncapi blocks are
         # still visible; the preprocessor tracks other fences itself.
-        md.preprocessors.register(self.preprocessor, "asyncapi_tag", 26)
+        md.preprocessors.register(self.preprocessor, "asyncapi_viewer", 26)
 
     def reset(self) -> None:
         self.preprocessor.reset()
 
 
-def makeExtension(**kwargs: Any) -> AsyncAPITagExtension:  # noqa: N802 (Python-Markdown API)
-    return AsyncAPITagExtension(**kwargs)
+def makeExtension(**kwargs: Any) -> AsyncAPIViewerExtension:  # noqa: N802 (Python-Markdown API)
+    return AsyncAPIViewerExtension(**kwargs)
+
+
+# Names from before the rename to asyncapi-viewer, kept for one major version.
+AsyncAPITagExtension = AsyncAPIViewerExtension
+AsyncAPITagPreprocessor = AsyncAPIViewerPreprocessor

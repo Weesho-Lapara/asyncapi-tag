@@ -5,7 +5,7 @@ Two syntaxes are accepted and take the same names:
 === "Element"
 
     ```html
-    <asyncapi-tag src="events.yaml" sidebar="false" publishLabel="PUBLISH"></asyncapi-tag>
+    <asyncapi-viewer src="events.yaml" sidebar="false" publishLabel="PUBLISH"></asyncapi-viewer>
     ```
 
 === "Fenced block"
@@ -26,7 +26,7 @@ In the fenced form each line is `key: value`; quotes around a value are optional
 | Attribute | Values | Default | Effect |
 |---|---|---|---|
 | `src` | path or URL | required | The AsyncAPI document (JSON or YAML) |
-| `id` | string | `asyncapi-tag-N` | HTML id of the container element |
+| `id` | string | `asyncapi-viewer-N` | HTML id of the container element |
 | `sidebar` | boolean | `false` | Show the navigation sidebar (a toggle button inside the viewer when the column is narrow) |
 | `info` | boolean | `true` | Show the info section |
 | `servers` | boolean | `true` | Show servers |
@@ -53,31 +53,31 @@ The default for `messageExamples` follows earlier releases of this plugin rather
 Hide the sidebar and collapse examples:
 
 ```html
-<asyncapi-tag src="events.yaml" sidebar="false" messageExamples="false"></asyncapi-tag>
+<asyncapi-viewer src="events.yaml" sidebar="false" messageExamples="false"></asyncapi-viewer>
 ```
 
 Group the sidebar by tags declared in the document:
 
 ```html
-<asyncapi-tag src="events.yaml" showServers="bySpecTags" showOperations="bySpecTags"></asyncapi-tag>
+<asyncapi-viewer src="events.yaml" showServers="bySpecTags" showOperations="bySpecTags"></asyncapi-viewer>
 ```
 
 Custom operation labels for an AsyncAPI 3 document:
 
 ```html
-<asyncapi-tag src="orders.yaml" sendLabel="EMIT" receiveLabel="ON"></asyncapi-tag>
+<asyncapi-viewer src="orders.yaml" sendLabel="EMIT" receiveLabel="ON"></asyncapi-viewer>
 ```
 
 Pass parser options as JSON (single quotes around the attribute keep the JSON readable):
 
 ```html
-<asyncapi-tag src="events.yaml" parserOptions='{"applyTraits": false}'></asyncapi-tag>
+<asyncapi-viewer src="events.yaml" parserOptions='{"applyTraits": false}'></asyncapi-viewer>
 ```
 
 Both the paired and the self-closing form are accepted, and a tag may span several lines:
 
 ```html
-<asyncapi-tag
+<asyncapi-viewer
     src="events.yaml"
     sidebar="false"
 />

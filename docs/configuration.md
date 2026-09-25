@@ -4,7 +4,7 @@
 
 ```yaml title="mkdocs.yml"
 plugins:
-  - asyncapi-tag:
+  - asyncapi-viewer:
       load_assets: true              # emit the viewer script and stylesheet (default: true)
       embed_css: true                # keep the viewer inside its container (default: true)
       viewer_js: https://unpkg.com/@asyncapi/react-component@3.2.1/browser/standalone/index.js
@@ -24,7 +24,7 @@ resolved per page like `src` is:
 
 ```yaml title="mkdocs.yml"
 plugins:
-  - asyncapi-tag:
+  - asyncapi-viewer:
       viewer_js: assets/asyncapi/index.js
       viewer_js_integrity: ''
       viewer_css: assets/asyncapi/default.min.css
@@ -52,13 +52,13 @@ The viewer is built for a full-width page. In a narrower container it switches t
 whose sidebar toggle and sidebar overlay are positioned relative to the browser window, and whose
 centre panel does not shrink below its content. The plugin emits a small stylesheet that keeps all
 of that inside the viewer's box (`embed_css: true`, the default). Set it to `false` if you style the
-viewer yourself; the rules are available as `asyncapi_tag.assets.EMBED_CSS`.
+viewer yourself; the rules are available as `asyncapi_viewer.assets.EMBED_CSS`.
 
 ## Loading assets yourself
 
 Set `load_assets: false` if you prefer to load the viewer through `extra_javascript` and `extra_css`.
 The page-side runner script is still required in that case; it is available as
-`asyncapi_tag.assets.RUNNER_JS`.
+`asyncapi_viewer.assets.RUNNER_JS`.
 
 ## Content Security Policy
 

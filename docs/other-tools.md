@@ -1,6 +1,6 @@
 # Other tools
 
-`asyncapi-tag` is a Python-Markdown extension first. The MkDocs plugin is a thin layer that resolves
+`asyncapi-viewer` is a Python-Markdown extension first. The MkDocs plugin is a thin layer that resolves
 document paths per page and reports problems through the MkDocs logger.
 
 ## Zensical
@@ -10,11 +10,11 @@ document paths per page and reports problems through the MkDocs logger.
 
 ```yaml title="mkdocs.yml"
 markdown_extensions:
-  - asyncapi_tag
+  - asyncapi_viewer
 ```
 
 Relative `src` paths work: Zensical rewrites them per page like it does for links. Listing both
-`plugins: [asyncapi-tag]` and `markdown_extensions: [asyncapi_tag]` is fine and lets one file build
+`plugins: [asyncapi-viewer]` and `markdown_extensions: [asyncapi_viewer]` is fine and lets one file build
 under MkDocs and Zensical. This site is built that way, and a Zensical build runs in CI.
 
 The differences from MkDocs are that a missing document is not reported at build time (the viewer
@@ -23,7 +23,7 @@ under Zensical, pass them as extension options:
 
 ```yaml title="mkdocs.yml"
 markdown_extensions:
-  - asyncapi_tag:
+  - asyncapi_viewer:
       viewer_js: https://cdn.example.com/asyncapi/index.js
       viewer_js_integrity: ''
 ```
@@ -33,10 +33,10 @@ markdown_extensions:
 ```python
 import markdown
 
-html = markdown.markdown(text, extensions=["asyncapi_tag"])
+html = markdown.markdown(text, extensions=["asyncapi_viewer"])
 ```
 
-Extension options, passed as `extension_configs={"asyncapi_tag": {...}}`:
+Extension options, passed as `extension_configs={"asyncapi_viewer": {...}}`:
 
 | Option | Default | Description |
 |---|---|---|
@@ -59,7 +59,7 @@ site has it enabled.
 
 ## How it works
 
-Each tag becomes a `<div class="asyncapi-tag">` carrying the document URL and the viewer
+Each tag becomes a `<div class="asyncapi-viewer">` carrying the document URL and the viewer
 configuration as HTML-escaped data attributes. The first tag on a page also emits the viewer's
 stylesheet and script and a short runner script. The runner fetches each document as text, hands it
 to `AsyncApiStandalone.render`, and prints a visible error inside the container if fetching or

@@ -4,7 +4,7 @@ info:
   version: 2.1.0
   description: |
     Events emitted and consumed by the orders service. This document is an
-    **AsyncAPI 3** example used by the asyncapi-tag documentation.
+    **AsyncAPI 3** example used by the asyncapi-viewer documentation.
   license:
     name: MIT
 servers:

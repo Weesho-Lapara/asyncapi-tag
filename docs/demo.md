@@ -1,6 +1,6 @@
 # Live demo
 
-Everything on this page is rendered by `asyncapi-tag` from the two example documents in
+Everything on this page is rendered by `asyncapi-viewer` from the two example documents in
 `docs/examples/`. The Markdown for each section is shown above its viewer.
 
 ## AsyncAPI 3 document (YAML), fenced-block syntax
@@ -25,10 +25,10 @@ The sidebar is off by default. With `sidebar="true"` in a narrow column it sits 
 toggle button at the top right of the viewer.
 
 ```markdown
-<asyncapi-tag src="examples/accounts-v2.json" sidebar="true" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-tag>
+<asyncapi-viewer src="examples/accounts-v2.json" sidebar="true" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-viewer>
 ```
 
-<asyncapi-tag src="examples/accounts-v2.json" sidebar="true" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-tag>
+<asyncapi-viewer src="examples/accounts-v2.json" sidebar="true" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-viewer>
 
 ## Error handling (this one is meant to fail)
 
@@ -37,7 +37,7 @@ be loaded: a message in place of the viewer, naming the URL, instead of a blank 
 is caught earlier, at build time, because `mkdocs build --strict` fails on it.
 
 ```markdown
-<asyncapi-tag src="https://example.invalid/asyncapi.yaml"></asyncapi-tag>
+<asyncapi-viewer src="https://example.invalid/asyncapi.yaml"></asyncapi-viewer>
 ```
 
-<asyncapi-tag src="https://example.invalid/asyncapi.yaml"></asyncapi-tag>
+<asyncapi-viewer src="https://example.invalid/asyncapi.yaml"></asyncapi-viewer>

@@ -41,7 +41,7 @@ Each chunk is 1 to 3 hours, has its own acceptance check, and ends in a green CI
 
 | # | Chunk | Depends on | Done when |
 |---|---|---|---|
-| 0.1 | Rename to `asyncapi-viewer` (repo, packages, docs, shim for the old name). See "Rename". | | Old configs still work; new name on PyPI |
+| 0.1 | ~~Rename to `asyncapi-viewer` (repo, packages, docs, shim for the old name).~~ Done 2026-09-26 (1.2.0). | | Old configs still work; new name on PyPI |
 | 0.2 | `viewer/` skeleton: Vite library mode, Lit, TypeScript, Vitest, ESLint. An empty `<asyncapi-viewer>` that renders its `src` attribute as text. `demo/index.html`. CI job: Node build, then Python tests. | 0.1 | `npm run build` yields one ESM and one IIFE file; CI green |
 
 **Phase 1: the viewer**
@@ -102,7 +102,7 @@ quarters of it, and 1.8b is the chunk most likely to grow.
 - **Maintenance surface.** A Node toolchain, Playwright in three browsers and a two-registry release
   join the repo. Keep chunks small and CI green so the surface stays manageable.
 
-## Rename to asyncapi-viewer (2026-09-25, in progress)
+## Rename to asyncapi-viewer (done 2026-09-26, release 1.2.0)
 
 The fenced-block syntax made "tag" a misnomer; the new viewer makes the name wrong twice. Target
 names, all checked free on 2026-09-25: PyPI `asyncapi-viewer`, npm `asyncapi-viewer`, GitHub
@@ -111,7 +111,7 @@ names, all checked free on 2026-09-25: PyPI `asyncapi-viewer`, npm `asyncapi-vie
 
 Compatibility kept for one major version: plugin id `asyncapi-tag`, extension name `asyncapi_tag`,
 element `<asyncapi-tag>`, and a PyPI shim `asyncapi-tag` depending on `asyncapi-viewer`. The fence
-language `asyncapi` does not change. Steps are in the session log below and, once done, in AGENTS.md.
+language `asyncapi` does not change. The old `asyncapi-tag` PyPI project can be archived once 1.2.0 is out.
 
 ## Later ideas (after 2.0)
 

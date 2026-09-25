@@ -3,9 +3,9 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "asyncapi-tag"
+name = "asyncapi-viewer"
 dynamic = ["version"]
-description = "Render AsyncAPI documents in Markdown with an <asyncapi-tag> element. Python-Markdown extension with a MkDocs plugin."
+description = "Render AsyncAPI documents in Markdown: an <asyncapi-viewer> element or an asyncapi fence. Python-Markdown extension with a MkDocs plugin."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -38,19 +38,21 @@ test = ["mkdocs>=1.5", "pytest>=7", "certifi", "pymdown-extensions>=10"]
 docs = ["mkdocs>=1.5", "mkdocs-material>=9.5"]
 
 [project.urls]
-Homepage = "https://github.com/Weesho-Lapara/asyncapi-tag"
-Documentation = "https://weesho-lapara.github.io/asyncapi-tag/"
-Changelog = "https://github.com/Weesho-Lapara/asyncapi-tag/blob/main/CHANGELOG.md"
-Issues = "https://github.com/Weesho-Lapara/asyncapi-tag/issues"
+Homepage = "https://github.com/Weesho-Lapara/asyncapi-viewer"
+Documentation = "https://weesho-lapara.github.io/asyncapi-viewer/"
+Changelog = "https://github.com/Weesho-Lapara/asyncapi-viewer/blob/main/CHANGELOG.md"
+Issues = "https://github.com/Weesho-Lapara/asyncapi-viewer/issues"
 
 [project.entry-points."markdown.extensions"]
-asyncapi_tag = "asyncapi_tag.extension:AsyncAPITagExtension"
+asyncapi_viewer = "asyncapi_viewer.extension:AsyncAPIViewerExtension"
+asyncapi_tag = "asyncapi_viewer.extension:AsyncAPIViewerExtension"
 
 [project.entry-points."mkdocs.plugins"]
-asyncapi-tag = "asyncapi_tag.mkdocs_plugin:AsyncAPIPlugin"
+asyncapi-viewer = "asyncapi_viewer.mkdocs_plugin:AsyncAPIPlugin"
+asyncapi-tag = "asyncapi_viewer.mkdocs_plugin:AsyncAPIPlugin"
 
 [tool.setuptools.dynamic]
-version = { attr = "asyncapi_tag.__version__" }
+version = { attr = "asyncapi_viewer.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

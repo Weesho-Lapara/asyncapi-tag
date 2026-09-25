@@ -1,12 +1,12 @@
-# Documentation site for asyncapi-tag. It is built with the plugin itself, so a
+# Documentation site for asyncapi-viewer. It is built with the plugin itself, so a
 # strict build of this site is an end-to-end test. Both the MkDocs plugin and
 # the bare Markdown extension are listed so the same file builds under MkDocs
 # and under Zensical (which ignores `plugins` but honours `markdown_extensions`).
-site_name: asyncapi-tag
-site_description: Render AsyncAPI documents in Markdown and MkDocs with a single <asyncapi-tag> element.
-site_url: https://weesho-lapara.github.io/asyncapi-tag/
-repo_url: https://github.com/Weesho-Lapara/asyncapi-tag
-repo_name: Weesho-Lapara/asyncapi-tag
+site_name: asyncapi-viewer
+site_description: Render AsyncAPI documents in Markdown and MkDocs with a single <asyncapi-viewer> element.
+site_url: https://weesho-lapara.github.io/asyncapi-viewer/
+repo_url: https://github.com/Weesho-Lapara/asyncapi-viewer
+repo_name: Weesho-Lapara/asyncapi-viewer
 edit_uri: edit/main/docs/
 copyright: MIT licensed. Made by <a href="https://weesholapara.com" target="_blank" rel="noopener">Weesho Lapara</a>.
 
@@ -43,10 +43,10 @@ theme:
 
 plugins:
   - search
-  - asyncapi-tag
+  - asyncapi-viewer
 
 markdown_extensions:
-  - asyncapi_tag
+  - asyncapi_viewer
   - admonition
   - attr_list
   - tables
@@ -67,6 +67,6 @@ extra:
       link: https://weesholapara.com
       name: weesholapara.com
     - icon: fontawesome/brands/github
-      link: https://github.com/Weesho-Lapara/asyncapi-tag
+      link: https://github.com/Weesho-Lapara/asyncapi-viewer
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/asyncapi-tag/
+      link: https://pypi.org/project/asyncapi-viewer/

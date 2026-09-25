@@ -1,6 +1,15 @@
 # Changelog
 
-## Unreleased
+## asyncapi-viewer 1.2.0 (2026-09-26)
+
+### Changed
+- **Renamed to `asyncapi-viewer`.** PyPI package `asyncapi-viewer`, import `asyncapi_viewer`, MkDocs
+  plugin id `asyncapi-viewer`, Markdown extension `asyncapi_viewer`, element `<asyncapi-viewer>`.
+  The old names (`asyncapi-tag` plugin id, `asyncapi_tag` extension, `<asyncapi-tag>` element,
+  `asyncapi_tag` import via the shim) keep working until 3.0. Default container ids are now
+  `asyncapi-viewer-N`; containers carry both the `asyncapi-viewer` and `asyncapi-tag` classes.
+- Repository renamed to `Weesho-Lapara/asyncapi-viewer`; docs at
+  https://weesho-lapara.github.io/asyncapi-viewer/.
 
 ### Added
 - Fenced-block syntax: a fence with language `asyncapi` whose body is `key: value` lines using the
@@ -11,6 +20,11 @@
 ### Fixed
 - An `<asyncapi-tag>` written inside an inline code span (backticks) was rendered instead of being
   shown as code.
+
+## asyncapi-tag 1.2.0 (2026-09-26)
+
+- Deprecated shim: contains no code of its own, depends on `asyncapi-viewer>=1.2.0,<2` and
+  re-exports its modules under the old import name.
 
 ## asyncapi-tag 1.1.0 (2026-09-25)
 
