@@ -1,4 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+.venv/
+venv/
+
+# Test and tooling output
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# MkDocs
+site/
+
+# Credentials
 .pypirc
-mkdocs_asyncapi_tag_plugin.egg-info/*
-build/*
-dist/*
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local scratch (demo sites, notes, agent working files)
+scratch/
+.claude/

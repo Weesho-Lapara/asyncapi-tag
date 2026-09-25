@@ -1,0 +1,106 @@
+"""Pinned viewer assets and the browser-side loader.
+
+The viewer is the standalone bundle of ``@asyncapi/react-component``. The
+version, URLs and Subresource Integrity hashes below are updated together
+with ``scripts/update_viewer.py``; do not edit them by hand.
+"""
+
+from __future__ import annotations
+
+import html
+
+# --- managed by scripts/update_viewer.py ------------------------------------
+VIEWER_VERSION = "3.2.1"
+VIEWER_JS_URL = "https://unpkg.com/@asyncapi/react-component@3.2.1/browser/standalone/index.js"
+VIEWER_JS_INTEGRITY = "sha384-wy5bSOazlkSKMGH7XMW6+pK8ho8+rCPr7mTqKdAb/dvfwXAPWCFivgr3C7wJMFAh"
+VIEWER_CSS_URL = "https://unpkg.com/@asyncapi/react-component@3.2.1/styles/default.min.css"
+VIEWER_CSS_INTEGRITY = "sha384-oo9RoQcacP++XdMX6CjTucTvASEORHX3chFik0/V2kHcsHiVboGyWZztGeq/0bum"
+# ---------------------------------------------------------------------------
+
+CONTAINER_CLASS = "asyncapi-tag"
+
+# Runs once per page. It finds every container the extension emitted, fetches
+# the AsyncAPI document as text (JSON or YAML, the viewer parses both) and
+# renders it. Nothing from the Markdown source is interpolated into this
+# script: per-tag data travels in HTML data attributes, which are HTML-escaped.
+RUNNER_JS = """\
+(function () {
+  "use strict";
+  var SELECTOR = ".asyncapi-tag[data-asyncapi-src]";
+  function showError(el, message) {
+    el.textContent = "";
+    var p = document.createElement("p");
+    p.className = "asyncapi-tag-error";
+    p.textContent = "AsyncAPI viewer: " + message;
+    el.appendChild(p);
+  }
+  function render(el) {
+    if (el.getAttribute("data-asyncapi-state")) { return; }
+    el.setAttribute("data-asyncapi-state", "loading");
+    var src = el.getAttribute("data-asyncapi-src");
+    var config = {};
+    try {
+      config = JSON.parse(el.getAttribute("data-asyncapi-config") || "{}");
+    } catch (err) {
+      showError(el, "invalid configuration (" + err.message + ")");
+      return;
+    }
+    if (!window.AsyncApiStandalone) {
+      showError(el, "the viewer script did not load; check the browser console and any Content Security Policy.");
+      return;
+    }
+    fetch(src, { credentials: "same-origin" }).then(function (response) {
+      if (!response.ok) {
+        throw new Error("could not fetch " + src + " (HTTP " + response.status + ")");
+      }
+      return response.text();
+    }).then(function (text) {
+      return window.AsyncApiStandalone.render({ schema: text, config: config }, el);
+    }).then(function () {
+      el.setAttribute("data-asyncapi-state", "rendered");
+    }).catch(function (err) {
+      showError(el, err && err.message ? err.message : String(err));
+      if (window.console) { console.error("asyncapi-tag:", err); }
+    });
+  }
+  function renderAll() {
+    var nodes = document.querySelectorAll(SELECTOR);
+    for (var i = 0; i < nodes.length; i++) { render(nodes[i]); }
+  }
+  renderAll();
+  /* Material for MkDocs instant navigation swaps page content without a reload. */
+  if (window.document$ && typeof window.document$.subscribe === "function") {
+    window.document$.subscribe(renderAll);
+  }
+})();
+"""
+
+
+def _attr(name: str, value: str) -> str:
+    return f' {name}="{html.escape(value, quote=True)}"'
+
+
+def loader_html(
+    js_url: str,
+    css_url: str,
+    js_integrity: str = "",
+    css_integrity: str = "",
+) -> str:
+    """Return the HTML that loads the viewer and runs it on the page.
+
+    Integrity attributes are emitted only when a hash is given, so the loader
+    also works for self-hosted copies of the viewer.
+    """
+    parts = []
+    if css_url:
+        attrs = _attr("rel", "stylesheet") + _attr("href", css_url)
+        if css_integrity:
+            attrs += _attr("integrity", css_integrity) + _attr("crossorigin", "anonymous")
+        parts.append(f"<link{attrs}>")
+    if js_url:
+        attrs = _attr("src", js_url)
+        if js_integrity:
+            attrs += _attr("integrity", js_integrity) + _attr("crossorigin", "anonymous")
+        parts.append(f"<script{attrs}></script>")
+    parts.append(f"<script>{RUNNER_JS}</script>")
+    return "\n".join(parts)

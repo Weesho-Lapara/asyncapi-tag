@@ -1,6 +1,58 @@
 [build-system]
-requires = [
-"setuptools>=46",
-"wheel"
-]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "asyncapi-tag"
+dynamic = ["version"]
+description = "Render AsyncAPI documents in Markdown with an <asyncapi-tag> element. Python-Markdown extension with a MkDocs plugin."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+authors = [{ name = "Weesho Lapara", email = "support@weesholapara.com" }]
+keywords = ["asyncapi", "markdown", "mkdocs", "documentation", "event-driven", "api"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: MkDocs",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+dependencies = ["Markdown>=3.4"]
+
+[project.optional-dependencies]
+mkdocs = ["mkdocs>=1.5"]
+test = ["mkdocs>=1.5", "pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/Weesho-Lapara/mkdocs-asyncapi-tag-plugin"
+Changelog = "https://github.com/Weesho-Lapara/mkdocs-asyncapi-tag-plugin/blob/main/CHANGELOG.md"
+Issues = "https://github.com/Weesho-Lapara/mkdocs-asyncapi-tag-plugin/issues"
+
+[project.entry-points."markdown.extensions"]
+asyncapi_tag = "asyncapi_tag.extension:AsyncAPITagExtension"
+
+[project.entry-points."mkdocs.plugins"]
+asyncapi-tag = "asyncapi_tag.mkdocs_plugin:AsyncAPIPlugin"
+
+[tool.setuptools.dynamic]
+version = { attr = "asyncapi_tag.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
