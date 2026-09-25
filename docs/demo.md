@@ -19,10 +19,11 @@ Everything on this page is rendered by `asyncapi-tag` from the two example docum
 
 <asyncapi-tag src="examples/accounts-v2.json" showServers="bySpecTags" showOperations="bySpecTags" messageExamples="false"></asyncapi-tag>
 
-## Missing document
+## Error handling (this one is meant to fail)
 
-A wrong path is reported at build time (`mkdocs build --strict` fails) and, if it slips through,
-shown in place instead of a blank box:
+The tag below points at a host that does not exist, to show what readers see when a document cannot
+be loaded: a message in place of the viewer, naming the URL, instead of a blank box. A wrong local path
+is caught earlier, at build time, because `mkdocs build --strict` fails on it.
 
 ```markdown
 <asyncapi-tag src="https://example.invalid/asyncapi.yaml"></asyncapi-tag>

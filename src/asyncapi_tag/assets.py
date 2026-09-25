@@ -52,9 +52,12 @@ RUNNER_JS = """\
     }
     fetch(src, { credentials: "same-origin" }).then(function (response) {
       if (!response.ok) {
-        throw new Error("could not fetch " + src + " (HTTP " + response.status + ")");
+        throw new Error("could not load " + src + " (HTTP " + response.status + ")");
       }
       return response.text();
+    }, function (err) {
+      /* Network-level failure: browsers report it tersely ("Failed to fetch", "Load failed"). */
+      throw new Error("could not load " + src + " (" + (err && err.message ? err.message : err) + ")");
     }).then(function (text) {
       return window.AsyncApiStandalone.render({ schema: text, config: config }, el);
     }).then(function () {
