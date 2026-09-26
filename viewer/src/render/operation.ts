@@ -38,8 +38,7 @@ export const operationStyles = css`
   .op__content {
     min-width: 0;
   }
-  .op__content > .block:first-child,
-  .op__content > .msg:first-child {
+  .op__content > .block:first-child {
     margin-top: 0;
   }
   .op__example {
@@ -128,6 +127,10 @@ export const operationStyles = css`
     align-items: baseline;
     gap: 4px 10px;
     margin-bottom: 16px;
+  }
+  .op__channel .label {
+    font-size: 13px;
+    letter-spacing: 0.06em;
   }
   .op__address {
     font: 400 13px/1.5 var(--_font-mono);
