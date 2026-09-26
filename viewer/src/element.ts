@@ -11,7 +11,7 @@ import { operationStyles, renderOperations } from './render/operation.js';
 import { detailStyles } from './render/details.js';
 import { exampleStyles, type ExampleContext, type ExamplePanelState } from './render/example.js';
 import { buildNavItems, filterNav } from './render/nav.js';
-import { operationsOn, renderMessages, renderProblems, renderSchemas, renderServerSelector, renderServers, sectionStyles } from './render/sections.js';
+import { renderMessages, renderProblems, renderSchemas, renderServers, sectionStyles } from './render/sections.js';
 import { menuIcon, renderSidebar, sidebarStyles } from './render/sidebar.js';
 import { TreeState, treeStyles } from './render/tree.js';
 import { base } from './styles/base.js';
@@ -53,7 +53,6 @@ export class AsyncAPIViewerElement extends LitElement {
     return state;
   };
   readonly #messageIndex = new Map<string, number>();
-  #server = '';
   #downloadUrl: string | undefined;
   #query = '';
   #drawerOpen = false;
@@ -281,7 +280,6 @@ export class AsyncAPIViewerElement extends LitElement {
     this.#trees.clear();
     this.#panels.clear();
     this.#messageIndex.clear();
-    this.#server = '';
     this.#query = '';
     this.#drawerOpen = false;
     this.#current = undefined;
@@ -336,8 +334,7 @@ export class AsyncAPIViewerElement extends LitElement {
     const m = this.#model;
     if (!m) return html`<div class="content"><p class="summary">Preparing ${src}…</p></div>`;
     const o = this.#options;
-    const operations = operationsOn(m, this.#server);
-    const selected = m.servers.find((s) => s.id === this.#server);
+    const operations = m.operations;
     const sectionCtx = { prefix: this.id, tree: this.#tree, example: this.#example };
     const navItems = o.sidebar
       ? buildNavItems(m, operations, this.id, {
@@ -372,35 +369,19 @@ export class AsyncAPIViewerElement extends LitElement {
         resolvedTheme: this.#resolved,
         onToggleTheme: () => this.#theme.toggle(),
         menu,
-        extra: o.servers
-          ? renderServerSelector(
-              m,
-              this.#server,
-              (id) => {
-                this.#server = id;
-                this.requestUpdate();
-              },
-              `${this.id}--server-selector`,
-            )
-          : nothing,
       })}
       <div class="content">
         ${o.info ? renderInfo(m, `${this.id}--info`) : nothing}
         ${o.servers ? renderServers(m, this.id) : nothing}
         ${o.operations
-          ? renderOperations(
-              m,
-              operations,
-              {
-                ...sectionCtx,
-                messageIndex: (anchor) => this.#messageIndex.get(anchor) ?? 0,
-                selectMessage: (anchor, index) => {
-                  this.#messageIndex.set(anchor, index);
-                  this.requestUpdate();
-                },
+          ? renderOperations(m, {
+              ...sectionCtx,
+              messageIndex: (anchor) => this.#messageIndex.get(anchor) ?? 0,
+              selectMessage: (anchor, index) => {
+                this.#messageIndex.set(anchor, index);
+                this.requestUpdate();
               },
-              selected?.id,
-            )
+            })
           : nothing}
         ${o.messages ? renderMessages(m, sectionCtx, o.showMessageExamples) : nothing}
         ${o.schemas ? renderSchemas(m, sectionCtx) : nothing}

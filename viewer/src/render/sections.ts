@@ -144,6 +144,16 @@ export const sectionStyles = css`
     font: 600 14px/1.5 var(--_font-heading);
     color: var(--_ink);
   }
+  .entry__host {
+    margin-left: auto;
+    word-break: break-all;
+  }
+  .entry__body .card__desc + .card__desc {
+    margin-top: 6px;
+  }
+  .entry__body .vars {
+    margin-top: 12px;
+  }
   .entry__desc {
     padding: 0 16px 12px;
     font-size: 13px;
@@ -175,51 +185,6 @@ export const sectionStyles = css`
     color: var(--_muted);
     overflow-wrap: anywhere;
   }
-  .selector {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    flex: none;
-    min-width: 0;
-  }
-  .selector__label {
-    font-size: 12.5px;
-    color: var(--_muted);
-  }
-  .selector select {
-    min-height: 40px;
-    max-width: 34ch;
-    text-overflow: ellipsis;
-    padding: 0 10px;
-    border: 1px solid var(--_line);
-    border-radius: var(--_radius-sm);
-    background: var(--_surface);
-    color: var(--_ink);
-    font: 13px/1 var(--_font-body);
-  }
-  .selector select:focus-visible {
-    outline: 2px solid var(--_primary);
-    outline-offset: 1px;
-  }
-  @container viewer (max-width: 1099px) {
-    .selector {
-      flex-basis: 100%;
-      order: 10;
-      padding-top: 4px;
-    }
-    .selector select {
-      flex: 1;
-      max-width: none;
-    }
-  }
-  .filtered {
-    margin: 0 0 20px;
-    padding: 10px 14px;
-    border: 1px dashed var(--_line-2);
-    border-radius: var(--_radius-sm);
-    font-size: 13px;
-    color: var(--_ink-2);
-  }
 `;
 
 export interface SectionContext {
@@ -228,52 +193,37 @@ export interface SectionContext {
   example: (key: string) => ExampleContext;
 }
 
-export function renderServerSelector(doc: Document, selected: string, onChange: (id: string) => void, id: string): TemplateResult | typeof nothing {
-  if (doc.servers.length < 2) return nothing;
-  return html`<label class="selector">
-    <span class="selector__label" id="${id}--label">Server</span>
-    <select aria-labelledby="${id}--label" @change=${(e: Event) => onChange((e.target as HTMLSelectElement).value)}>
-      <option value="" ?selected=${selected === ''}>All servers</option>
-      ${doc.servers.map((s) => html`<option value=${s.id} ?selected=${s.id === selected}>${s.id} · ${s.protocol} · ${s.hostDisplay}</option>`)}
-    </select>
-  </label>`;
-}
-
-/** Operations whose channel is available on the selected server (no servers listed means all). */
-export function operationsOn(doc: Document, serverId: string): Document['operations'] {
-  if (serverId === '' || !doc.servers.some((s) => s.id === serverId)) return doc.operations;
-  return doc.operations.filter((op) => op.channel.servers.length === 0 || op.channel.servers.includes(serverId));
-}
-
-function serverCard(server: Server, prefix: string): TemplateResult {
+function serverEntry(server: Server, prefix: string): TemplateResult {
   const anchor = `${prefix}--servers--${server.anchor}`;
-  return html`<article class="card" id=${anchor} aria-labelledby="${anchor}--id">
-    <div class="card__head">
-      <h3 class="card__id" id="${anchor}--id" tabindex="-1">${server.id}</h3>
-      ${server.title ? html`<span>${server.title}</span>` : nothing}
+  return html`<details class="entry" id=${anchor}>
+    <summary>
+      <span class="entry__title">${server.id}</span>
       <span class="card__meta">${server.protocol}${server.protocolVersion ? ` ${server.protocolVersion}` : ''}</span>
+      <span class="card__meta entry__host">${server.hostDisplay || 'Host not specified'}</span>
+    </summary>
+    <div class="entry__body">
+      ${server.title ? html`<div class="card__desc"><strong>${server.title}</strong></div>` : nothing}
+      ${server.summary ? html`<div class="card__desc">${renderInline(server.summary)}</div>` : nothing}
+      ${server.description ? html`<div class="card__desc">${renderMarkdown(server.description)}</div>` : nothing}
+      ${server.variables.length > 0
+        ? html`<table class="vars">
+            <thead><tr><th>Variable</th><th>Enum</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              ${server.variables.map(
+                (v) => html`<tr>
+                  <td class="mono vars__name">${v.name}</td>
+                  <td class="mono">${v.enum?.join(' · ') ?? ''}</td>
+                  <td class="mono">${v.default ?? ''}</td>
+                  <td>${renderInline(v.description)}${v.examples ? html` <span class="card__meta">examples: ${v.examples.join(' · ')}</span>` : nothing}</td>
+                </tr>`,
+              )}
+            </tbody>
+          </table>`
+        : nothing}
+      ${renderSecurity(server.security, `#${anchor}`)}
+      ${renderBindings(server.bindings)}
     </div>
-    <div class="card__host">${server.hostDisplay || 'Host not specified'}</div>
-    ${server.summary ? html`<div class="card__desc">${renderInline(server.summary)}</div>` : nothing}
-    ${server.description ? html`<div class="card__desc">${renderMarkdown(server.description)}</div>` : nothing}
-    ${server.variables.length > 0
-      ? html`<table class="vars">
-          <thead><tr><th>Variable</th><th>Enum</th><th>Default</th><th>Description</th></tr></thead>
-          <tbody>
-            ${server.variables.map(
-              (v) => html`<tr>
-                <td class="mono vars__name">${v.name}</td>
-                <td class="mono">${v.enum?.join(' · ') ?? ''}</td>
-                <td class="mono">${v.default ?? ''}</td>
-                <td>${renderInline(v.description)}${v.examples ? html` <span class="card__meta">examples: ${v.examples.join(' · ')}</span>` : nothing}</td>
-              </tr>`,
-            )}
-          </tbody>
-        </table>`
-      : nothing}
-    ${renderSecurity(server.security, `#${anchor}`)}
-    ${renderBindings(server.bindings)}
-  </article>`;
+  </details>`;
 }
 
 export function renderServers(doc: Document, prefix: string): TemplateResult | typeof nothing {
@@ -281,7 +231,7 @@ export function renderServers(doc: Document, prefix: string): TemplateResult | t
   const id = `${prefix}--servers`;
   return html`<section aria-labelledby=${id}>
     <h2 class="section-title" id=${id} tabindex="-1">Servers</h2>
-    <div class="cards">${doc.servers.map((s) => serverCard(s, prefix))}</div>
+    ${doc.servers.map((s) => serverEntry(s, prefix))}
   </section>`;
 }
 

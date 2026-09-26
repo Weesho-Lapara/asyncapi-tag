@@ -3,6 +3,7 @@ import type { Document, Message, Operation } from '../model/types.js';
 import { renderInline, renderMarkdown } from './markdown.js';
 import { renderBindings, renderParameters, renderReply, renderSecurity } from './details.js';
 import { examplesFor, isPanelOpen, renderExamplePanel, renderShowExample, type ExampleContext } from './example.js';
+import { slug } from '../model/context.js';
 import { schemaFormatLabel } from './format.js';
 import { renderSchema, type TreeState } from './tree.js';
 
@@ -131,6 +132,13 @@ export const operationStyles = css`
   .op__channel .label {
     font-size: 13px;
     letter-spacing: 0.06em;
+  }
+  .op__servers {
+    margin-top: -8px;
+  }
+  .op__server {
+    font: 400 13px/1.5 var(--_font-mono);
+    color: var(--_primary-text);
   }
   .op__address {
     font: 400 13px/1.5 var(--_font-mono);
@@ -316,6 +324,12 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
           <span class="label">Channel</span>
           ${renderAddress(op, anchor)}
         </div>
+        ${op.channel.servers.length > 0
+          ? html`<div class="op__channel op__servers">
+              <span class="label">Available on</span>
+              ${op.channel.servers.map((id) => html`<a class="op__server" href="#${prefix}--servers--${slug(id)}">${id}</a>`)}
+            </div>`
+          : nothing}
         ${op.summary ? html`<p class="summary op__summary">${renderInline(op.summary)}</p>` : nothing}
         ${op.description ? html`<div class="op__desc">${renderMarkdown(op.description)}</div>` : nothing}
         ${renderParameters(op.channel.parameters, anchor)}
@@ -340,17 +354,13 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
   `;
 }
 
-export function renderOperations(doc: Document, operations: Operation[], ctx: OperationContext, filteredBy?: string): TemplateResult | typeof nothing {
+export function renderOperations(doc: Document, ctx: OperationContext): TemplateResult | typeof nothing {
   if (doc.operations.length === 0) return nothing;
   const id = `${ctx.prefix}--operations`;
-  const hidden = doc.operations.length - operations.length;
   return html`
     <section class="ops" aria-labelledby=${id}>
       <h2 class="section-title" id=${id} tabindex="-1">Operations</h2>
-      ${filteredBy && hidden > 0
-        ? html`<p class="filtered" role="status">Showing operations available on <strong>${filteredBy}</strong>; ${hidden} other${hidden === 1 ? '' : 's'} hidden.</p>`
-        : nothing}
-      <div class="ops__list">${operations.map((op) => renderOperation(op, ctx))}</div>
+      <div class="ops__list">${doc.operations.map((op) => renderOperation(op, ctx))}</div>
     </section>
   `;
 }

@@ -74,6 +74,14 @@ These override the imported spec where they differ:
    RawSchema" for Avro only): records, unions, arrays, maps, enums, fixed, logical types and named
    references map onto the same model, so Kafka documents get rows and generated examples.
    Protobuf and other formats stay code blocks. Decided 2026-09-26 after reviewing the Adeo document.
+16. **No server selector** (overrides spec 4.6). The header dropdown only filtered operations
+   for documents whose channels restrict their servers, which most documents do not. Servers are
+   collapsible entries (closed by default) showing id, protocol and host in the summary, and an
+   operation whose channel is restricted shows an "Available on" line linking to those servers.
+   Also from the same review: no large operation heading (the badge row carries the operation
+   id), channel label and address inline at one size, message ids instead of titles in the
+   Message heading and example panel, the tree toolbar shows the field count and a single
+   Expand all / Collapse all toggle. Decided 2026-09-26.
 
 ### Work plan in session-sized chunks
 
