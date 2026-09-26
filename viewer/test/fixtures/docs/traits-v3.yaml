@@ -1,0 +1,89 @@
+asyncapi: 3.0.0
+info:
+  title: Traits
+  version: 1.0.0
+servers:
+  broker:
+    host: kafka.example.com
+    protocol: kafka
+    security:
+      - $ref: '#/components/securitySchemes/sasl'
+    bindings:
+      kafka:
+        schemaRegistryUrl: https://registry.example.com
+        bindingVersion: 0.5.0
+channels:
+  orders:
+    address: orders
+    messages:
+      Order:
+        $ref: '#/components/messages/Order'
+    bindings:
+      kafka:
+        partitions: 12
+  empty:
+    address: nothing-here
+operations:
+  emitOrder:
+    action: send
+    channel:
+      $ref: '#/channels/orders'
+    summary: The operation's own summary wins
+    traits:
+      - $ref: '#/components/operationTraits/kafkaDefaults'
+      - summary: Ignored, the operation has one
+        description: From the second trait
+        tags:
+          - name: from-second-trait
+        bindings:
+          kafka:
+            clientId: second
+            groupId: second
+        action: receive
+    security:
+      - $ref: '#/components/securitySchemes/sasl'
+  onNothing:
+    action: receive
+    channel:
+      $ref: '#/channels/empty'
+components:
+  securitySchemes:
+    sasl:
+      type: scramSha256
+      description: SASL/SCRAM
+  operationTraits:
+    kafkaDefaults:
+      description: From the first trait
+      bindings:
+        kafka:
+          groupId: orders-api
+          bindingVersion: 0.5.0
+      tags:
+        - name: from-first-trait
+  messageTraits:
+    envelope:
+      contentType: application/avro
+      headers:
+        type: object
+        properties:
+          traceId:
+            type: string
+      correlationId:
+        location: $message.header#/traceId
+      payload:
+        type: string
+  messages:
+    Order:
+      name: Order
+      traits:
+        - $ref: '#/components/messageTraits/envelope'
+        - contentType: application/json
+      payload:
+        type: object
+        properties:
+          id:
+            type: string
+      bindings:
+        kafka:
+          key:
+            type: string

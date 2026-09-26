@@ -1,0 +1,283 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`traits (v3) > operation fields win, then earlier traits over later; forbidden keys are dropped with a problem 1`] = `
+{
+  "messages": [
+    {
+      "anchor": "Order",
+      "bindings": [
+        {
+          "key": "key",
+          "protocol": "kafka",
+          "scope": "message",
+          "value": {
+            "type": "string",
+          },
+        },
+      ],
+      "contentType": "application/avro",
+      "correlationId": {
+        "location": "$message.header#/traceId",
+      },
+      "examples": [],
+      "headers": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "traceId",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "id": "Order",
+      "name": "Order",
+      "payload": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "id",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+      "tags": [],
+    },
+  ],
+  "operations": [
+    {
+      "action": "send",
+      "anchor": "emitOrder",
+      "badgeLabel": "SEND",
+      "bindings": [
+        {
+          "key": "clientId",
+          "protocol": "kafka",
+          "scope": "operation",
+          "value": "second",
+        },
+        {
+          "key": "groupId",
+          "protocol": "kafka",
+          "scope": "operation",
+          "value": "orders-api",
+        },
+        {
+          "key": "bindingVersion",
+          "protocol": "kafka",
+          "scope": "operation",
+          "value": "0.5.0",
+        },
+      ],
+      "channel": {
+        "address": "orders",
+        "bindings": [
+          {
+            "key": "partitions",
+            "protocol": "kafka",
+            "scope": "channel",
+            "value": 12,
+          },
+        ],
+        "id": "orders",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "description": "From the first trait",
+      "heading": "emitOrder",
+      "id": "emitOrder",
+      "kind": "send",
+      "locationHint": "emitOrder",
+      "messages": [
+        {
+          "anchor": "Order",
+          "bindings": [
+            {
+              "key": "key",
+              "protocol": "kafka",
+              "scope": "message",
+              "value": {
+                "type": "string",
+              },
+            },
+          ],
+          "contentType": "application/avro",
+          "correlationId": {
+            "location": "$message.header#/traceId",
+          },
+          "examples": [],
+          "headers": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "traceId",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "id": "Order",
+          "name": "Order",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "id",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+      ],
+      "security": [
+        {
+          "description": "SASL/SCRAM",
+          "id": "sasl",
+          "scopes": [],
+          "type": "scramSha256",
+        },
+      ],
+      "summary": "The operation's own summary wins",
+      "tags": [
+        {
+          "name": "from-first-trait",
+        },
+      ],
+    },
+    {
+      "action": "receive",
+      "anchor": "onNothing",
+      "badgeLabel": "RECEIVE",
+      "bindings": [],
+      "channel": {
+        "address": "nothing-here",
+        "bindings": [],
+        "id": "empty",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "onNothing",
+      "id": "onNothing",
+      "kind": "receive",
+      "locationHint": "onNothing",
+      "messages": [],
+      "security": [],
+      "tags": [],
+    },
+  ],
+  "problems": [
+    {
+      "message": "A trait must not define "payload"; that field of the trait at "/components/messages/Order/traits/0" was ignored.",
+      "severity": "warning",
+      "where": "/components/messages/Order/traits/0",
+    },
+    {
+      "message": "A trait must not define "action"; that field of the trait at "/operations/emitOrder/traits/1" was ignored.",
+      "severity": "warning",
+      "where": "/operations/emitOrder/traits/1",
+    },
+    {
+      "message": "Operation "onNothing" uses channel "empty", which defines no messages.",
+      "severity": "warning",
+      "where": "/operations/onNothing/channel",
+    },
+  ],
+  "schemas": [],
+  "servers": [
+    {
+      "anchor": "broker",
+      "bindings": [
+        {
+          "key": "schemaRegistryUrl",
+          "protocol": "kafka",
+          "scope": "server",
+          "value": "https://registry.example.com",
+        },
+        {
+          "key": "bindingVersion",
+          "protocol": "kafka",
+          "scope": "server",
+          "value": "0.5.0",
+        },
+      ],
+      "hostDisplay": "kafka.example.com",
+      "id": "broker",
+      "protocol": "kafka",
+      "security": [
+        {
+          "description": "SASL/SCRAM",
+          "id": "sasl",
+          "scopes": [],
+          "type": "scramSha256",
+        },
+      ],
+      "tags": [],
+      "variables": [],
+    },
+  ],
+  "specMajor": 3,
+  "specVersion": "3.0.0",
+  "tags": [],
+  "title": "Traits",
+  "version": "1.0.0",
+}
+`;

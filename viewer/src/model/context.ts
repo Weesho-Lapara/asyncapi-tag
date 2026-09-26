@@ -162,6 +162,29 @@ export class Context {
     return out;
   }
 
+  /**
+   * Apply `traits` to an object: the object's own fields win, then earlier traits over later
+   * ones (the official parser's order). Keys a trait must not carry are dropped with a problem.
+   * Returns the object unchanged when `applyTraits` is off or there are no traits.
+   */
+  withTraits(value: Obj, baseUrl: string, where: string, forbidden: readonly string[]): Obj {
+    const traits = value['traits'];
+    if (!this.options.applyTraits || traits === undefined) return value;
+    let merged: Obj = { ...value };
+    delete merged['traits'];
+    for (const [trait, w] of this.items(traits, baseUrl, `${where}/traits`)) {
+      const patch: Obj = { ...trait.value };
+      for (const key of forbidden) {
+        if (key in patch) {
+          this.problem('warning', `A trait must not define "${key}"; that field of the trait at "${w}" was ignored.`, w);
+          delete patch[key];
+        }
+      }
+      merged = mergeObjects(patch, merged);
+    }
+    return merged;
+  }
+
   /** The last pointer segment of a resolved id: `#/servers/production` -> `production`. */
   static keyOf(id: string | undefined): string | undefined {
     if (id === undefined) return undefined;
@@ -179,4 +202,14 @@ function describeType(value: unknown): string {
   if (value === null) return 'null';
   if (Array.isArray(value)) return 'a list';
   return typeof value === 'object' ? 'an object' : `a ${typeof value}`;
+}
+
+/** Deep merge where `over` wins; lists and scalars are replaced, objects merged key by key. */
+export function mergeObjects(base: Obj, over: Obj): Obj {
+  const out: Obj = { ...base };
+  for (const [key, v] of Object.entries(over)) {
+    const existing = out[key];
+    out[key] = isObj(existing) && isObj(v) && !('$ref' in v) && !('$ref' in existing) ? mergeObjects(existing, v) : v;
+  }
+  return out;
 }

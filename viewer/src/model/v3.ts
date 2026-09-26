@@ -215,7 +215,9 @@ class V3State {
     return message;
   }
 
-  message(id: string, anchorSeed: string, { value, baseUrl }: Located, where: string): Message {
+  message(id: string, anchorSeed: string, located: Located, where: string): Message {
+    const baseUrl = located.baseUrl;
+    const value = this.ctx.withTraits(located.value, baseUrl, where, ['payload', 'traits']);
     const message: Message = {
       id,
       anchor: this.ctx.anchor('messages', anchorSeed),
@@ -266,7 +268,9 @@ class V3State {
     }
   }
 
-  operation(key: string, { value, baseUrl }: Located, where: string): Operation | undefined {
+  operation(key: string, located: Located, where: string): Operation | undefined {
+    const baseUrl = located.baseUrl;
+    const value = this.ctx.withTraits(located.value, baseUrl, where, ['action', 'channel', 'messages', 'reply', 'traits']);
     const action = str(value['action']);
     if (action !== 'send' && action !== 'receive') {
       this.ctx.problem('error', `Operation "${key}" has action "${action ?? ''}"; expected send or receive. It was skipped.`, `${where}/action`);
@@ -280,6 +284,9 @@ class V3State {
       return undefined;
     }
 
+    if (this.channelMessagesOf(channel.id).length === 0) {
+      this.ctx.problem('warning', `Operation "${key}" uses channel "${channel.id}", which defines no messages.`, `${where}/channel`);
+    }
     const reply = this.reply(value['reply'], baseUrl, `${where}/reply`);
     const kind: OperationKind = reply ? (action === 'send' ? 'request' : 'reply') : action;
     const labels = this.ctx.options.labels;

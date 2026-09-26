@@ -160,6 +160,9 @@ class V2State {
   channels(map: unknown): void {
     for (const [key, located, where] of this.ctx.entries(map, this.base, '/channels')) {
       const channel = this.channel(key, located, where);
+      if (located.value['publish'] === undefined && located.value['subscribe'] === undefined) {
+        this.ctx.problem('warning', `Channel "${key}" has neither publish nor subscribe, so nothing is shown for it.`, where);
+      }
       for (const keyword of ['publish', 'subscribe'] as const) {
         const raw = located.value[keyword];
         if (raw === undefined) continue;
@@ -209,7 +212,9 @@ class V2State {
     return parameter;
   }
 
-  operation(channelKey: string, keyword: 'publish' | 'subscribe', channel: Channel, { value, baseUrl }: Located, where: string): Operation {
+  operation(channelKey: string, keyword: 'publish' | 'subscribe', channel: Channel, located: Located, where: string): Operation {
+    const baseUrl = located.baseUrl;
+    const value = this.ctx.withTraits(located.value, baseUrl, where, ['message', 'traits']);
     const action = keyword === 'publish' ? 'receive' : 'send';
     const id = str(value['operationId']) ?? `${keyword}-${channelKey}`;
     const op: Operation = {
@@ -260,7 +265,9 @@ class V2State {
     return message;
   }
 
-  message(id: string, anchorSeed: string, { value, baseUrl }: Located, where: string): Message {
+  message(id: string, anchorSeed: string, located: Located, where: string): Message {
+    const baseUrl = located.baseUrl;
+    const value = this.ctx.withTraits(located.value, baseUrl, where, ['payload', 'traits']);
     const message: Message = {
       id,
       anchor: this.ctx.anchor('messages', anchorSeed),

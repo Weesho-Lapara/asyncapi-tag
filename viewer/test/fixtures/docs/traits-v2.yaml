@@ -1,0 +1,40 @@
+asyncapi: 2.6.0
+info:
+  title: Traits v2
+  version: 1.0.0
+channels:
+  orders:
+    subscribe:
+      operationId: emitOrder
+      traits:
+        - $ref: '#/components/operationTraits/defaults'
+        - message:
+            name: Smuggled
+      message:
+        $ref: '#/components/messages/Order'
+  quiet: {}
+components:
+  operationTraits:
+    defaults:
+      summary: From the trait
+      bindings:
+        mqtt:
+          qos: 1
+  messageTraits:
+    envelope:
+      contentType: text/plain
+      headers:
+        type: object
+        properties:
+          traceId:
+            type: string
+  messages:
+    Order:
+      name: Order
+      traits:
+        - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        properties:
+          id:
+            type: string
