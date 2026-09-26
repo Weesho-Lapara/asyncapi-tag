@@ -1,0 +1,485 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`schema tree builder > composition fixture satisfies the invariants and matches its snapshot 1`] = `
+{
+  "messages": [],
+  "operations": [],
+  "problems": [],
+  "schemas": [
+    {
+      "anchor": "Base",
+      "id": "Base",
+      "schema": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "format": "uuid",
+            "kind": "node",
+            "name": "id",
+            "path": [],
+            "required": true,
+            "types": [
+              "string",
+            ],
+          },
+          {
+            "children": [],
+            "constraints": [],
+            "format": "date-time",
+            "kind": "node",
+            "name": "createdAt",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "description": "Common fields",
+        "kind": "node",
+        "name": "Base",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+    },
+    {
+      "anchor": "Pet",
+      "id": "Pet",
+      "schema": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "format": "uuid",
+            "kind": "node",
+            "name": "id",
+            "path": [],
+            "required": true,
+            "types": [
+              "string",
+            ],
+          },
+          {
+            "children": [],
+            "constraints": [],
+            "description": "Overrides the Base description",
+            "kind": "node",
+            "name": "createdAt",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+          {
+            "children": [],
+            "constraints": [
+              {
+                "key": "minLength",
+                "value": 1,
+              },
+            ],
+            "kind": "node",
+            "name": "name",
+            "path": [],
+            "required": true,
+            "types": [
+              "string",
+            ],
+          },
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "nickname",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "description": "Common fields",
+        "kind": "node",
+        "name": "Pet",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+    },
+    {
+      "anchor": "Shape",
+      "id": "Shape",
+      "schema": {
+        "children": [],
+        "composition": {
+          "kind": "oneOf",
+          "variants": [
+            {
+              "node": {
+                "children": [
+                  {
+                    "children": [],
+                    "constraints": [
+                      {
+                        "key": "exclusiveMinimum",
+                        "value": 0,
+                      },
+                    ],
+                    "kind": "node",
+                    "name": "radius",
+                    "path": [],
+                    "required": true,
+                    "types": [
+                      "number",
+                    ],
+                  },
+                ],
+                "constraints": [],
+                "kind": "node",
+                "name": "Shape",
+                "path": [],
+                "required": false,
+                "title": "Circle",
+                "types": [
+                  "object",
+                ],
+              },
+              "title": "Circle",
+            },
+            {
+              "node": {
+                "children": [
+                  {
+                    "children": [],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "side",
+                    "path": [],
+                    "required": false,
+                    "types": [
+                      "number",
+                    ],
+                  },
+                ],
+                "constraints": [],
+                "kind": "node",
+                "name": "Shape",
+                "path": [],
+                "refName": "Square",
+                "required": false,
+                "types": [
+                  "object",
+                ],
+              },
+              "title": "Square",
+            },
+            {
+              "node": {
+                "children": [
+                  {
+                    "children": [],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "sides",
+                    "path": [],
+                    "required": false,
+                    "types": [
+                      "integer",
+                    ],
+                  },
+                ],
+                "constraints": [],
+                "kind": "node",
+                "name": "Shape",
+                "path": [],
+                "required": false,
+                "types": [
+                  "object",
+                ],
+              },
+              "title": "Variant 3",
+            },
+          ],
+        },
+        "constraints": [],
+        "description": "One of several shapes",
+        "kind": "node",
+        "name": "Shape",
+        "path": [],
+        "required": false,
+        "types": [],
+      },
+    },
+    {
+      "anchor": "Square",
+      "id": "Square",
+      "schema": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "side",
+            "path": [],
+            "required": false,
+            "types": [
+              "number",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "Square",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+    },
+    {
+      "anchor": "Contact",
+      "id": "Contact",
+      "schema": {
+        "children": [
+          {
+            "children": [],
+            "composition": {
+              "kind": "anyOf",
+              "variants": [
+                {
+                  "node": {
+                    "children": [],
+                    "constraints": [],
+                    "format": "email",
+                    "kind": "node",
+                    "name": "channel",
+                    "path": [],
+                    "required": false,
+                    "types": [
+                      "string",
+                    ],
+                  },
+                  "title": "Variant 1",
+                },
+                {
+                  "node": {
+                    "children": [],
+                    "constraints": [
+                      {
+                        "key": "pattern",
+                        "value": "^\\+[0-9]+$",
+                      },
+                    ],
+                    "kind": "node",
+                    "name": "channel",
+                    "path": [],
+                    "required": false,
+                    "types": [
+                      "string",
+                    ],
+                  },
+                  "title": "Variant 2",
+                },
+              ],
+            },
+            "constraints": [],
+            "kind": "node",
+            "name": "channel",
+            "path": [],
+            "required": false,
+            "types": [],
+          },
+          {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "[0]",
+                "path": [
+                  "tags",
+                ],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "[1]",
+                "path": [
+                  "tags",
+                ],
+                "required": false,
+                "types": [
+                  "integer",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "tags",
+            "path": [],
+            "required": false,
+            "types": [
+              "array",
+            ],
+          },
+          {
+            "children": [
+              {
+                "children": [],
+                "constraints": [
+                  {
+                    "key": "maxLength",
+                    "value": 20,
+                  },
+                ],
+                "kind": "node",
+                "name": "*",
+                "path": [
+                  "labels",
+                ],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "labels",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "/^x-/",
+                "path": [
+                  "meta",
+                ],
+                "required": false,
+                "types": [
+                  "boolean",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "meta",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "nullable",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+              "null",
+            ],
+          },
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "anything",
+            "path": [],
+            "required": false,
+            "types": [],
+          },
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "nothing",
+            "path": [],
+            "required": false,
+            "types": [
+              "never",
+            ],
+          },
+          {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "[]",
+                "path": [
+                  "untypedList",
+                ],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "untypedList",
+            "path": [],
+            "required": false,
+            "types": [
+              "array",
+            ],
+          },
+          {
+            "children": [],
+            "const": "fixed",
+            "constraints": [],
+            "deprecated": true,
+            "kind": "node",
+            "name": "deprecatedField",
+            "path": [],
+            "readOnly": true,
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "Contact",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+    },
+  ],
+  "servers": [],
+  "specMajor": 3,
+  "specVersion": "3.0.0",
+  "tags": [],
+  "title": "Composition",
+  "version": "1.0.0",
+}
+`;

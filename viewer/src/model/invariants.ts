@@ -124,7 +124,7 @@ function checkNode(
   if (node.composition) {
     node.composition.variants.forEach((v, i) => {
       if (!v.title) fail(`${here}: variant ${i + 1} has no title`);
-      checkNode(v.node, `${here} variant ${i + 1}`, expectedPath, false, schemaIds, fail);
+      checkNode(v.node, `${here} variant ${i + 1}`, expectedPath, isRoot, schemaIds, fail);
     });
   }
 }

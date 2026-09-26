@@ -1,0 +1,47 @@
+asyncapi: 3.0.0
+info:
+  title: Avro
+  version: 1.0.0
+channels:
+  events:
+    address: events
+    messages:
+      UserEvent:
+        $ref: '#/components/messages/UserEvent'
+      Proto:
+        $ref: '#/components/messages/Proto'
+operations:
+  emit:
+    action: send
+    channel:
+      $ref: '#/channels/events'
+components:
+  messages:
+    UserEvent:
+      name: UserEvent
+      payload:
+        schemaFormat: application/vnd.apache.avro;version=1.9.0
+        schema:
+          type: record
+          name: UserEvent
+          fields:
+            - name: id
+              type: string
+            - name: age
+              type: [null, int]
+    Proto:
+      name: Proto
+      payload:
+        schemaFormat: application/vnd.google.protobuf;version=3
+        schema: |
+          syntax = "proto3";
+          message Proto { string id = 1; }
+    Plain:
+      name: Plain
+      payload:
+        schemaFormat: application/schema+json;version=draft-07
+        schema:
+          type: object
+          properties:
+            ok:
+              type: boolean

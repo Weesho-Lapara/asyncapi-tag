@@ -1,0 +1,25 @@
+asyncapi: 2.6.0
+info:
+  title: Avro v2
+  version: 1.0.0
+channels:
+  events:
+    publish:
+      message:
+        $ref: '#/components/messages/UserEvent'
+components:
+  messages:
+    UserEvent:
+      name: UserEvent
+      schemaFormat: application/vnd.apache.avro;version=1.9.0
+      payload:
+        type: record
+        name: UserEvent
+        fields:
+          - name: id
+            type: string
+      headers:
+        type: object
+        properties:
+          traceId:
+            type: string

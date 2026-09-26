@@ -1,0 +1,89 @@
+asyncapi: 3.0.0
+info:
+  title: Composition
+  version: 1.0.0
+channels: {}
+operations: {}
+components:
+  schemas:
+    Base:
+      type: object
+      description: Common fields
+      required: [id]
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+    Pet:
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - type: object
+          required: [name]
+          properties:
+            name:
+              type: string
+              minLength: 1
+            createdAt:
+              type: string
+              description: Overrides the Base description
+        - allOf:
+            - properties:
+                nickname:
+                  type: string
+    Shape:
+      description: One of several shapes
+      oneOf:
+        - title: Circle
+          type: object
+          required: [radius]
+          properties:
+            radius:
+              type: number
+              exclusiveMinimum: 0
+        - $ref: '#/components/schemas/Square'
+        - type: object
+          properties:
+            sides:
+              type: integer
+    Square:
+      type: object
+      properties:
+        side:
+          type: number
+    Contact:
+      type: object
+      properties:
+        channel:
+          anyOf:
+            - type: string
+              format: email
+            - type: string
+              pattern: '^\+[0-9]+$'
+        tags:
+          type: array
+          items: [{ type: string }, { type: integer }]
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 20
+        meta:
+          type: object
+          patternProperties:
+            '^x-':
+              type: boolean
+        nullable:
+          type: [string, 'null']
+        anything: true
+        nothing: false
+        untypedList:
+          items:
+            type: string
+        deprecatedField:
+          type: string
+          deprecated: true
+          readOnly: true
+          const: fixed
