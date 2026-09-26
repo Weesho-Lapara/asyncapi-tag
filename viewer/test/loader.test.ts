@@ -1,10 +1,7 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import accountsJson from '../../docs/examples/accounts-v2.json?raw';
+import ordersYaml from '../../docs/examples/orders-v3.yaml?raw';
 import { detectVersion, loadDocument, parseText, resolveUrl, type FetchLike } from '../src/load/loader.js';
-
-const examples = new URL('../../docs/examples/', import.meta.url);
-const ordersYaml = readFileSync(new URL('orders-v3.yaml', examples), 'utf8');
-const accountsJson = readFileSync(new URL('accounts-v2.json', examples), 'utf8');
 
 function serve(files: Record<string, string | number | Error>): FetchLike {
   return async (url) => {
