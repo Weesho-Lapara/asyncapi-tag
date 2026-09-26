@@ -38,8 +38,8 @@ export const sidebarStyles = css`
     min-height: 100%;
     padding: 16px 12px 24px;
   }
-  /* Items under a group heading sit a step in from it. */
-  .side__block--grouped ul {
+  /* Items under a group heading sit a step in from it (specific enough to beat the list reset). */
+  .side .side__block--grouped > ul {
     padding-left: 12px;
   }
   .side__block--components {
