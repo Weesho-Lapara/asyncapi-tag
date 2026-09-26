@@ -8,6 +8,7 @@
  * are shown as the array's children, and their path already reads "items[]".
  */
 import { css, html, nothing, type TemplateResult } from 'lit';
+import { slug } from '../model/context.js';
 import type { Schema, SchemaNode } from '../model/types.js';
 import { renderInline } from './markdown.js';
 
@@ -412,7 +413,7 @@ function renderRow(node: SchemaNode, options: TreeOptions, key: string, depth: n
   const expanded = expandable && options.state.isExpanded(key, depth);
   const hidden = expandable && !expanded ? countDescendants(node) : 0;
   const facts = factsLine(node);
-  const circularHref = node.circularRef ? `#${options.prefix}--schemas--${node.circularRef}` : undefined;
+  const circularHref = node.circularRef ? `#${options.prefix}--schemas--${slug(node.circularRef)}` : undefined;
   return html`<li class="row ${depth === 1 ? 'row--top' : ''}">
     ${expandable
       ? html`<button

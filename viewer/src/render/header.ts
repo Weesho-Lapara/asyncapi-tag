@@ -4,8 +4,10 @@ import type { Document } from '../model/types.js';
 
 export interface HeaderInput {
   doc: Document;
-  /** The original document URL, for "Download spec". */
+  /** The original document URL. */
   src: string | undefined;
+  /** Object URL holding the document exactly as fetched, for "Download spec". */
+  downloadHref: string | undefined;
   hasLogo: boolean;
   themeToggle: boolean;
   resolvedTheme: 'light' | 'dark';
@@ -97,8 +99,8 @@ export function renderHeader(input: HeaderInput): TemplateResult {
       <div class="header__spacer"></div>
       ${input.extra ?? nothing}
       <div class="header__actions">
-        ${input.src
-          ? html`<a class="btn" href=${input.src} download=${fileName} title="Download spec">${downloadIcon}<span class="btn__text">Download spec</span></a>`
+        ${input.downloadHref
+          ? html`<a class="btn" href=${input.downloadHref} download=${fileName} title="Download spec">${downloadIcon}<span class="btn__text">Download spec</span></a>`
           : nothing}
         ${input.themeToggle
           ? html`<button

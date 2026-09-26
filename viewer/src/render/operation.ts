@@ -301,13 +301,17 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
   `;
 }
 
-export function renderOperations(doc: Document, ctx: OperationContext): TemplateResult | typeof nothing {
+export function renderOperations(doc: Document, operations: Operation[], ctx: OperationContext, filteredBy?: string): TemplateResult | typeof nothing {
   if (doc.operations.length === 0) return nothing;
   const id = `${ctx.prefix}--operations`;
+  const hidden = doc.operations.length - operations.length;
   return html`
     <section class="ops" aria-labelledby=${id}>
       <h2 class="section-title" id=${id} tabindex="-1">Operations</h2>
-      <div class="ops__list">${doc.operations.map((op) => renderOperation(op, ctx))}</div>
+      ${filteredBy && hidden > 0
+        ? html`<p class="filtered" role="status">Showing operations available on <strong>${filteredBy}</strong>; ${hidden} other${hidden === 1 ? '' : 's'} hidden.</p>`
+        : nothing}
+      <div class="ops__list">${operations.map((op) => renderOperation(op, ctx))}</div>
     </section>
   `;
 }

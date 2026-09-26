@@ -10,6 +10,7 @@ import { infoStyles, renderInfo } from './render/info.js';
 import { operationStyles, renderOperations } from './render/operation.js';
 import { detailStyles } from './render/details.js';
 import { exampleStyles, type ExampleContext, type ExamplePanelState } from './render/example.js';
+import { operationsOn, renderMessages, renderProblems, renderSchemas, renderServerSelector, renderServers, sectionStyles } from './render/sections.js';
 import { TreeState, treeStyles } from './render/tree.js';
 import { base } from './styles/base.js';
 import { tokens } from './styles/tokens.js';
@@ -28,7 +29,7 @@ let counter = 0;
  * from the resolved accent at runtime and set as private custom properties on the root.
  */
 export class AsyncAPIViewerElement extends LitElement {
-  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles, treeStyles, exampleStyles, detailStyles];
+  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles, treeStyles, exampleStyles, detailStyles, sectionStyles];
 
   #options: Options = parseOptions([]);
   #observer: MutationObserver | undefined;
@@ -50,6 +51,8 @@ export class AsyncAPIViewerElement extends LitElement {
     return state;
   };
   readonly #messageIndex = new Map<string, number>();
+  #server = '';
+  #downloadUrl: string | undefined;
   readonly #panels = new Map<string, ExamplePanelState>();
   readonly #example = (key: string): ExampleContext => {
     let state = this.#panels.get(key);
@@ -187,12 +190,17 @@ export class AsyncAPIViewerElement extends LitElement {
     this.#trees.clear();
     this.#panels.clear();
     this.#messageIndex.clear();
+    this.#server = '';
+    if (this.#downloadUrl) URL.revokeObjectURL(this.#downloadUrl);
+    this.#downloadUrl = undefined;
     if (src === undefined) return;
     const url = resolveUrl(src, this.ownerDocument.baseURI);
     const result = await loadDocument(url);
     if (this.#loadedSrc !== src) return; // src changed while loading
     this.#result = result;
     if (result.ok) {
+      // Download spec serves the document exactly as fetched, whatever its origin.
+      this.#downloadUrl = URL.createObjectURL(new Blob([result.text], { type: result.format === 'json' ? 'application/json' : 'application/yaml' }));
       const resolver = new RefResolver(result.url, result.data);
       const problems = await resolver.preload();
       if (this.#loadedSrc !== src) return;
@@ -234,35 +242,51 @@ export class AsyncAPIViewerElement extends LitElement {
     const m = this.#model;
     if (!m) return html`<div class="content"><p class="summary">Preparing ${src}…</p></div>`;
     const o = this.#options;
+    const operations = operationsOn(m, this.#server);
+    const selected = m.servers.find((s) => s.id === this.#server);
+    const sectionCtx = { prefix: this.id, tree: this.#tree, example: this.#example };
     return html`
       ${renderHeader({
         doc: m,
         src: r.url,
+        downloadHref: this.#downloadUrl,
         hasLogo: this.#hasLogo,
         themeToggle: o.themeToggle,
         resolvedTheme: this.#resolved,
         onToggleTheme: () => this.#theme.toggle(),
+        extra: o.servers
+          ? renderServerSelector(
+              m,
+              this.#server,
+              (id) => {
+                this.#server = id;
+                this.requestUpdate();
+              },
+              `${this.id}--server-selector`,
+            )
+          : nothing,
       })}
       <div class="content">
         ${o.info ? renderInfo(m, `${this.id}--info`) : nothing}
+        ${o.servers ? renderServers(m, this.id) : nothing}
         ${o.operations
-          ? renderOperations(m, {
-              prefix: this.id,
-              tree: this.#tree,
-              example: this.#example,
-              messageIndex: (anchor) => this.#messageIndex.get(anchor) ?? 0,
-              selectMessage: (anchor, index) => {
-                this.#messageIndex.set(anchor, index);
-                this.requestUpdate();
+          ? renderOperations(
+              m,
+              operations,
+              {
+                ...sectionCtx,
+                messageIndex: (anchor) => this.#messageIndex.get(anchor) ?? 0,
+                selectMessage: (anchor, index) => {
+                  this.#messageIndex.set(anchor, index);
+                  this.requestUpdate();
+                },
               },
-            })
+              selected?.id,
+            )
           : nothing}
-        ${o.errors && this.#problems.length > 0
-          ? html`<section aria-labelledby="${this.id}--problems">
-              <h2 class="section-title" id="${this.id}--problems" tabindex="-1">Problems</h2>
-              <ul>${this.#problems.map((p) => html`<li><strong>${p.severity}</strong> at <code>${p.where}</code>: ${p.message}</li>`)}</ul>
-            </section>`
-          : nothing}
+        ${o.messages ? renderMessages(m, sectionCtx, o.showMessageExamples) : nothing}
+        ${o.schemas ? renderSchemas(m, sectionCtx) : nothing}
+        ${o.errors ? renderProblems(this.#problems, this.id) : nothing}
       </div>
     `;
   }

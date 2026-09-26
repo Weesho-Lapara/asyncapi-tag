@@ -107,9 +107,7 @@ export class Context {
   anchor(section: SectionId, id: string): string {
     const used = this.#anchors.get(section) ?? new Set<string>();
     this.#anchors.set(section, used);
-    // Runs of separators collapse to one hyphen so an anchor never contains "--", the separator
-    // between element id, section and item in page anchors.
-    const base = id.replace(/[^A-Za-z0-9_.]+/g, '-').replace(/^-+|-+$/g, '') || 'item';
+    const base = slug(id);
     let candidate = base;
     for (let n = 2; used.has(candidate); n++) candidate = `${base}-${n}`;
     used.add(candidate);
@@ -212,4 +210,12 @@ export function mergeObjects(base: Obj, over: Obj): Obj {
     out[key] = isObj(existing) && isObj(v) && !('$ref' in v) && !('$ref' in existing) ? mergeObjects(existing, v) : v;
   }
   return out;
+}
+
+/**
+ * Anchor slug for an id. Runs of separators collapse to one hyphen so an anchor never contains
+ * "--", the separator between element id, section and item in page anchors.
+ */
+export function slug(id: string): string {
+  return id.replace(/[^A-Za-z0-9_.]+/g, '-').replace(/^-+|-+$/g, '') || 'item';
 }
