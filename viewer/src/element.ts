@@ -1,7 +1,8 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { loadDocument, resolveUrl, type LoadResult } from './load/loader.js';
 import { RefResolver } from './load/refs.js';
-import type { Problem } from './model/types.js';
+import { normalize } from './model/normalize.js';
+import type { Document, Problem } from './model/types.js';
 import { parseOptions, type Options } from './options.js';
 
 /**
@@ -28,6 +29,7 @@ export class AsyncAPIViewerElement extends LitElement {
   #result: LoadResult | undefined;
   #resolver: RefResolver | undefined;
   #problems: Problem[] = [];
+  #model: Document | undefined;
 
   /** The validated options, re-read whenever an attribute changes. */
   get options(): Options {
@@ -39,9 +41,14 @@ export class AsyncAPIViewerElement extends LitElement {
     return this.#result;
   }
 
-  /** Problems collected so far (reference loading; later normalisation too). */
+  /** Problems collected so far (reference loading and normalisation). */
   get problems(): readonly Problem[] {
     return this.#problems;
+  }
+
+  /** The normalised model, once loaded. */
+  get model(): Document | undefined {
+    return this.#model;
   }
 
   override connectedCallback(): void {
@@ -75,11 +82,26 @@ export class AsyncAPIViewerElement extends LitElement {
     this.#result = result;
     this.#problems = [];
     this.#resolver = undefined;
+    this.#model = undefined;
     if (result.ok) {
       const resolver = new RefResolver(result.url, result.data);
-      this.#problems = await resolver.preload();
+      const problems = await resolver.preload();
       if (this.#loadedSrc !== src) return;
       this.#resolver = resolver;
+      const o = this.#options;
+      this.#model = normalize({
+        resolver,
+        data: result.data,
+        specVersion: result.specVersion,
+        specMajor: result.specMajor,
+        problems,
+        options: {
+          labels: { publish: o.publishLabel, subscribe: o.subscribeLabel, send: o.sendLabel, receive: o.receiveLabel, request: o.requestLabel, reply: o.replyLabel },
+          useChannelAddressAsIdentifier: o.useChannelAddressAsIdentifier,
+          applyTraits: o.parserOptions.applyTraits,
+        },
+      });
+      this.#problems = this.#model.problems;
     }
     this.requestUpdate();
   }
@@ -90,12 +112,15 @@ export class AsyncAPIViewerElement extends LitElement {
     const r = this.#result;
     if (!r) return html`<p>Loading ${src}…</p>`;
     if (!r.ok) return html`<p role="alert">Could not load ${r.url}: ${r.error.message}</p>`;
-    const info = r.data['info'] as { title?: string; version?: string } | undefined;
+    const m = this.#model;
+    if (!m) return html`<p>Normalising ${src}…</p>`;
     const docs = this.#resolver?.documents.size ?? 1;
     return html`<p>
-      Loaded AsyncAPI ${r.specVersion} (${r.format}): ${info?.title ?? nothing} ${info?.version ?? nothing}
-      · ${docs} document${docs === 1 ? '' : 's'} · ${this.#problems.length} problem${this.#problems.length === 1 ? '' : 's'}
+      ${m.title} ${m.version} · AsyncAPI ${m.specVersion} (${r.format}) · ${docs} document${docs === 1 ? '' : 's'}
+      · ${m.servers.length} servers · ${m.operations.length} operations · ${m.messages.length} messages
+      · ${m.schemas.length} schemas · ${this.#problems.length} problem${this.#problems.length === 1 ? '' : 's'}
     </p>
+    <ul>${m.operations.map((op) => html`<li><code>${op.badgeLabel}</code> ${op.heading} <small>${op.channel.address ?? 'Address not specified'}</small></li>`)}</ul>
     ${this.#problems.length > 0 ? html`<ul>${this.#problems.map((p) => html`<li>${p.message} (at ${p.where})</li>`)}</ul>` : nothing}`;
   }
 }

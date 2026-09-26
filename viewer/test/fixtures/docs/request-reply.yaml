@@ -1,0 +1,134 @@
+asyncapi: 3.0.0
+info:
+  title: Quotes service
+  version: 0.3.0
+  description: Request a quote, get a reply.
+  contact:
+    name: Platform team
+    email: platform@example.com
+  tags:
+    - name: quotes
+      description: Quote lifecycle
+  externalDocs:
+    url: https://example.com/docs/quotes
+    description: Runbook
+defaultContentType: application/json
+servers:
+  main:
+    host: mq.example.com
+    pathname: /v1
+    protocol: amqp
+    protocolVersion: '0.9.1'
+    title: Main broker
+    variables:
+      region:
+        enum: [eu, us]
+        default: eu
+        description: Deployment region
+    security:
+      - $ref: '#/components/securitySchemes/userPass'
+    bindings:
+      amqp:
+        bindingVersion: 0.3.0
+channels:
+  quoteRequests:
+    address: quotes/{customerId}/request
+    title: Quote requests
+    parameters:
+      customerId:
+        description: The customer asking
+        examples: [cus_1]
+    servers:
+      - $ref: '#/servers/main'
+    messages:
+      QuoteRequest:
+        $ref: '#/components/messages/QuoteRequest'
+    bindings:
+      amqp:
+        is: queue
+        queue:
+          name: quotes
+          durable: true
+  quoteReplies:
+    address: null
+    messages:
+      QuoteReply:
+        $ref: '#/components/messages/QuoteReply'
+      QuoteRejected:
+        name: QuoteRejected
+        payload:
+          type: object
+          properties:
+            reason:
+              type: string
+operations:
+  requestQuote:
+    action: send
+    title: Request a quote
+    channel:
+      $ref: '#/channels/quoteRequests'
+    messages:
+      - $ref: '#/channels/quoteRequests/messages/QuoteRequest'
+    reply:
+      address:
+        location: $message.header#/replyTo
+        description: Where the reply goes
+      channel:
+        $ref: '#/channels/quoteReplies'
+    bindings:
+      amqp:
+        expiration: 100000
+        ack: false
+  answerQuote:
+    action: receive
+    channel:
+      $ref: '#/channels/quoteReplies'
+    messages:
+      - $ref: '#/channels/quoteReplies/messages/QuoteReply'
+      - $ref: '#/channels/quoteReplies/messages/QuoteRejected'
+    reply:
+      channel:
+        $ref: '#/channels/quoteRequests'
+      messages:
+        - $ref: '#/channels/quoteRequests/messages/QuoteRequest'
+components:
+  securitySchemes:
+    userPass:
+      type: userPassword
+      description: Broker credentials
+  messages:
+    QuoteRequest:
+      name: QuoteRequest
+      title: Quote request
+      correlationId:
+        location: $message.header#/correlationId
+        description: Echoed in the reply
+      headers:
+        type: object
+        properties:
+          replyTo:
+            type: string
+      payload:
+        type: object
+        required: [productId]
+        properties:
+          productId:
+            type: string
+          quantity:
+            type: integer
+            default: 1
+      examples:
+        - name: one
+          summary: A single item
+          headers:
+            replyTo: quotes/cus_1/reply
+          payload:
+            productId: prd_9
+    QuoteReply:
+      name: QuoteReply
+      contentType: application/xml
+      payload:
+        type: object
+        properties:
+          price:
+            type: number

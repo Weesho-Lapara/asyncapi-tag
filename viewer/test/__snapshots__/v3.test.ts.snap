@@ -1,0 +1,800 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`v3 normaliser > multi-message: all channel messages by default, a listed subset otherwise; bad operations become problems 1`] = `
+{
+  "messages": [
+    {
+      "anchor": "Email",
+      "bindings": [],
+      "contentType": "application/json",
+      "examples": [],
+      "id": "Email",
+      "name": "Email",
+      "payload": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "format": "email",
+            "kind": "node",
+            "name": "to",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+      "tags": [],
+    },
+    {
+      "anchor": "Sms",
+      "bindings": [],
+      "contentType": "application/json",
+      "examples": [],
+      "id": "Sms",
+      "name": "Sms",
+      "payload": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "number",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+      "tags": [],
+    },
+  ],
+  "operations": [
+    {
+      "action": "send",
+      "anchor": "sendAll",
+      "badgeLabel": "SEND",
+      "bindings": [],
+      "channel": {
+        "address": "notifications",
+        "bindings": [],
+        "id": "events",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "sendAll",
+      "id": "sendAll",
+      "kind": "send",
+      "locationHint": "sendAll",
+      "messages": [
+        {
+          "anchor": "Email",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Email",
+          "name": "Email",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "format": "email",
+                "kind": "node",
+                "name": "to",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+        {
+          "anchor": "Sms",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Sms",
+          "name": "Sms",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "number",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+        {
+          "anchor": "events-Push",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Push",
+          "name": "Push",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "deviceToken",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+    {
+      "action": "send",
+      "anchor": "sendSome",
+      "badgeLabel": "SEND",
+      "bindings": [],
+      "channel": {
+        "address": "notifications",
+        "bindings": [],
+        "id": "events",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "sendSome",
+      "id": "sendSome",
+      "kind": "send",
+      "locationHint": "sendSome",
+      "messages": [
+        {
+          "anchor": "Sms",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Sms",
+          "name": "Sms",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "number",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+        {
+          "anchor": "events-Push",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Push",
+          "name": "Push",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "deviceToken",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+  ],
+  "problems": [
+    {
+      "message": "Could not resolve $ref "#/channels/nope": nothing at "/channels/nope".",
+      "severity": "error",
+      "where": "/operations/broken/channel",
+    },
+    {
+      "message": "Operation "broken" does not reference a channel in "channels". It was skipped.",
+      "severity": "error",
+      "where": "/operations/broken/channel",
+    },
+    {
+      "message": "Operation "wrongAction" has action "publish"; expected send or receive. It was skipped.",
+      "severity": "error",
+      "where": "/operations/wrongAction/action",
+    },
+  ],
+  "schemas": [],
+  "servers": [],
+  "specMajor": 3,
+  "specVersion": "3.0.0",
+  "tags": [],
+  "title": "Notifications",
+  "version": "1.0.0",
+}
+`;
+
+exports[`v3 normaliser > request/reply: kinds, labels, reply channel and address, parameters, security, bindings, examples 1`] = `
+{
+  "contact": {
+    "email": "platform@example.com",
+    "name": "Platform team",
+  },
+  "defaultContentType": "application/json",
+  "description": "Request a quote, get a reply.",
+  "externalDocs": {
+    "description": "Runbook",
+    "url": "https://example.com/docs/quotes",
+  },
+  "messages": [
+    {
+      "anchor": "QuoteRequest",
+      "bindings": [],
+      "contentType": "application/json",
+      "correlationId": {
+        "description": "Echoed in the reply",
+        "location": "$message.header#/correlationId",
+      },
+      "examples": [
+        {
+          "headers": {
+            "replyTo": "quotes/cus_1/reply",
+          },
+          "name": "one",
+          "payload": {
+            "productId": "prd_9",
+          },
+          "summary": "A single item",
+        },
+      ],
+      "headers": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "replyTo",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "id": "QuoteRequest",
+      "name": "QuoteRequest",
+      "payload": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "productId",
+            "path": [],
+            "required": true,
+            "types": [
+              "string",
+            ],
+          },
+          {
+            "children": [],
+            "constraints": [],
+            "default": 1,
+            "kind": "node",
+            "name": "quantity",
+            "path": [],
+            "required": false,
+            "types": [
+              "integer",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+      "tags": [],
+      "title": "Quote request",
+    },
+    {
+      "anchor": "QuoteReply",
+      "bindings": [],
+      "contentType": "application/xml",
+      "examples": [],
+      "id": "QuoteReply",
+      "name": "QuoteReply",
+      "payload": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "price",
+            "path": [],
+            "required": false,
+            "types": [
+              "number",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+      "tags": [],
+    },
+  ],
+  "operations": [
+    {
+      "action": "send",
+      "anchor": "requestQuote",
+      "badgeLabel": "REQUEST",
+      "bindings": [
+        {
+          "key": "expiration",
+          "protocol": "amqp",
+          "scope": "operation",
+          "value": 100000,
+        },
+        {
+          "key": "ack",
+          "protocol": "amqp",
+          "scope": "operation",
+          "value": false,
+        },
+      ],
+      "channel": {
+        "address": "quotes/{customerId}/request",
+        "bindings": [
+          {
+            "key": "is",
+            "protocol": "amqp",
+            "scope": "channel",
+            "value": "queue",
+          },
+          {
+            "key": "queue",
+            "protocol": "amqp",
+            "scope": "channel",
+            "value": {
+              "durable": true,
+              "name": "quotes",
+            },
+          },
+        ],
+        "id": "quoteRequests",
+        "parameters": [
+          {
+            "description": "The customer asking",
+            "examples": [
+              "cus_1",
+            ],
+            "name": "customerId",
+          },
+        ],
+        "servers": [
+          "main",
+        ],
+        "tags": [],
+        "title": "Quote requests",
+      },
+      "heading": "Request a quote",
+      "id": "requestQuote",
+      "kind": "request",
+      "locationHint": "requestQuote",
+      "messages": [
+        {
+          "anchor": "QuoteRequest",
+          "bindings": [],
+          "contentType": "application/json",
+          "correlationId": {
+            "description": "Echoed in the reply",
+            "location": "$message.header#/correlationId",
+          },
+          "examples": [
+            {
+              "headers": {
+                "replyTo": "quotes/cus_1/reply",
+              },
+              "name": "one",
+              "payload": {
+                "productId": "prd_9",
+              },
+              "summary": "A single item",
+            },
+          ],
+          "headers": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "replyTo",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "id": "QuoteRequest",
+          "name": "QuoteRequest",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "productId",
+                "path": [],
+                "required": true,
+                "types": [
+                  "string",
+                ],
+              },
+              {
+                "children": [],
+                "constraints": [],
+                "default": 1,
+                "kind": "node",
+                "name": "quantity",
+                "path": [],
+                "required": false,
+                "types": [
+                  "integer",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+          "title": "Quote request",
+        },
+      ],
+      "reply": {
+        "addressDescription": "Where the reply goes",
+        "addressLocation": "$message.header#/replyTo",
+        "channel": {
+          "address": null,
+          "bindings": [],
+          "id": "quoteReplies",
+          "parameters": [],
+          "servers": [],
+          "tags": [],
+        },
+        "messages": [
+          {
+            "anchor": "QuoteReply",
+            "id": "QuoteReply",
+            "name": "QuoteReply",
+          },
+          {
+            "anchor": "quoteReplies-QuoteRejected",
+            "id": "QuoteRejected",
+            "name": "QuoteRejected",
+          },
+        ],
+      },
+      "security": [],
+      "tags": [],
+    },
+    {
+      "action": "receive",
+      "anchor": "answerQuote",
+      "badgeLabel": "REPLY",
+      "bindings": [],
+      "channel": {
+        "address": null,
+        "bindings": [],
+        "id": "quoteReplies",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "answerQuote",
+      "id": "answerQuote",
+      "kind": "reply",
+      "locationHint": "answerQuote",
+      "messages": [
+        {
+          "anchor": "QuoteReply",
+          "bindings": [],
+          "contentType": "application/xml",
+          "examples": [],
+          "id": "QuoteReply",
+          "name": "QuoteReply",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "price",
+                "path": [],
+                "required": false,
+                "types": [
+                  "number",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+        {
+          "anchor": "quoteReplies-QuoteRejected",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "QuoteRejected",
+          "name": "QuoteRejected",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "reason",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+      ],
+      "reply": {
+        "channel": {
+          "address": "quotes/{customerId}/request",
+          "bindings": [
+            {
+              "key": "is",
+              "protocol": "amqp",
+              "scope": "channel",
+              "value": "queue",
+            },
+            {
+              "key": "queue",
+              "protocol": "amqp",
+              "scope": "channel",
+              "value": {
+                "durable": true,
+                "name": "quotes",
+              },
+            },
+          ],
+          "id": "quoteRequests",
+          "parameters": [
+            {
+              "description": "The customer asking",
+              "examples": [
+                "cus_1",
+              ],
+              "name": "customerId",
+            },
+          ],
+          "servers": [
+            "main",
+          ],
+          "tags": [],
+          "title": "Quote requests",
+        },
+        "messages": [
+          {
+            "anchor": "QuoteRequest",
+            "id": "QuoteRequest",
+            "name": "QuoteRequest",
+            "title": "Quote request",
+          },
+        ],
+      },
+      "security": [],
+      "tags": [],
+    },
+  ],
+  "problems": [],
+  "schemas": [],
+  "servers": [
+    {
+      "anchor": "main",
+      "bindings": [
+        {
+          "key": "bindingVersion",
+          "protocol": "amqp",
+          "scope": "server",
+          "value": "0.3.0",
+        },
+      ],
+      "hostDisplay": "mq.example.com/v1",
+      "id": "main",
+      "protocol": "amqp",
+      "protocolVersion": "0.9.1",
+      "security": [
+        {
+          "description": "Broker credentials",
+          "id": "userPass",
+          "scopes": [],
+          "type": "userPassword",
+        },
+      ],
+      "tags": [],
+      "title": "Main broker",
+      "variables": [
+        {
+          "default": "eu",
+          "description": "Deployment region",
+          "enum": [
+            "eu",
+            "us",
+          ],
+          "name": "region",
+        },
+      ],
+    },
+  ],
+  "specMajor": 3,
+  "specVersion": "3.0.0",
+  "tags": [
+    {
+      "description": "Quote lifecycle",
+      "name": "quotes",
+    },
+  ],
+  "title": "Quotes service",
+  "version": "0.3.0",
+}
+`;

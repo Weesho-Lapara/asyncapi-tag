@@ -22,3 +22,4 @@ npm run build   # dist/asyncapi-viewer.js (ESM) and dist/asyncapi-viewer.iife.js
 |---|---|---|
 | 2026-09-26 | 0.2 skeleton (Lit only) | 6.0 kB |
 | 2026-09-26 | 1.2 loader (`yaml` added) | 38.6 kB |
+| 2026-09-26 | 1.4 v3 normaliser and schema builder | 45.1 kB |

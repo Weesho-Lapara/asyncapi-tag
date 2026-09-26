@@ -1,0 +1,56 @@
+asyncapi: 3.0.0
+info:
+  title: Notifications
+  version: 1.0.0
+channels:
+  events:
+    address: notifications
+    messages:
+      Email:
+        $ref: '#/components/messages/Email'
+      Sms:
+        $ref: '#/components/messages/Sms'
+      Push:
+        name: Push
+        payload:
+          type: object
+          properties:
+            deviceToken:
+              type: string
+operations:
+  sendAll:
+    action: send
+    channel:
+      $ref: '#/channels/events'
+  sendSome:
+    action: send
+    channel:
+      $ref: '#/channels/events'
+    messages:
+      - $ref: '#/channels/events/messages/Sms'
+      - $ref: '#/channels/events/messages/Push'
+  broken:
+    action: send
+    channel:
+      $ref: '#/channels/nope'
+  wrongAction:
+    action: publish
+    channel:
+      $ref: '#/channels/events'
+components:
+  messages:
+    Email:
+      name: Email
+      payload:
+        type: object
+        properties:
+          to:
+            type: string
+            format: email
+    Sms:
+      name: Sms
+      payload:
+        type: object
+        properties:
+          number:
+            type: string
