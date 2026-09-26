@@ -1,0 +1,37 @@
+asyncapi: 3.0.0
+info:
+  title: Six levels
+  version: 1.0.0
+channels: {}
+operations: {}
+components:
+  schemas:
+    Order:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required: [customisation]
+            properties:
+              customisation:
+                type: object
+                properties:
+                  engraving:
+                    type: object
+                    properties:
+                      text:
+                        type: string
+                        maxLength: 40
+                      font:
+                        type: object
+                        properties:
+                          family:
+                            type: string
+                            enum: [serif, sans]
+                          size:
+                            type: integer
+                            minimum: 6
+                            maximum: 72

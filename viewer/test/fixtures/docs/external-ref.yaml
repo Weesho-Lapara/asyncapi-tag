@@ -1,0 +1,23 @@
+asyncapi: 3.0.0
+info:
+  title: External refs
+  version: 1.0.0
+channels:
+  orders:
+    address: orders
+    messages:
+      OrderPlaced:
+        $ref: 'shared/messages.yaml#/OrderPlaced'
+operations:
+  emit:
+    action: send
+    channel:
+      $ref: '#/channels/orders'
+components:
+  schemas:
+    Money:
+      $ref: 'shared/schemas.yaml#/Money'
+    Broken:
+      $ref: 'missing.yaml#/Nope'
+    Deep:
+      $ref: 'https://schemas.example.com/common.json#/definitions/Address'

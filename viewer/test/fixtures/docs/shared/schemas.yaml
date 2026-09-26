@@ -1,0 +1,10 @@
+Money:
+  type: object
+  properties:
+    amount:
+      type: number
+    currency:
+      $ref: '#/Currency'
+Currency:
+  type: string
+  enum: [EUR, USD]

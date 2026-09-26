@@ -1,0 +1,7 @@
+OrderPlaced:
+  name: OrderPlaced
+  payload:
+    type: object
+    properties:
+      total:
+        $ref: 'schemas.yaml#/Money'

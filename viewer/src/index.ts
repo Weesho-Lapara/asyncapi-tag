@@ -5,3 +5,5 @@ export { parseOptions, DEFAULTS, OPTION_SPECS, toAttributeName } from './options
 export type { Options } from './options.js';
 export { loadDocument, parseText, resolveUrl } from './load/loader.js';
 export type { LoadResult, LoadError } from './load/loader.js';
+export { RefResolver, isRef, schemaNameOf } from './load/refs.js';
+export type { Resolved, Dereferenced, ResolveFailure } from './load/refs.js';

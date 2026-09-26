@@ -1,0 +1,25 @@
+asyncapi: 3.0.0
+info:
+  title: Circular
+  version: 1.0.0
+channels: {}
+operations: {}
+components:
+  schemas:
+    Node:
+      type: object
+      properties:
+        name:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Node'
+        parent:
+          $ref: '#/components/schemas/Node'
+    A:
+      $ref: '#/components/schemas/B'
+    B:
+      $ref: '#/components/schemas/A'
+    Alias:
+      $ref: '#/components/schemas/Node'
