@@ -28,14 +28,7 @@ export const operationStyles = css`
     padding-top: 40px;
     border-top: 1px solid var(--_line);
   }
-  .op__crumb {
-    margin-bottom: 14px;
-    font-size: 12.5px;
-    color: var(--_muted);
-  }
-  .op__crumb span + span::before {
-    content: ' / ';
-  }
+
   .op__content {
     min-width: 0;
   }
@@ -107,7 +100,7 @@ export const operationStyles = css`
     color: var(--_badge-ink-receive);
   }
   .op__tags {
-    margin-left: auto;
+    margin-bottom: 14px;
   }
   .op__tags .chip {
     min-height: 24px;
@@ -121,9 +114,12 @@ export const operationStyles = css`
   }
   .op__heading {
     margin: 0;
-    font: 500 15px/1.5 var(--_font-mono);
+    font: 600 18px/1.4 var(--_font-mono);
     color: var(--_ink);
     overflow-wrap: anywhere;
+  }
+  .op__meta {
+    margin-bottom: 16px;
   }
   .op__heading:focus-visible {
     outline: 2px solid var(--_primary);
@@ -322,16 +318,15 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
   return html`
     <article class="op ${open ? 'op--split' : ''}" id=${anchor} aria-labelledby="${anchor}--heading">
       <div class="op__intro">
-        <div class="op__crumb"><span>Operations</span>${op.tags[0] ? html`<span>${capitalise(op.tags[0].name)}</span>` : nothing}</div>
+        ${op.tags.length > 0
+          ? html`<ul class="chips op__tags" aria-label="Tags">
+              ${op.tags.map((t) => html`<li class="chip" title=${t.description ?? ''}>${t.name}</li>`)}
+            </ul>`
+          : nothing}
         <div class="op__meta">
           <span class="badge badge--${direction}">${op.badgeLabel}</span>
           <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
           ${op.locationHint !== op.heading ? html`<span class="op__hint">${op.locationHint}</span>` : nothing}
-          ${op.tags.length > 0
-            ? html`<ul class="chips op__tags" aria-label="Tags">
-                ${op.tags.map((t) => html`<li class="chip" title=${t.description ?? ''}>${t.name}</li>`)}
-              </ul>`
-            : nothing}
         </div>
         <div class="op__channel">
           <span class="label">Channel</span>
@@ -376,8 +371,4 @@ export function renderOperations(doc: Document, ctx: OperationContext): Template
       <div class="ops__list">${doc.operations.map((op) => renderOperation(op, ctx))}</div>
     </section>
   `;
-}
-
-function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
