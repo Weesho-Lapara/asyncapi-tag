@@ -3,24 +3,17 @@ import type { Document } from '../model/types.js';
 import { renderInline, renderMarkdown } from './markdown.js';
 
 export const infoStyles = css`
-  .info__lead {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px 12px;
-    margin-bottom: 14px;
-  }
-  .info__lead .section-title {
-    margin: 0;
-  }
-  .info__version {
-    color: var(--_muted);
-    font-family: var(--_font-mono);
-    font-size: 13px;
-  }
   .info__desc {
-    margin-bottom: 16px;
-    max-width: 72ch;
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    border-left: 3px solid var(--_primary);
+    border-radius: 0 var(--_radius-sm) var(--_radius-sm) 0;
+    background: var(--_surface);
+  }
+  .info__desc .md p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--_ink);
   }
 `;
 
@@ -51,11 +44,8 @@ export function renderInfo(doc: Document, anchorId: string): TemplateResult {
   }
   return html`
     <section class="info" aria-labelledby=${anchorId}>
-      <div class="info__lead">
-        <h2 class="section-title" id=${anchorId} tabindex="-1">${doc.title}</h2>
-        ${doc.version ? html`<span class="info__version">v${doc.version}</span>` : nothing}
-      </div>
-      <div class="info__desc">${renderMarkdown(doc.description)}</div>
+      <h2 class="section-title visually-hidden" id=${anchorId} tabindex="-1">${doc.title}</h2>
+      ${doc.description ? html`<div class="info__desc">${renderMarkdown(doc.description)}</div>` : nothing}
       ${facts.length > 0
         ? html`<dl class="facts">${facts.map(([k, v]) => html`<dt>${k}</dt><dd>${v}</dd>`)}</dl>`
         : nothing}
