@@ -11,12 +11,13 @@ describe('buildNavItems', () => {
     expect(items.map((i) => [i.kind, i.label, i.group])).toEqual([
       ['section', 'Orders service', undefined],
       ['section', 'Servers', undefined],
-      ['operation', 'emitOrderPlaced', undefined],
-      ['operation', 'onOrderShipped', undefined],
+      ['operation', 'emitOrderPlaced', 'Operations'],
+      ['operation', 'onOrderShipped', 'Operations'],
       ['section', 'Messages', 'Components'],
       ['section', 'Schemas', 'Components'],
     ]);
-    expect(items[2]).toMatchObject({ anchor: 'v--operations--emitOrderPlaced', badge: { label: 'SEND', action: 'send' }, sub: 'orders.placed' });
+    expect(items[2]).toMatchObject({ anchor: 'v--operations--emitOrderPlaced', badge: { label: 'SEND', action: 'send' } });
+    expect(items[2]?.sub).toBeUndefined();
     expect(items[2]?.search).toEqual(['emitorderplaced', 'emitorderplaced', 'orders.placed', 'orderplaced', 'order placed']);
     expect(items[4]?.count).toBe(2);
   });

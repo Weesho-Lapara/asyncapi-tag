@@ -46,19 +46,19 @@ export function buildNavItems(doc: Document, operations: Operation[], prefix: st
     }
   }
   for (const op of operations) {
-    const group = options.showOperations === 'byDefault' ? undefined : groupFor(op.tags.map((t) => t.name), doc, options.showOperations === 'bySpecTags');
-    const item: NavItem = {
+    // Flat mode lists every operation under one "Operations" heading; tag modes group by tag.
+    const group = options.showOperations === 'byDefault' ? 'Operations' : groupFor(op.tags.map((t) => t.name), doc, options.showOperations === 'bySpecTags');
+    items.push({
       kind: 'operation',
       label: op.heading,
       anchor: `${prefix}--operations--${op.anchor}`,
+      group,
       badge: { label: op.badgeLabel, action: op.action },
+      // The channel address is searchable but not shown: the list stays a list of operations.
       search: [op.heading, op.id, op.channel.address ?? '', ...op.messages.flatMap((m) => [m.name ?? '', m.title ?? ''])]
         .filter((s) => s !== '')
         .map((s) => s.toLowerCase()),
-    };
-    if (group !== undefined) item.group = group;
-    if (op.channel.address !== null) item.sub = op.channel.address;
-    items.push(item);
+    });
   }
   if (options.messages && doc.messages.length > 0) {
     items.push({ kind: 'section', label: 'Messages', anchor: `${prefix}--messages`, group: 'Components', count: doc.messages.length, search: [] });
