@@ -4,6 +4,7 @@
 import type { RefResolver } from '../load/refs.js';
 import { Context, DEFAULT_NORMALIZE_OPTIONS, type NormalizeOptions } from './context.js';
 import type { Document, Problem } from './types.js';
+import { normalizeV2 } from './v2.js';
 import { normalizeV3 } from './v3.js';
 
 export interface NormalizeInput {
@@ -21,18 +22,5 @@ export function normalize(input: NormalizeInput): Document {
   const ctx = new Context(input.resolver, options);
   for (const p of input.problems ?? []) ctx.problems.push(p);
   if (input.specMajor === 3) return normalizeV3(ctx, input.data, input.specVersion);
-  ctx.problem('error', `AsyncAPI ${input.specVersion} normalisation is not implemented yet.`, '/asyncapi');
-  const info = (input.data['info'] ?? {}) as Record<string, unknown>;
-  return {
-    specVersion: input.specVersion,
-    specMajor: 2,
-    title: typeof info['title'] === 'string' ? info['title'] : 'Untitled API',
-    version: typeof info['version'] === 'string' ? info['version'] : '',
-    tags: [],
-    servers: [],
-    operations: [],
-    messages: [],
-    schemas: [],
-    problems: ctx.problems,
-  };
+  return normalizeV2(ctx, input.data, input.specVersion);
 }

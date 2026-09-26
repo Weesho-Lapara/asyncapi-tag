@@ -1,0 +1,51 @@
+asyncapi: 2.4.0
+info:
+  title: Alerts
+  version: 1.0.0
+channels:
+  alerts:
+    publish:
+      message:
+        oneOf:
+          - $ref: '#/components/messages/Warning'
+          - name: Critical
+            title: Critical alert
+            payload:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: integer
+          - $ref: '#/components/messages/Warning'
+    subscribe:
+      operationId: acknowledge
+      message:
+        $ref: '#/components/messages/Ack'
+  audit/{id}:
+    parameters:
+      id:
+        schema:
+          type: [string, 'null']
+    subscribe:
+      message:
+        payload:
+          type: string
+components:
+  messages:
+    Warning:
+      name: Warning
+      payload:
+        type: object
+        properties:
+          text:
+            type: string
+      examples:
+        - payload:
+            text: Disk almost full
+    Ack:
+      name: Ack
+      payload:
+        type: object
+        properties:
+          alertId:
+            type: string

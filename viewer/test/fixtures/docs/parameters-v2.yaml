@@ -1,0 +1,91 @@
+asyncapi: 2.6.0
+info:
+  title: Rooms
+  version: 3.0.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+externalDocs:
+  url: https://example.com/rooms
+servers:
+  prod:
+    url: wss://rooms.example.com/{tenant}
+    protocol: wss
+    protocolVersion: '13'
+    variables:
+      tenant:
+        default: acme
+        examples: [acme, globex]
+    security:
+      - apiKey: []
+      - oauth: [read, write]
+      - ghost: []
+    bindings:
+      ws:
+        bindingVersion: 0.1.0
+  dev:
+    url: ws://localhost:8080
+    protocol: ws
+channels:
+  rooms/{roomId}/messages/{kind}:
+    description: Chat traffic for one room
+    servers: [prod, nope]
+    parameters:
+      roomId:
+        description: Room identifier
+        schema:
+          type: string
+          pattern: '^room_'
+        location: $message.payload#/roomId
+      kind:
+        $ref: '#/components/parameters/kind'
+    bindings:
+      ws:
+        method: GET
+    publish:
+      operationId: postMessage
+      summary: Post a chat message
+      security:
+        - apiKey: []
+      bindings:
+        ws:
+          bindingVersion: 0.1.0
+      message:
+        name: ChatMessage
+        payload:
+          type: object
+          properties:
+            text:
+              type: string
+            roomId:
+              type: string
+    subscribe:
+      message:
+        $ref: '#/components/messages/ChatMessage'
+components:
+  parameters:
+    kind:
+      description: Message kind
+      schema:
+        type: string
+        enum: [text, image]
+        default: text
+  securitySchemes:
+    apiKey:
+      type: httpApiKey
+      name: X-Api-Key
+      in: header
+      description: Tenant API key
+    oauth:
+      type: oauth2
+      flows: {}
+  messages:
+    ChatMessage:
+      name: ChatMessage
+      title: Chat message
+      schemaFormat: application/schema+json;version=draft-07
+      payload:
+        type: object
+        properties:
+          text:
+            type: string

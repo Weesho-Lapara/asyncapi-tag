@@ -1,0 +1,644 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`v2 normaliser > message oneOf, synthesised ids, and union parameter types 1`] = `
+{
+  "messages": [
+    {
+      "anchor": "Warning",
+      "bindings": [],
+      "contentType": "application/json",
+      "examples": [
+        {
+          "payload": {
+            "text": "Disk almost full",
+          },
+        },
+      ],
+      "id": "Warning",
+      "name": "Warning",
+      "payload": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "text",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "schemaFormat": "application/vnd.aai.asyncapi;version=2.4.0",
+      "tags": [],
+    },
+    {
+      "anchor": "Ack",
+      "bindings": [],
+      "contentType": "application/json",
+      "examples": [],
+      "id": "Ack",
+      "name": "Ack",
+      "payload": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "alertId",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "schemaFormat": "application/vnd.aai.asyncapi;version=2.4.0",
+      "tags": [],
+    },
+  ],
+  "operations": [
+    {
+      "action": "receive",
+      "anchor": "publish-alerts",
+      "badgeLabel": "PUB",
+      "bindings": [],
+      "channel": {
+        "address": "alerts",
+        "bindings": [],
+        "id": "alerts",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "publish alerts",
+      "id": "publish-alerts",
+      "kind": "receive",
+      "locationHint": "channels › alerts › publish",
+      "messages": [
+        {
+          "anchor": "Warning",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [
+            {
+              "payload": {
+                "text": "Disk almost full",
+              },
+            },
+          ],
+          "id": "Warning",
+          "name": "Warning",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "text",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi;version=2.4.0",
+          "tags": [],
+        },
+        {
+          "anchor": "alerts-publish-1",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Critical",
+          "name": "Critical",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "code",
+                "path": [],
+                "required": true,
+                "types": [
+                  "integer",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi;version=2.4.0",
+          "tags": [],
+          "title": "Critical alert",
+        },
+        {
+          "anchor": "Warning",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [
+            {
+              "payload": {
+                "text": "Disk almost full",
+              },
+            },
+          ],
+          "id": "Warning",
+          "name": "Warning",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "text",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi;version=2.4.0",
+          "tags": [],
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+    {
+      "action": "send",
+      "anchor": "acknowledge",
+      "badgeLabel": "SUB",
+      "bindings": [],
+      "channel": {
+        "address": "alerts",
+        "bindings": [],
+        "id": "alerts",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "acknowledge",
+      "id": "acknowledge",
+      "kind": "send",
+      "locationHint": "channels › alerts › subscribe",
+      "messages": [
+        {
+          "anchor": "Ack",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Ack",
+          "name": "Ack",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "alertId",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi;version=2.4.0",
+          "tags": [],
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+    {
+      "action": "send",
+      "anchor": "subscribe-audit-id",
+      "badgeLabel": "SUB",
+      "bindings": [],
+      "channel": {
+        "address": "audit/{id}",
+        "bindings": [],
+        "id": "audit/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "schemaType": "string | null",
+          },
+        ],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "subscribe audit/{id}",
+      "id": "subscribe-audit/{id}",
+      "kind": "send",
+      "locationHint": "channels › audit/{id} › subscribe",
+      "messages": [
+        {
+          "anchor": "audit-id-subscribe",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "audit/{id}-subscribe",
+          "payload": {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi;version=2.4.0",
+          "tags": [],
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+  ],
+  "problems": [],
+  "schemas": [],
+  "servers": [],
+  "specMajor": 2,
+  "specVersion": "2.4.0",
+  "tags": [],
+  "title": "Alerts",
+  "version": "1.0.0",
+}
+`;
+
+exports[`v2 normaliser > parameters with schema, server lists, security requirements, license and external docs 1`] = `
+{
+  "externalDocs": {
+    "url": "https://example.com/rooms",
+  },
+  "license": {
+    "name": "Apache 2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+  },
+  "messages": [
+    {
+      "anchor": "ChatMessage",
+      "bindings": [],
+      "contentType": "application/json",
+      "examples": [],
+      "id": "ChatMessage",
+      "name": "ChatMessage",
+      "payload": {
+        "children": [
+          {
+            "children": [],
+            "constraints": [],
+            "kind": "node",
+            "name": "text",
+            "path": [],
+            "required": false,
+            "types": [
+              "string",
+            ],
+          },
+        ],
+        "constraints": [],
+        "kind": "node",
+        "name": "",
+        "path": [],
+        "required": false,
+        "types": [
+          "object",
+        ],
+      },
+      "schemaFormat": "application/schema+json;version=draft-07",
+      "tags": [],
+      "title": "Chat message",
+    },
+  ],
+  "operations": [
+    {
+      "action": "receive",
+      "anchor": "postMessage",
+      "badgeLabel": "PUB",
+      "bindings": [
+        {
+          "key": "bindingVersion",
+          "protocol": "ws",
+          "scope": "operation",
+          "value": "0.1.0",
+        },
+      ],
+      "channel": {
+        "address": "rooms/{roomId}/messages/{kind}",
+        "bindings": [
+          {
+            "key": "method",
+            "protocol": "ws",
+            "scope": "channel",
+            "value": "GET",
+          },
+        ],
+        "description": "Chat traffic for one room",
+        "id": "rooms/{roomId}/messages/{kind}",
+        "parameters": [
+          {
+            "description": "Room identifier",
+            "location": "$message.payload#/roomId",
+            "name": "roomId",
+            "schemaType": "string",
+          },
+          {
+            "default": "text",
+            "description": "Message kind",
+            "enum": [
+              "text",
+              "image",
+            ],
+            "name": "kind",
+            "schemaType": "string",
+          },
+        ],
+        "servers": [
+          "prod",
+        ],
+        "tags": [],
+      },
+      "heading": "postMessage",
+      "id": "postMessage",
+      "kind": "receive",
+      "locationHint": "channels › rooms/{roomId}/messages/{kind} › publish",
+      "messages": [
+        {
+          "anchor": "rooms-roomId-messages-kind-publish",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "ChatMessage",
+          "name": "ChatMessage",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "text",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "roomId",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi;version=2.6.0",
+          "tags": [],
+        },
+      ],
+      "security": [
+        {
+          "description": "Tenant API key",
+          "id": "apiKey",
+          "scopes": [],
+          "type": "httpApiKey",
+        },
+      ],
+      "summary": "Post a chat message",
+      "tags": [],
+    },
+    {
+      "action": "send",
+      "anchor": "subscribe-rooms-roomId-messages-kind",
+      "badgeLabel": "SUB",
+      "bindings": [],
+      "channel": {
+        "address": "rooms/{roomId}/messages/{kind}",
+        "bindings": [
+          {
+            "key": "method",
+            "protocol": "ws",
+            "scope": "channel",
+            "value": "GET",
+          },
+        ],
+        "description": "Chat traffic for one room",
+        "id": "rooms/{roomId}/messages/{kind}",
+        "parameters": [
+          {
+            "description": "Room identifier",
+            "location": "$message.payload#/roomId",
+            "name": "roomId",
+            "schemaType": "string",
+          },
+          {
+            "default": "text",
+            "description": "Message kind",
+            "enum": [
+              "text",
+              "image",
+            ],
+            "name": "kind",
+            "schemaType": "string",
+          },
+        ],
+        "servers": [
+          "prod",
+        ],
+        "tags": [],
+      },
+      "heading": "subscribe rooms/{roomId}/messages/{kind}",
+      "id": "subscribe-rooms/{roomId}/messages/{kind}",
+      "kind": "send",
+      "locationHint": "channels › rooms/{roomId}/messages/{kind} › subscribe",
+      "messages": [
+        {
+          "anchor": "ChatMessage",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "ChatMessage",
+          "name": "ChatMessage",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "text",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/schema+json;version=draft-07",
+          "tags": [],
+          "title": "Chat message",
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+  ],
+  "problems": [
+    {
+      "message": "Security scheme "ghost" is not defined in components.securitySchemes.",
+      "severity": "warning",
+      "where": "/servers/prod/security/2",
+    },
+    {
+      "message": "Channel "rooms/{roomId}/messages/{kind}" lists server "nope" which is not in "servers"; it was ignored.",
+      "severity": "warning",
+      "where": "/channels/rooms~1{roomId}~1messages~1{kind}/servers/1",
+    },
+  ],
+  "schemas": [],
+  "servers": [
+    {
+      "anchor": "prod",
+      "bindings": [
+        {
+          "key": "bindingVersion",
+          "protocol": "ws",
+          "scope": "server",
+          "value": "0.1.0",
+        },
+      ],
+      "hostDisplay": "wss://rooms.example.com/{tenant}",
+      "id": "prod",
+      "protocol": "wss",
+      "protocolVersion": "13",
+      "security": [
+        {
+          "description": "Tenant API key",
+          "id": "apiKey",
+          "scopes": [],
+          "type": "httpApiKey",
+        },
+        {
+          "id": "oauth",
+          "scopes": [
+            "read",
+            "write",
+          ],
+          "type": "oauth2",
+        },
+        {
+          "id": "ghost",
+          "scopes": [],
+          "type": "",
+        },
+      ],
+      "tags": [],
+      "variables": [
+        {
+          "default": "acme",
+          "examples": [
+            "acme",
+            "globex",
+          ],
+          "name": "tenant",
+        },
+      ],
+    },
+    {
+      "anchor": "dev",
+      "bindings": [],
+      "hostDisplay": "ws://localhost:8080",
+      "id": "dev",
+      "protocol": "ws",
+      "security": [],
+      "tags": [],
+      "variables": [],
+    },
+  ],
+  "specMajor": 2,
+  "specVersion": "2.6.0",
+  "tags": [],
+  "title": "Rooms",
+  "version": "3.0.0",
+}
+`;

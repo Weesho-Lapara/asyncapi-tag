@@ -107,7 +107,9 @@ export class Context {
   anchor(section: SectionId, id: string): string {
     const used = this.#anchors.get(section) ?? new Set<string>();
     this.#anchors.set(section, used);
-    const base = id.replace(/[^A-Za-z0-9_.-]+/g, '-').replace(/^[^A-Za-z0-9]+/, '') || 'item';
+    // Runs of separators collapse to one hyphen so an anchor never contains "--", the separator
+    // between element id, section and item in page anchors.
+    const base = id.replace(/[^A-Za-z0-9_.]+/g, '-').replace(/^-+|-+$/g, '') || 'item';
     let candidate = base;
     for (let n = 2; used.has(candidate); n++) candidate = `${base}-${n}`;
     used.add(candidate);
