@@ -217,8 +217,9 @@ export const base = css`
   /* Definition rows used by Info and Servers. */
   .facts {
     display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 10px 20px;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: baseline;
+    gap: 8px 14px;
     margin: 0;
   }
   .facts dt {

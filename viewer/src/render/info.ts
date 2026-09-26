@@ -20,7 +20,7 @@ export const infoStyles = css`
     font-size: 13px;
   }
   .info__desc {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     max-width: 72ch;
   }
 `;
