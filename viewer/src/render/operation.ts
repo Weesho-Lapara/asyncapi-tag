@@ -77,8 +77,7 @@ export const operationStyles = css`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px 14px;
-    margin-bottom: 14px;
+    gap: 6px 10px;
   }
   .badge {
     display: inline-flex;
@@ -113,13 +112,24 @@ export const operationStyles = css`
     overflow-wrap: anywhere;
   }
   .op__heading {
-    margin: 0;
-    font: 600 18px/1.4 var(--_font-mono);
+    margin: 0 0 12px;
+    font: 600 28px/1.2 var(--_font-heading);
+    letter-spacing: -0.01em;
     color: var(--_ink);
     overflow-wrap: anywhere;
   }
   .op__meta {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
+  }
+  .op__id {
+    font: 400 13px/1.5 var(--_font-mono);
+    color: var(--_ink);
+    overflow-wrap: anywhere;
+  }
+  @container viewer (max-width: 699px) {
+    .op__heading {
+      font-size: 22px;
+    }
   }
   .op__heading:focus-visible {
     outline: 2px solid var(--_primary);
@@ -132,6 +142,9 @@ export const operationStyles = css`
     align-items: baseline;
     gap: 4px 10px;
     margin-bottom: 16px;
+  }
+  .op__meta + .op__channel {
+    margin-top: 8px;
   }
   .op__channel .label {
     font-size: 13px;
@@ -323,10 +336,14 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
               ${op.tags.map((t) => html`<li class="chip" title=${t.description ?? ''}>${t.name}</li>`)}
             </ul>`
           : nothing}
+        <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
         <div class="op__meta">
           <span class="badge badge--${direction}">${op.badgeLabel}</span>
-          <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
-          ${op.locationHint !== op.heading ? html`<span class="op__hint">${op.locationHint}</span>` : nothing}
+          ${op.heading !== op.id
+            ? html`<span class="op__id">${op.id}</span>`
+            : op.locationHint !== op.heading
+              ? html`<span class="op__id">${op.locationHint}</span>`
+              : nothing}
         </div>
         <div class="op__channel">
           <span class="label">Channel</span>
