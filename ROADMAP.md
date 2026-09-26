@@ -58,6 +58,11 @@ These override the imported spec where they differ:
    active the section links (Info, Servers, Messages, Schemas) are hidden; the new option
    `searchKeepSections` (boolean, default `false`, attribute `search-keep-sections`) keeps them
    visible. Decided 2026-09-26.
+12. **Host palette is opt-in.** `theme="auto"` follows only the host's light/dark state (Material's
+   `data-md-color-scheme`, `html[data-theme]`, the system preference). Colours and fonts come from
+   the viewer's own tokens. Matching a Material site's palette is a documented two-line override in
+   the theme file (`--asyncapi-primary: var(--md-primary-fg-color)` and the font variables), not the
+   default, so every site looks right without tuning. Decided 2026-09-26.
 
 ### Work plan in session-sized chunks
 
