@@ -10,6 +10,9 @@ export const tokens = css`
   :host {
     --_primary: var(--asyncapi-primary, #2944c9);
     --_secondary: var(--asyncapi-secondary, #b84e1a);
+    /* Badge colours default to the accents but can be set on their own. */
+    --_send: var(--asyncapi-send, var(--_primary));
+    --_receive: var(--asyncapi-receive, var(--_secondary));
 
     --_bg: var(--asyncapi-bg, #f6f5f1);
     --_surface: var(--asyncapi-surface, #ffffff);
@@ -22,8 +25,8 @@ export const tokens = css`
     --_line-2: var(--asyncapi-line-2, #c9c5ba);
     --_tint-strength: 10%;
 
-    /* Example panel: the same in both themes. */
-    --_ex-bg: #12141a;
+    /* Example panel: the same in both themes unless overridden. */
+    --_ex-bg: var(--asyncapi-example-bg, #12141a);
     --_ex-ink: #dcdfe6;
     --_ex-muted: #8c92a0;
     --_ex-lines: #4a505c;
@@ -38,8 +41,9 @@ export const tokens = css`
     --_radius-sm: calc(var(--_radius) - 3px);
     --_example-width: clamp(360px, var(--asyncapi-example-width, 452px), 560px);
 
-    /* Derived at runtime from the resolved accent (util/color.ts); these are the fallbacks. */
-    --_badge-ink: #ffffff;
+    /* Derived at runtime from the resolved colours (util/color.ts); these are the fallbacks. */
+    --_badge-ink-send: #ffffff;
+    --_badge-ink-receive: #ffffff;
     --_primary-text: var(--_primary);
     --_secondary-text: var(--_secondary);
     --_tint: color-mix(in srgb, var(--_primary) var(--_tint-strength), transparent);

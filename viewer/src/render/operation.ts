@@ -22,16 +22,27 @@ export const operationStyles = css`
   .op {
     scroll-margin-top: 16px;
   }
-  .op__body {
+  .op__content {
+    min-width: 0;
+  }
+  .op__content > .block:first-child,
+  .op__content > .msg:first-child {
+    margin-top: 0;
+  }
+  /* The message head (tabs, name, format) spans the full width; the tree and the example
+     panel start together underneath it. The split depends on the main column's width (a
+     container of its own), so beside a sidebar the panel stacks until both have room. */
+  .msg__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     align-items: start;
   }
-  /* The split depends on the main column's width (a container of its own), so a sidebar
-     narrows the threshold's reference and the panel stacks until both columns have room. */
+  .msg__trees {
+    min-width: 0;
+  }
   @container main (min-width: 1100px) {
-    .op--split .op__body {
+    .op--split .msg__grid {
       grid-template-columns: minmax(0, 1fr) var(--_example-width);
       gap: 32px;
     }
@@ -40,15 +51,8 @@ export const operationStyles = css`
       top: 16px;
     }
   }
-  .op__content {
-    min-width: 0;
-  }
-  .op__content > .block:first-child,
-  .op__content > .msg:first-child {
-    margin-top: 0;
-  }
-  .op__show {
-    margin-top: 22px;
+  .msg__head .ex__show {
+    margin-left: auto;
   }
   .op + .op {
     padding-top: 40px;
@@ -73,12 +77,12 @@ export const operationStyles = css`
     white-space: nowrap;
   }
   .badge--send {
-    background: var(--_primary);
-    color: var(--_badge-ink);
+    background: var(--_send);
+    color: var(--_badge-ink-send);
   }
   .badge--receive {
-    background: var(--_secondary);
-    color: var(--_badge-ink-secondary, #ffffff);
+    background: var(--_receive);
+    color: var(--_badge-ink-receive);
   }
   .op__hint {
     font: 400 12.5px/1.4 var(--_font-mono);
@@ -220,7 +224,15 @@ export function renderAddress(op: Operation, anchor: string): TemplateResult {
   })}</span>`;
 }
 
-function renderMessage(op: Operation, message: Message, anchor: string, index: number, ctx: OperationContext): TemplateResult {
+function renderMessage(
+  op: Operation,
+  message: Message,
+  anchor: string,
+  index: number,
+  ctx: OperationContext,
+  panel: TemplateResult | typeof nothing,
+  showExample: TemplateResult | typeof nothing,
+): TemplateResult {
   const treeKey = `${anchor}--m${index}`;
   const name = (m: Message) => m.title ?? m.name ?? m.id;
   return html`<div class="msg">
@@ -255,18 +267,24 @@ function renderMessage(op: Operation, message: Message, anchor: string, index: n
         <span class="label">Message</span>
         <span class="msg__name">${name(message)}</span>
         <span class="msg__format">${message.contentType} · ${message.schemaFormat}</span>
+        ${showExample}
       </div>
       ${message.summary ? html`<div class="msg__desc">${renderInline(message.summary)}</div>` : nothing}
       ${message.description ? html`<div class="msg__desc">${renderMarkdown(message.description)}</div>` : nothing}
-      ${message.payload
-        ? renderSchema(message.payload, { prefix: ctx.prefix, key: `${treeKey}--payload`, state: ctx.tree(`${treeKey}--payload`) })
-        : html`<p class="tree__empty">This message has no payload schema.</p>`}
-      ${message.headers
-        ? html`<div class="msg__part">
-            <div class="msg__head"><span class="label">Headers</span></div>
-            ${renderSchema(message.headers, { prefix: ctx.prefix, key: `${treeKey}--headers`, state: ctx.tree(`${treeKey}--headers`) })}
-          </div>`
-        : nothing}
+      <div class="msg__grid">
+        <div class="msg__trees">
+          ${message.payload
+            ? renderSchema(message.payload, { prefix: ctx.prefix, key: `${treeKey}--payload`, state: ctx.tree(`${treeKey}--payload`) })
+            : html`<p class="tree__empty">This message has no payload schema.</p>`}
+          ${message.headers
+            ? html`<div class="msg__part">
+                <div class="msg__head"><span class="label">Headers</span></div>
+                ${renderSchema(message.headers, { prefix: ctx.prefix, key: `${treeKey}--headers`, state: ctx.tree(`${treeKey}--headers`) })}
+              </div>`
+            : nothing}
+        </div>
+        ${panel !== nothing ? html`<div class="op__example">${panel}</div>` : nothing}
+      </div>
     </div>
   </div>`;
 }
@@ -295,17 +313,23 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
         </div>
         ${op.summary ? html`<p class="summary op__summary">${renderInline(op.summary)}</p>` : nothing}
         ${op.description ? html`<div class="op__desc">${renderMarkdown(op.description)}</div>` : nothing}
-        ${examples.length > 0 && !open ? html`<div class="op__show">${renderShowExample(exampleCtx)}</div>` : nothing}
         ${renderParameters(op.channel.parameters, anchor)}
       </div>
-      <div class="op__body">
-        <div class="op__content">
-          ${message ? renderMessage(op, message, anchor, index, ctx) : html`<p class="tree__empty block">This operation has no messages.</p>`}
-          ${op.reply ? renderReply(op.reply, prefix) : nothing}
-          ${renderBindings(bindings)}
-          ${renderSecurity(op.security, `#${prefix}--servers`)}
-        </div>
-        ${open && message ? html`<div class="op__example">${renderExamplePanel(message, examples, exampleCtx, `${anchor}--example`)}</div>` : nothing}
+      <div class="op__content">
+        ${message
+          ? renderMessage(
+              op,
+              message,
+              anchor,
+              index,
+              ctx,
+              open ? renderExamplePanel(message, examples, exampleCtx, `${anchor}--example`) : nothing,
+              examples.length > 0 && !open ? renderShowExample(exampleCtx) : nothing,
+            )
+          : html`<p class="tree__empty block">This operation has no messages.</p>`}
+        ${op.reply ? renderReply(op.reply, prefix) : nothing}
+        ${renderBindings(bindings)}
+        ${renderSecurity(op.security, `#${prefix}--servers`)}
       </div>
     </article>
   `;

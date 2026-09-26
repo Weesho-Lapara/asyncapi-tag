@@ -16,3 +16,27 @@ asyncapi-viewer {
   --asyncapi-font-mono: var(--md-code-font-family);
 }
 */
+
+/* Advanced variables, all optional. Values shown are the defaults.
+asyncapi-viewer {
+  --asyncapi-send: var(--asyncapi-primary);       send and request badges
+  --asyncapi-receive: var(--asyncapi-secondary);  receive and reply badges
+  --asyncapi-font-heading: ui-sans-serif, system-ui, sans-serif;
+  --asyncapi-font-body: ui-sans-serif, system-ui, sans-serif;
+  --asyncapi-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --asyncapi-radius: 10px;
+  --asyncapi-example-width: 452px;                 clamped between 360px and 560px
+  --asyncapi-example-bg: #12141A;                  the example panel, both themes
+  --asyncapi-bg: #F6F5F1;          page background          (dark: #0F1115)
+  --asyncapi-surface: #FFFFFF;     cards, header            (dark: #161920)
+  --asyncapi-sidebar: #EFEDE7;     sidebar                  (dark: #12151A)
+  --asyncapi-head: #F8F7F3;        table and tree toolbars  (dark: #1B1F27)
+  --asyncapi-ink: #17191F;         main text                (dark: #ECEDEF)
+  --asyncapi-ink-2: #3A3E48;       secondary text           (dark: #C4C8D0)
+  --asyncapi-muted: #5E626D;       labels, meta             (dark: #959BA7)
+  --asyncapi-line: #E3E0D8;        borders                  (dark: #262A33)
+  --asyncapi-line-2: #C9C5BA;      tree guide lines         (dark: #3A404C)
+}
+Scope a value to one mode with the attribute the viewer reflects:
+asyncapi-viewer[resolved-theme="dark"] { --asyncapi-bg: #000; }
+*/

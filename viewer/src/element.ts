@@ -252,17 +252,15 @@ export class AsyncAPIViewerElement extends LitElement {
     };
     const primary = read('--_primary');
     const secondary = read('--_secondary');
+    const send = read('--_send');
+    const receive = read('--_receive');
     const bg = read('--_bg');
     const dark = this.#resolved === 'dark';
     const derived: Record<string, string> = {};
-    if (primary) {
-      derived['--_badge-ink'] = badgeInk(primary);
-      if (bg) derived['--_primary-text'] = toHex(textSafe(primary, bg, dark));
-    }
-    if (secondary) {
-      derived['--_badge-ink-secondary'] = badgeInk(secondary);
-      if (bg) derived['--_secondary-text'] = toHex(textSafe(secondary, bg, dark));
-    }
+    if (primary && bg) derived['--_primary-text'] = toHex(textSafe(primary, bg, dark));
+    if (secondary && bg) derived['--_secondary-text'] = toHex(textSafe(secondary, bg, dark));
+    if (send) derived['--_badge-ink-send'] = badgeInk(send);
+    if (receive) derived['--_badge-ink-receive'] = badgeInk(receive);
     const logo = getComputedStyle(this).getPropertyValue('--_logo').trim();
     const hasLogo = logo !== '' && logo !== 'none';
     if (hasLogo !== this.#hasLogo || JSON.stringify(derived) !== JSON.stringify(this.#derived)) {

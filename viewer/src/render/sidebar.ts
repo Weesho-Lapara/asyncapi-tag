@@ -100,12 +100,12 @@ export const sidebarStyles = css`
     text-transform: uppercase;
   }
   .side__badge--send {
-    background: var(--_primary);
-    color: var(--_badge-ink);
+    background: var(--_send);
+    color: var(--_badge-ink-send);
   }
   .side__badge--receive {
-    background: var(--_secondary);
-    color: var(--_badge-ink-secondary, #fff);
+    background: var(--_receive);
+    color: var(--_badge-ink-receive);
   }
   .side__label {
     grid-column: 2;
