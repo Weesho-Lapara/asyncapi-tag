@@ -8,7 +8,7 @@ import { renderInline } from './markdown.js';
 
 export const detailStyles = css`
   .block {
-    margin-top: 22px;
+    margin-top: 28px;
   }
   .block__title {
     margin: 0 0 10px;
@@ -223,7 +223,7 @@ export function flattenBinding(b: Binding): Array<{ key: string; value: unknown 
 export function renderBindings(bindings: Binding[], title = 'Bindings'): TemplateResult | typeof nothing {
   if (bindings.length === 0) return nothing;
   return html`<div class="block">
-    <h4 class="block__title">${title}</h4>
+    <h4 class="sub-title">${title}</h4>
     <ul class="chips">
       ${bindings.flatMap((b) =>
         flattenBinding(b).map(
@@ -240,7 +240,7 @@ export function renderBindings(bindings: Binding[], title = 'Bindings'): Templat
 export function renderSecurity(security: SecurityRequirement[], serversHref: string): TemplateResult | typeof nothing {
   if (security.length === 0) return nothing;
   return html`<div class="block">
-    <h4 class="block__title">Security</h4>
+    <h4 class="sub-title">Security</h4>
     <ul class="sec">
       ${security.map(
         (s) => html`<li>
@@ -257,7 +257,7 @@ export function renderSecurity(security: SecurityRequirement[], serversHref: str
 export function renderReply(reply: Reply, prefix: string): TemplateResult {
   const address = reply.channel ? reply.channel.address : undefined;
   return html`<div class="block">
-    <h4 class="block__title">Reply</h4>
+    <h4 class="sub-title">Reply</h4>
     <div class="reply">
       ${reply.addressLocation
         ? html`<div class="reply__row"><span class="label">Address from</span><span class="reply__address">${reply.addressLocation}</span></div>`
