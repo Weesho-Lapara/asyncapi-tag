@@ -73,11 +73,20 @@ export const operationStyles = css`
       border-radius: 0;
     }
   }
-  .op__meta {
-    display: flex;
-    flex-wrap: wrap;
+  /* Badge/id, CHANNEL/address and Available on/servers share two columns so the values line up. */
+  .op__facts {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
     align-items: center;
-    gap: 6px 10px;
+    gap: 8px 12px;
+    margin-bottom: 16px;
+  }
+  .op__facts .label {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+  .op__facts .badge {
+    justify-self: start;
   }
   .badge {
     display: inline-flex;
@@ -118,10 +127,10 @@ export const operationStyles = css`
     color: var(--_ink);
     overflow-wrap: anywhere;
   }
-  .op__meta {
-    margin-bottom: 10px;
-  }
   .op__id {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
     font: 400 13px/1.5 var(--_font-mono);
     color: var(--_ink);
     overflow-wrap: anywhere;
@@ -136,22 +145,10 @@ export const operationStyles = css`
     outline-offset: 4px;
     border-radius: 2px;
   }
-  .op__channel {
+  .op__servers {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
     gap: 4px 10px;
-    margin-bottom: 16px;
-  }
-  .op__meta + .op__channel {
-    margin-top: 8px;
-  }
-  .op__channel .label {
-    font-size: 13px;
-    letter-spacing: 0.06em;
-  }
-  .op__servers {
-    margin-top: -8px;
   }
   .op__server {
     font: 400 13px/1.5 var(--_font-mono);
@@ -337,21 +334,21 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
             </ul>`
           : nothing}
         <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
-        <div class="op__meta">
+        <div class="op__facts">
           <span class="badge badge--${direction}">${op.badgeLabel}</span>
-          <span class="op__id">${op.id}</span>
-          ${op.locationHint !== op.id && op.locationHint !== op.heading ? html`<span class="op__hint">${op.locationHint}</span>` : nothing}
-        </div>
-        <div class="op__channel">
+          <span class="op__id">
+            ${op.id}
+            ${op.locationHint !== op.id && op.locationHint !== op.heading ? html`<span class="op__hint">${op.locationHint}</span>` : nothing}
+          </span>
           <span class="label">Channel</span>
           ${renderAddress(op, anchor)}
+          ${op.channel.servers.length > 0
+            ? html`<span class="label">Available on</span>
+                <span class="op__servers">
+                  ${op.channel.servers.map((id) => html`<a class="op__server" href="#${prefix}--servers--${slug(id)}">${id}</a>`)}
+                </span>`
+            : nothing}
         </div>
-        ${op.channel.servers.length > 0
-          ? html`<div class="op__channel op__servers">
-              <span class="label">Available on</span>
-              ${op.channel.servers.map((id) => html`<a class="op__server" href="#${prefix}--servers--${slug(id)}">${id}</a>`)}
-            </div>`
-          : nothing}
         ${op.summary ? html`<p class="summary op__summary">${renderInline(op.summary)}</p>` : nothing}
         ${op.description ? html`<div class="op__desc">${renderMarkdown(op.description)}</div>` : nothing}
         ${renderParameters(op.channel.parameters, anchor)}
