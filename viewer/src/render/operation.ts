@@ -339,11 +339,8 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
         <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
         <div class="op__meta">
           <span class="badge badge--${direction}">${op.badgeLabel}</span>
-          ${op.heading !== op.id
-            ? html`<span class="op__id">${op.id}</span>`
-            : op.locationHint !== op.heading
-              ? html`<span class="op__id">${op.locationHint}</span>`
-              : nothing}
+          <span class="op__id">${op.id}</span>
+          ${op.locationHint !== op.id && op.locationHint !== op.heading ? html`<span class="op__hint">${op.locationHint}</span>` : nothing}
         </div>
         <div class="op__channel">
           <span class="label">Channel</span>
