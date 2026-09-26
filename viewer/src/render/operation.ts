@@ -1,11 +1,13 @@
 import { css, html, nothing, type TemplateResult } from 'lit';
 import type { Document, Message, Operation } from '../model/types.js';
 import { renderInline, renderMarkdown } from './markdown.js';
+import { examplesFor, isPanelOpen, renderExamplePanel, renderShowExample, type ExampleContext } from './example.js';
 import { renderSchema, type TreeState } from './tree.js';
 
 export interface OperationContext {
   prefix: string;
   tree: (key: string) => TreeState;
+  example: (key: string) => ExampleContext;
 }
 
 export const operationStyles = css`
@@ -15,6 +17,28 @@ export const operationStyles = css`
   }
   .op {
     scroll-margin-top: 16px;
+  }
+  .op--split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+  @container viewer (min-width: 1100px) {
+    .op--split {
+      grid-template-columns: minmax(0, 1fr) var(--_example-width);
+      gap: 32px;
+    }
+    .op__example {
+      position: sticky;
+      top: 16px;
+    }
+  }
+  .op__content {
+    min-width: 0;
+  }
+  .op__show {
+    margin-top: 22px;
   }
   .op + .op {
     padding-top: 40px;
@@ -164,22 +188,29 @@ function renderMessage(message: Message, anchor: string, ctx: OperationContext):
 export function renderOperation(op: Operation, ctx: OperationContext): TemplateResult {
   const prefix = ctx.prefix;
   const anchor = operationAnchor(prefix, op);
-  const first = op.messages[0];
   const direction = op.action === 'send' ? 'send' : 'receive';
+  const first = op.messages[0];
+  const examples = first ? examplesFor(first) : [];
+  const exampleCtx = ctx.example(`${anchor}--example`);
+  const open = examples.length > 0 && isPanelOpen(exampleCtx);
   return html`
-    <article class="op" id=${anchor} aria-labelledby="${anchor}--heading">
-      <div class="op__meta">
-        <span class="badge badge--${direction}">${op.badgeLabel}</span>
-        <span class="op__hint">${op.locationHint}</span>
+    <article class="op ${open ? 'op--split' : ''}" id=${anchor} aria-labelledby="${anchor}--heading">
+      <div class="op__content">
+        <div class="op__meta">
+          <span class="badge badge--${direction}">${op.badgeLabel}</span>
+          <span class="op__hint">${op.locationHint}</span>
+        </div>
+        <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
+        <div class="op__channel">
+          <span class="label">Channel</span>
+          ${renderAddress(op, anchor)}
+        </div>
+        ${op.summary ? html`<p class="summary op__summary">${renderInline(op.summary)}</p>` : nothing}
+        ${op.description ? html`<div class="op__desc">${renderMarkdown(op.description)}</div>` : nothing}
+        ${examples.length > 0 && !open ? html`<div class="op__show">${renderShowExample(exampleCtx)}</div>` : nothing}
+        ${first ? renderMessage(first, anchor, ctx) : nothing}
       </div>
-      <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
-      <div class="op__channel">
-        <span class="label">Channel</span>
-        ${renderAddress(op, anchor)}
-      </div>
-      ${op.summary ? html`<p class="summary op__summary">${renderInline(op.summary)}</p>` : nothing}
-      ${op.description ? html`<div class="op__desc">${renderMarkdown(op.description)}</div>` : nothing}
-      ${first ? renderMessage(first, anchor, ctx) : nothing}
+      ${open && first ? html`<div class="op__example">${renderExamplePanel(first, examples, exampleCtx, `${anchor}--example`)}</div>` : nothing}
     </article>
   `;
 }

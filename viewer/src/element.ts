@@ -8,6 +8,7 @@ import { parseOptions, type Options } from './options.js';
 import { headerStyles, renderHeader } from './render/header.js';
 import { infoStyles, renderInfo } from './render/info.js';
 import { operationStyles, renderOperations } from './render/operation.js';
+import { exampleStyles, type ExampleContext, type ExamplePanelState } from './render/example.js';
 import { TreeState, treeStyles } from './render/tree.js';
 import { base } from './styles/base.js';
 import { tokens } from './styles/tokens.js';
@@ -26,7 +27,7 @@ let counter = 0;
  * from the resolved accent at runtime and set as private custom properties on the root.
  */
 export class AsyncAPIViewerElement extends LitElement {
-  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles, treeStyles];
+  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles, treeStyles, exampleStyles];
 
   #options: Options = parseOptions([]);
   #observer: MutationObserver | undefined;
@@ -46,6 +47,15 @@ export class AsyncAPIViewerElement extends LitElement {
       this.#trees.set(key, state);
     }
     return state;
+  };
+  readonly #panels = new Map<string, ExamplePanelState>();
+  readonly #example = (key: string): ExampleContext => {
+    let state = this.#panels.get(key);
+    if (!state) {
+      state = { tab: 'payload', index: 0, open: undefined, copied: undefined };
+      this.#panels.set(key, state);
+    }
+    return { state, defaultOpen: this.#options.messageExamples, onChange: () => this.requestUpdate() };
   };
   readonly #onHashChange = () => {
     this.#hashHandled = undefined;
@@ -173,6 +183,7 @@ export class AsyncAPIViewerElement extends LitElement {
     this.#model = undefined;
     this.#problems = [];
     this.#trees.clear();
+    this.#panels.clear();
     if (src === undefined) return;
     const url = resolveUrl(src, this.ownerDocument.baseURI);
     const result = await loadDocument(url);
@@ -231,7 +242,7 @@ export class AsyncAPIViewerElement extends LitElement {
       })}
       <div class="content">
         ${o.info ? renderInfo(m, `${this.id}--info`) : nothing}
-        ${o.operations ? renderOperations(m, { prefix: this.id, tree: this.#tree }) : nothing}
+        ${o.operations ? renderOperations(m, { prefix: this.id, tree: this.#tree, example: this.#example }) : nothing}
         ${o.errors && this.#problems.length > 0
           ? html`<section aria-labelledby="${this.id}--problems">
               <h2 class="section-title" id="${this.id}--problems" tabindex="-1">Problems</h2>
