@@ -70,18 +70,27 @@ export const detailStyles = css`
   .chip__value {
     color: var(--_ink);
   }
-  .chip__desc {
-    flex-basis: 100%;
+  .chip__head {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
     min-width: 0;
-    max-width: min(60ch, 100%);
-    font-size: 12px;
+  }
+  /* A described binding takes the full width: key and type first, the text underneath. */
+  .chip--row {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--_radius-sm);
+  }
+  .chip__desc {
+    min-width: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
     color: var(--_ink-2);
     overflow-wrap: anywhere;
-  }
-  .chip:has(.chip__desc) {
-    flex-wrap: wrap;
-    border-radius: var(--_radius);
-    padding: 6px 10px;
   }
   .chip pre {
     margin: 0;
@@ -182,17 +191,32 @@ export function renderParameters(parameters: Parameter[], anchor: string): Templ
   </div>`;
 }
 
+function isSchemaShaped(value: unknown): value is { type: string; description?: unknown; enum?: unknown } {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) && typeof (value as { type?: unknown }).type === 'string';
+}
+
 function chipValue(value: unknown): TemplateResult {
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return html`<span class="chip__value mono">${String(value)}</span>`;
-  // Some bindings (Kafka groupId, clientId) carry a schema instead of a value: show its type and description.
-  if (typeof value === 'object' && value !== null && !Array.isArray(value) && typeof (value as { type?: unknown }).type === 'string') {
-    const schema = value as { type: string; description?: unknown; enum?: unknown };
-    const facts = [schema.type, Array.isArray(schema.enum) ? `enum: ${schema.enum.map(String).join(' · ')}` : undefined].filter(Boolean).join(' · ');
-    return html`<span class="chip__value mono">${facts}</span>${typeof schema.description === 'string' ? html`<span class="chip__desc">${renderInline(schema.description)}</span>` : nothing}`;
+  // Some bindings (Kafka groupId, clientId) carry a schema instead of a value: show its type.
+  if (isSchemaShaped(value)) {
+    const facts = [value.type, Array.isArray(value.enum) ? `enum: ${value.enum.map(String).join(' · ')}` : undefined].filter(Boolean).join(' · ');
+    return html`<span class="chip__value mono">${facts}</span>`;
   }
   const text = JSON.stringify(value);
   if (text.length <= 40) return html`<span class="chip__value mono">${text}</span>`;
   return html`<pre class="chip__value">${JSON.stringify(value, null, 2)}</pre>`;
+}
+
+/** A binding chip; one with a description becomes a full-width row with the text underneath. */
+function bindingChip(scopeLabel: string, protocol: string, leaf: { key: string; value: unknown }, title: string): TemplateResult {
+  const description = isSchemaShaped(leaf.value) && typeof leaf.value.description === 'string' ? leaf.value.description : undefined;
+  return html`<li class="chip ${description ? 'chip--row' : ''}" title=${title}>
+    <span class="chip__head">
+      <span class="mono"><span class="chip__scope">${scopeLabel}</span>${leaf.key}</span>
+      ${chipValue(leaf.value)}
+    </span>
+    ${description ? html`<span class="chip__desc">${renderInline(description)}</span>` : nothing}
+  </li>`;
 }
 
 /**
@@ -228,14 +252,7 @@ export function renderBindings(bindings: Binding[], title = 'Bindings'): Templat
   return html`<div class="block">
     <h4 class="sub-title">${title}</h4>
     <ul class="chips">
-      ${bindings.flatMap((b) =>
-        flattenBinding(b).map(
-          (leaf) => html`<li class="chip" title="${b.protocol} binding">
-            <span class="mono"><span class="chip__scope">${b.scope}.</span>${leaf.key}</span>
-            ${chipValue(leaf.value)}
-          </li>`,
-        ),
-      )}
+      ${bindings.flatMap((b) => flattenBinding(b).map((leaf) => bindingChip(`${b.scope}.`, b.protocol, leaf, `${b.protocol} binding`)))}
     </ul>
   </div>`;
 }
@@ -285,14 +302,7 @@ export function renderReply(reply: Reply, prefix: string): TemplateResult {
         ? html`<div class="reply__row reply__row--bindings">
             <span class="label">Bindings</span>
             <ul class="chips">
-              ${reply.channel.bindings.flatMap((b) =>
-                flattenBinding(b).map(
-                  (leaf) => html`<li class="chip" title="${b.protocol} binding of the reply channel">
-                    <span class="mono"><span class="chip__scope">reply.channel.</span>${leaf.key}</span>
-                    ${chipValue(leaf.value)}
-                  </li>`,
-                ),
-              )}
+              ${reply.channel.bindings.flatMap((b) => flattenBinding(b).map((leaf) => bindingChip('reply.channel.', b.protocol, leaf, `${b.protocol} binding of the reply channel`)))}
             </ul>
           </div>`
         : nothing}
