@@ -1,4 +1,5 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
+import { loadDocument, resolveUrl, type LoadResult } from './load/loader.js';
 import { parseOptions, type Options } from './options.js';
 
 /**
@@ -8,7 +9,8 @@ import { parseOptions, type Options } from './options.js';
  * watched with a MutationObserver rather than Lit properties because each option has several
  * accepted spellings and hand-written HTML lowercases camelCase names.
  *
- * Skeleton state: renders the parsed options. Loading and the sections arrive in later chunks.
+ * Skeleton state: loads the document and shows its title or the load error. The model and the
+ * sections arrive in later chunks.
  */
 export class AsyncAPIViewerElement extends LitElement {
   static override styles = css`
@@ -20,10 +22,17 @@ export class AsyncAPIViewerElement extends LitElement {
 
   #options: Options = parseOptions([]);
   #observer: MutationObserver | undefined;
+  #loadedSrc: string | undefined;
+  #result: LoadResult | undefined;
 
   /** The validated options, re-read whenever an attribute changes. */
   get options(): Options {
     return this.#options;
+  }
+
+  /** The outcome of the last load, for tests and tooling. */
+  get loadResult(): LoadResult | undefined {
+    return this.#result;
   }
 
   override connectedCallback(): void {
@@ -42,10 +51,30 @@ export class AsyncAPIViewerElement extends LitElement {
   #readOptions(): void {
     this.#options = parseOptions(this.getAttributeNames().map((n) => [n, this.getAttribute(n)] as const));
     this.requestUpdate();
+    void this.#load();
+  }
+
+  async #load(): Promise<void> {
+    const src = this.#options.src;
+    if (src === this.#loadedSrc) return;
+    this.#loadedSrc = src;
+    this.#result = undefined;
+    if (src === undefined) return;
+    const url = resolveUrl(src, this.ownerDocument.baseURI);
+    const result = await loadDocument(url);
+    if (this.#loadedSrc !== src) return; // src changed while loading
+    this.#result = result;
+    this.requestUpdate();
   }
 
   override render() {
-    return html`<pre>${JSON.stringify(this.#options, null, 2)}</pre>`;
+    const src = this.#options.src;
+    if (src === undefined) return html`<p role="alert">asyncapi-viewer: the src attribute is missing.</p>`;
+    const r = this.#result;
+    if (!r) return html`<p>Loading ${src}…</p>`;
+    if (!r.ok) return html`<p role="alert">Could not load ${r.url}: ${r.error.message}</p>`;
+    const info = r.data['info'] as { title?: string; version?: string } | undefined;
+    return html`<p>Loaded AsyncAPI ${r.specVersion} (${r.format}): ${info?.title ?? nothing} ${info?.version ?? nothing}</p>`;
   }
 }
 

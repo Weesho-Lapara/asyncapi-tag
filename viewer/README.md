@@ -15,3 +15,10 @@ npm run build   # dist/asyncapi-viewer.js (ESM) and dist/asyncapi-viewer.iife.js
 ```
 
 `dist/` is never committed. The Python package copies the built files at build time.
+
+## Bundle size log (gzipped IIFE)
+
+| Date | Chunk | Size |
+|---|---|---|
+| 2026-09-26 | 0.2 skeleton (Lit only) | 6.0 kB |
+| 2026-09-26 | 1.2 loader (`yaml` added) | 38.6 kB |

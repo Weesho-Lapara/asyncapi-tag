@@ -79,7 +79,7 @@ stays main-only.
 | # | Chunk | Depends on | Done when |
 |---|---|---|---|
 | 1.1 | ~~`options.schema.json` and `options.ts`: every option, kebab-case and lowercased forms, boolean rules identical to Python, one `console.warn` per bad value.~~ Done 2026-09-26. One deliberate difference: the DOM reports a bare attribute as `""`, so the viewer treats an empty boolean value as true; align the Python side in 2.1. | 0.2 | Vitest covers every option and the Python boolean table |
-| 1.2 | Loader: fetch as text, JSON-then-YAML parse, error model naming URL and reason. | 0.2 | Vitest with good, malformed and missing documents |
+| 1.2 | ~~Loader: fetch as text, JSON-then-YAML parse, error model naming URL and reason.~~ Done 2026-09-26. The `yaml` package costs about 30 kB gzipped; revisit if the final bundle needs trimming. | 0.2 | Vitest with good, malformed and missing documents |
 | 1.3 | `$ref` resolver: internal, relative file, absolute URL, per-document cache, cycle detection producing a "Circular reference" leaf. | 1.2 | Fixtures: external ref, circular ref, six-level nesting |
 | 1.4 | Model types and the v3 normaliser: info, servers, channels, operations, messages, reply, tags, external docs. | 1.3 | Snapshot of `orders-v3.yaml` plus request/reply and multi-message fixtures |
 | 1.5 | v2 normaliser: direction mapping, labels, headings, location hints, parameters with schema, message `oneOf`. | 1.4 | Snapshot of `accounts-v2.json` plus parameter and oneOf fixtures |
