@@ -220,8 +220,9 @@ export class AsyncAPIViewerElement extends LitElement {
     const target = (this.renderRoot as ShadowRoot).getElementById(id) ?? (this.renderRoot as ShadowRoot).getElementById(`${id}--heading`);
     if (!target) return;
     this.#hashHandled = hash;
+    if (target instanceof HTMLDetailsElement) target.open = true;
     target.scrollIntoView({ block: 'start' });
-    (target.querySelector<HTMLElement>('[tabindex="-1"]') ?? target).focus({ preventScroll: true });
+    (target.querySelector<HTMLElement>('[tabindex="-1"], summary') ?? target).focus({ preventScroll: true });
   }
 
   #readOptions(): void {

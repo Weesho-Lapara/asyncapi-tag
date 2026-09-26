@@ -84,27 +84,19 @@ export const sectionStyles = css`
   .vars__name {
     color: var(--_primary-text);
   }
-  .msgs {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-  }
-  .msgs .card__head {
-    margin-bottom: 12px;
-  }
   .msg-example {
     margin-top: 16px;
   }
-  details.schema {
+  details.entry {
     border: 1px solid var(--_line);
     border-radius: var(--_radius);
     background: var(--_surface);
     scroll-margin-top: 16px;
   }
-  details.schema + details.schema {
+  details.entry + details.entry {
     margin-top: 10px;
   }
-  details.schema > summary {
+  details.entry > summary {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -116,10 +108,10 @@ export const sectionStyles = css`
     font: 600 14px/1.5 var(--_font-mono);
     color: var(--_ink);
   }
-  details.schema > summary::-webkit-details-marker {
+  details.entry > summary::-webkit-details-marker {
     display: none;
   }
-  details.schema > summary::before {
+  details.entry > summary::before {
     content: '';
     width: 7px;
     height: 7px;
@@ -130,20 +122,32 @@ export const sectionStyles = css`
     transition: transform 120ms;
     align-self: center;
   }
-  details.schema[open] > summary::before {
+  details.entry[open] > summary::before {
     transform: rotate(45deg);
   }
-  details.schema > summary:focus-visible {
+  details.entry > summary:focus-visible {
     outline: 2px solid var(--_primary);
     outline-offset: -2px;
     border-radius: var(--_radius);
   }
-  .schema__body {
+  .entry__body {
     padding: 0 16px 16px;
   }
-  .schema__body .tree,
-  .schema__body .raw {
+  .entry__body .tree,
+  .entry__body .raw {
     border-color: var(--_line);
+  }
+  .entry__body > .block:first-child {
+    margin-top: 4px;
+  }
+  .entry__title {
+    font: 600 14px/1.5 var(--_font-heading);
+    color: var(--_ink);
+  }
+  .entry__desc {
+    padding: 0 16px 12px;
+    font-size: 13px;
+    color: var(--_ink-2);
   }
   .problems {
     margin: 0;
@@ -277,26 +281,29 @@ export function renderServers(doc: Document, prefix: string): TemplateResult | t
   </section>`;
 }
 
-function messageCard(message: Message, ctx: SectionContext, showExamples: boolean): TemplateResult {
+function messageEntry(message: Message, ctx: SectionContext, showExamples: boolean): TemplateResult {
   const anchor = `${ctx.prefix}--messages--${message.anchor}`;
   const examples = showExamples ? examplesFor(message) : [];
-  return html`<article class="card" id=${anchor} aria-labelledby="${anchor}--id">
-    <div class="card__head">
-      <h3 class="card__id" id="${anchor}--id" tabindex="-1">${message.title ?? message.name ?? message.id}</h3>
-      ${message.title && message.name && message.name !== message.title ? html`<span class="card__meta">${message.name}</span>` : nothing}
+  const title = message.title ?? message.name ?? message.id;
+  return html`<details class="entry" id=${anchor}>
+    <summary>
+      <span class="entry__title">${title}</span>
+      ${message.name && message.name !== title ? html`<span class="card__meta">${message.name}</span>` : nothing}
       <span class="card__meta">${message.contentType} · ${message.schemaFormat}</span>
+    </summary>
+    ${message.summary ? html`<div class="entry__desc">${renderInline(message.summary)}</div>` : nothing}
+    ${message.description ? html`<div class="entry__desc">${renderMarkdown(message.description)}</div>` : nothing}
+    <div class="entry__body">
+      ${message.payload
+        ? html`<div class="block"><h4 class="block__title">Payload</h4>${renderSchema(message.payload, { prefix: ctx.prefix, key: `${anchor}--payload`, state: ctx.tree(`${anchor}--payload`) })}</div>`
+        : nothing}
+      ${message.headers
+        ? html`<div class="block"><h4 class="block__title">Headers</h4>${renderSchema(message.headers, { prefix: ctx.prefix, key: `${anchor}--headers`, state: ctx.tree(`${anchor}--headers`) })}</div>`
+        : nothing}
+      ${examples.length > 0 ? html`<div class="msg-example">${renderExamplePanel(message, examples, ctx.example(`${anchor}--example`), `${anchor}--example`)}</div>` : nothing}
+      ${renderBindings(message.bindings)}
     </div>
-    ${message.summary ? html`<div class="card__desc">${renderInline(message.summary)}</div>` : nothing}
-    ${message.description ? html`<div class="card__desc">${renderMarkdown(message.description)}</div>` : nothing}
-    ${message.payload
-      ? html`<div class="block"><h4 class="block__title">Payload</h4>${renderSchema(message.payload, { prefix: ctx.prefix, key: `${anchor}--payload`, state: ctx.tree(`${anchor}--payload`) })}</div>`
-      : nothing}
-    ${message.headers
-      ? html`<div class="block"><h4 class="block__title">Headers</h4>${renderSchema(message.headers, { prefix: ctx.prefix, key: `${anchor}--headers`, state: ctx.tree(`${anchor}--headers`) })}</div>`
-      : nothing}
-    ${examples.length > 0 ? html`<div class="msg-example">${renderExamplePanel(message, examples, ctx.example(`${anchor}--example`), `${anchor}--example`)}</div>` : nothing}
-    ${renderBindings(message.bindings)}
-  </article>`;
+  </details>`;
 }
 
 export function renderMessages(doc: Document, ctx: SectionContext, showExamples: boolean): TemplateResult | typeof nothing {
@@ -304,7 +311,7 @@ export function renderMessages(doc: Document, ctx: SectionContext, showExamples:
   const id = `${ctx.prefix}--messages`;
   return html`<section aria-labelledby=${id}>
     <h2 class="section-title" id=${id} tabindex="-1">Messages</h2>
-    <div class="msgs">${doc.messages.map((m) => messageCard(m, ctx, showExamples))}</div>
+    ${doc.messages.map((m) => messageEntry(m, ctx, showExamples))}
   </section>`;
 }
 
@@ -316,9 +323,9 @@ export function renderSchemas(doc: Document, ctx: SectionContext): TemplateResul
     ${doc.schemas.map((s) => {
       const anchor = `${ctx.prefix}--schemas--${s.anchor}`;
       const label = s.schema.kind === 'node' ? typeLabel(s.schema) : s.schema.schemaFormat;
-      return html`<details class="schema" id=${anchor}>
-        <summary>${s.id} ${label ? html`<span class="card__meta">${label}</span>` : nothing}</summary>
-        <div class="schema__body">${renderSchema(s.schema, { prefix: ctx.prefix, key: anchor, state: ctx.tree(anchor) })}</div>
+      return html`<details class="entry" id=${anchor}>
+        <summary><span class="entry__title mono">${s.id}</span> ${label ? html`<span class="card__meta">${label}</span>` : nothing}</summary>
+        <div class="entry__body">${renderSchema(s.schema, { prefix: ctx.prefix, key: anchor, state: ctx.tree(anchor) })}</div>
       </details>`;
     })}
   </section>`;

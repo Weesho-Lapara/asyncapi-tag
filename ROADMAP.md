@@ -68,6 +68,8 @@ These override the imported spec where they differ:
    example panel on the right, so the panel starts level with the payload tree. The two-column
    body needs the *main column* (viewer minus sidebar) to be 1100px or wider; below that the
    panel stacks under the message. Decided 2026-09-26 after review.
+14. **Messages and Schemas entries are collapsible**, closed by default (native `<details>`).
+   A link into either section opens the entry it targets. Decided 2026-09-26 after review.
 
 ### Work plan in session-sized chunks
 
