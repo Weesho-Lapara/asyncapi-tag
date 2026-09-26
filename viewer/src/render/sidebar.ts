@@ -103,6 +103,17 @@ export const sidebarStyles = css`
   .side__item--section {
     font-weight: 500;
   }
+  /* No badge: no badge column, so the label starts where the group headings start. */
+  .side__item--plain {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .side__item--plain .side__label,
+  .side__item--plain .side__sub {
+    grid-column: 1;
+  }
+  .side__item--plain .side__count {
+    grid-column: 2;
+  }
   .side__badge {
     grid-row: 1 / span 2;
     height: 18px;
@@ -283,7 +294,7 @@ function renderItem(item: NavItem, input: SidebarInput): TemplateResult {
   const current = input.current === item.anchor;
   return html`<li>
     <a
-      class="side__item ${item.kind === 'section' ? 'side__item--section' : ''}"
+      class="side__item ${item.kind === 'section' ? 'side__item--section' : ''} ${item.badge ? '' : 'side__item--plain'}"
       href="#${item.anchor}"
       aria-current=${current ? 'true' : nothing}
       @click=${input.onChoose}
