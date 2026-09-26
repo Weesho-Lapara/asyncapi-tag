@@ -72,9 +72,11 @@ export const detailStyles = css`
   }
   .chip__desc {
     flex-basis: 100%;
+    min-width: 0;
+    max-width: min(60ch, 100%);
     font-size: 12px;
     color: var(--_ink-2);
-    max-width: 60ch;
+    overflow-wrap: anywhere;
   }
   .chip:has(.chip__desc) {
     flex-wrap: wrap;
@@ -129,6 +131,7 @@ export const detailStyles = css`
     flex-wrap: wrap;
     align-items: baseline;
     gap: 4px 12px;
+    min-width: 0;
   }
   .reply__address {
     font: 400 14px/1.5 var(--_font-mono);

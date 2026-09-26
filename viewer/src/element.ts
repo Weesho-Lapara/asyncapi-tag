@@ -1,5 +1,4 @@
 import { LitElement, html, nothing } from 'lit';
-import { styleMap } from 'lit/directives/style-map.js';
 import { loadDocument, resolveUrl, type LoadResult } from './load/loader.js';
 import { RefResolver } from './load/refs.js';
 import { normalize } from './model/normalize.js';
@@ -254,7 +253,9 @@ export class AsyncAPIViewerElement extends LitElement {
     const secondary = read('--_secondary');
     const send = read('--_send');
     const receive = read('--_receive');
-    const bg = read('--_bg');
+    // The toolbar colour is the worst-case background for accent text: slightly darker than the
+    // surface in light mode, slightly lighter than the page in dark mode.
+    const bg = read('--_head');
     const dark = this.#resolved === 'dark';
     const derived: Record<string, string> = {};
     if (primary && bg) derived['--_primary-text'] = toHex(textSafe(primary, bg, dark));
@@ -263,6 +264,9 @@ export class AsyncAPIViewerElement extends LitElement {
     if (receive) derived['--_badge-ink-receive'] = badgeInk(receive);
     const logo = getComputedStyle(this).getPropertyValue('--_logo').trim();
     const hasLogo = logo !== '' && logo !== 'none';
+    // Written through the CSSOM, never as a style attribute, so a strict style-src holds.
+    const rootEl = root?.querySelector<HTMLElement>('.root');
+    if (rootEl) for (const [k, v] of Object.entries(derived)) rootEl.style.setProperty(k, v);
     if (hasLogo !== this.#hasLogo || JSON.stringify(derived) !== JSON.stringify(this.#derived)) {
       this.#hasLogo = hasLogo;
       this.#derived = derived;
@@ -315,7 +319,7 @@ export class AsyncAPIViewerElement extends LitElement {
   }
 
   override render() {
-    return html`<div class="root" style=${styleMap(this.#derived)}>
+    return html`<div class="root">
       <span class="probe visually-hidden" aria-hidden="true"></span>
       ${this.#renderBody()}
     </div>`;

@@ -57,6 +57,7 @@ pip install -e ".[docs]" && mkdocs build --strict   # docs site; `mkdocs serve` 
 pip install zensical && zensical build             # same site under Zensical
 cd viewer && npm ci && npm run check && npm test && npm run build   # the 2.0 viewer (Node 22)
 cd viewer && npm run coverage            # normaliser over the AsyncAPI example corpus -> test/coverage/REPORT.md
+cd viewer && npm run e2e:install && npm run e2e   # Playwright: accessibility, CSP page, screenshots
 ```
 
 ## Conventions and constraints

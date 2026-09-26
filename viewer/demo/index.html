@@ -4,35 +4,93 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>asyncapi-viewer demo</title>
-  <!-- Portability test: one script tag and the theme file, no build tooling. Serve the
-       repository root with any static file server after `npm run build` and open /viewer/demo/. -->
+  <!-- Portability test and visual test bench: one script tag and the theme file, no build
+       tooling. Serve the repository root with any static file server after `npm run build`
+       and open /viewer/demo/. Pick a document from the list; options apply live. -->
   <script type="module" src="../dist/asyncapi-viewer.js"></script>
   <link rel="stylesheet" href="../theme/asyncapi-theme.css">
   <style>
     :root { color-scheme: light dark; }
-    body { font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 24px; background: #fff; color: #222; }
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 16px 24px 40px; background: #fff; color: #222; }
     html[data-theme="dark"] body { background: #1a1c22; color: #ddd; }
-    .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
-    .column { max-width: 1440px; margin: 0 auto 32px; }
-    .narrow { max-width: 420px; }
+    .bench { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-bottom: 16px; }
+    .bench label { display: inline-flex; align-items: center; gap: 6px; }
+    .bench select, .bench button { font: inherit; padding: 4px 8px; }
+    .bench .width { margin-left: auto; }
+    .stage { margin: 0 auto; max-width: 1440px; transition: max-width 120ms; }
+    .stage[data-width="820"] { max-width: 820px; }
+    .stage[data-width="380"] { max-width: 380px; }
   </style>
 </head>
 <body>
-  <div class="toolbar">
+  <div class="bench">
     <strong>asyncapi-viewer demo</strong>
-    <button type="button" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'">Toggle page theme (html[data-theme])</button>
+    <label>Document
+      <select id="doc">
+        <optgroup label="AsyncAPI 3">
+          <option value="../../docs/examples/anyof.yaml">anyOf example (spec)</option>
+          <option value="../../docs/examples/adeo-kafka-request-reply.yaml">Adeo Kafka request/reply (spec)</option>
+          <option value="../../docs/examples/kraken-websocket-request-reply.yaml">Kraken websocket request/reply (spec)</option>
+          <option value="../../docs/examples/gitter-streaming.yaml">Gitter streaming (spec)</option>
+          <option value="../../docs/examples/orders-v3.yaml">Orders service (docs)</option>
+          <option value="../test/fixtures/docs/request-reply.yaml">Quotes request/reply (fixture)</option>
+          <option value="../test/fixtures/docs/composition.yaml">Composition: allOf, oneOf, anyOf (fixture)</option>
+          <option value="../test/fixtures/docs/nested-six.yaml">Six levels deep (fixture)</option>
+          <option value="../test/fixtures/docs/multi-message.yaml">Multi-message and problems (fixture)</option>
+          <option value="../test/fixtures/docs/traits-v3.yaml">Traits (fixture)</option>
+          <option value="../test/fixtures/docs/avro-v3.yaml">Avro and Protobuf payloads (fixture)</option>
+          <option value="../test/fixtures/docs/circular.yaml">Circular schemas (fixture)</option>
+          <option value="../test/fixtures/docs/external-ref.yaml">External references, some broken (fixture)</option>
+        </optgroup>
+        <optgroup label="AsyncAPI 2">
+          <option value="../../docs/examples/accounts-v2.json">Accounts service (docs)</option>
+          <option value="../test/fixtures/docs/parameters-v2.yaml">Rooms: parameters, servers, security (fixture)</option>
+          <option value="../test/fixtures/docs/oneof-v2.yaml">Alerts: message oneOf (fixture)</option>
+          <option value="../test/fixtures/docs/traits-v2.yaml">Traits v2 (fixture)</option>
+          <option value="../test/fixtures/docs/avro-v2.yaml">Avro v2 (fixture)</option>
+        </optgroup>
+        <optgroup label="Errors">
+          <option value="missing.yaml">Missing file</option>
+        </optgroup>
+      </select>
+    </label>
+    <label><input type="checkbox" id="sidebar" checked> sidebar</label>
+    <label><input type="checkbox" id="examples" checked> examples open</label>
+    <label><input type="checkbox" id="toggle" checked> theme toggle</label>
+    <button type="button" id="page-theme">Toggle page theme</button>
+    <label class="width">Width
+      <select id="width">
+        <option value="full">full</option>
+        <option value="820">820px</option>
+        <option value="380">380px</option>
+      </select>
+    </label>
   </div>
-  <div class="column">
-    <asyncapi-viewer src="../../docs/examples/adeo-kafka-request-reply.yaml" sidebar theme-toggle></asyncapi-viewer>
+  <div class="stage" id="stage">
+    <asyncapi-viewer id="viewer" src="../../docs/examples/anyof.yaml" sidebar theme-toggle></asyncapi-viewer>
   </div>
-  <div class="column">
-    <asyncapi-viewer src="../../docs/examples/orders-v3.yaml" sidebar theme-toggle></asyncapi-viewer>
-  </div>
-  <div class="column">
-    <asyncapi-viewer src="../../docs/examples/accounts-v2.json" sidebar publish-label="PUBLISH" subscribeLabel="SUBSCRIBE" message-examples="false"></asyncapi-viewer>
-  </div>
-  <div class="column narrow">
-    <asyncapi-viewer src="missing.yaml"></asyncapi-viewer>
-  </div>
+  <script>
+    const viewer = document.getElementById('viewer');
+    const doc = document.getElementById('doc');
+    const params = new URLSearchParams(location.search);
+    if (params.get('doc')) doc.value = params.get('doc');
+    const apply = () => {
+      viewer.setAttribute('src', doc.value);
+      viewer.toggleAttribute('sidebar', document.getElementById('sidebar').checked);
+      viewer.setAttribute('message-examples', document.getElementById('examples').checked ? 'true' : 'false');
+      viewer.toggleAttribute('theme-toggle', document.getElementById('toggle').checked);
+      const url = new URL(location.href);
+      url.searchParams.set('doc', doc.value);
+      history.replaceState(null, '', url);
+    };
+    for (const id of ['doc', 'sidebar', 'examples', 'toggle']) document.getElementById(id).addEventListener('change', apply);
+    document.getElementById('width').addEventListener('change', (e) => {
+      document.getElementById('stage').dataset.width = e.target.value;
+    });
+    document.getElementById('page-theme').addEventListener('click', () => {
+      document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    });
+    apply();
+  </script>
 </body>
 </html>

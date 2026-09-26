@@ -11,6 +11,7 @@ import { generateExample } from '../util/example.js';
 
 export const exampleStyles = css`
   .ex {
+    min-width: 0;
     background: var(--_ex-bg);
     color: var(--_ex-ink);
     border-radius: var(--_radius);
@@ -117,6 +118,10 @@ export const exampleStyles = css`
     stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+  .ex__code:focus-visible {
+    outline: 2px solid var(--_ex-key);
+    outline-offset: -2px;
   }
   .ex__code {
     margin: 8px 0 0;
@@ -334,7 +339,7 @@ export function renderExamplePanel(message: Message, examples: ResolvedExample[]
       <button class="ex__copy" type="button" @click=${copy}>${copyIcon} ${state.copied === 'copied' ? 'Copied' : state.copied === 'failed' ? 'Copy failed' : 'Copy'}</button>
       <span class="ex__live" aria-live="polite">${state.copied === 'copied' ? 'Copied to clipboard' : state.copied === 'failed' ? 'Copying failed; select the text to copy it' : ''}</span>
     </div>
-    <pre class="ex__code" id="${panelId}--code" role=${hasHeaders ? 'tabpanel' : nothing} aria-labelledby=${hasHeaders ? `${panelId}--tab-${tab}` : nothing}><code>${highlight(text)}</code></pre>
+    <pre class="ex__code" id="${panelId}--code" tabindex="0" role=${hasHeaders ? 'tabpanel' : nothing} aria-labelledby=${hasHeaders ? `${panelId}--tab-${tab}` : nothing} aria-label=${hasHeaders ? nothing : 'Example, scrollable'}><code>${highlight(text)}</code></pre>
     <div class="ex__foot">
       ${message.correlationId ? html`<span>Correlation ID</span><code>${message.correlationId.location}</code>` : nothing}
       <span>Message ID</span><code>${message.id}</code>

@@ -24,7 +24,9 @@
     "check": "npm run typecheck && npm run lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "tsx scripts/coverage.ts"
+    "coverage": "tsx scripts/coverage.ts",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install --with-deps"
   },
   "dependencies": {
     "lit": "^3.3.0",
@@ -32,7 +34,9 @@
     "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.0",
+    "@playwright/test": "^1.63.0",
     "@types/markdown-it": "^14.2.0",
     "@types/node": "^22.20.4",
     "eslint": "^10.0.0",

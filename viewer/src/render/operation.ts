@@ -19,9 +19,11 @@ export interface OperationContext {
 export const operationStyles = css`
   .ops__list {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 40px;
   }
   .op {
+    min-width: 0;
     scroll-margin-top: 16px;
   }
   .op + .op {

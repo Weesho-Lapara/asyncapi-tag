@@ -47,6 +47,7 @@ export const tokens = css`
     --_primary-text: var(--_primary);
     --_secondary-text: var(--_secondary);
     --_tint: color-mix(in srgb, var(--_primary) var(--_tint-strength), transparent);
+    --_tint-ink: var(--_primary-text);
     --_logo: var(--asyncapi-logo, none);
   }
 
@@ -62,5 +63,7 @@ export const tokens = css`
     --_line-2: var(--asyncapi-line-2, #3a404c);
     --_tint-strength: 20%;
     --_logo: var(--asyncapi-logo-dark, var(--asyncapi-logo, none));
+    /* Accent text on the tint does not reach 4.5:1 in dark mode; use ink there. */
+    --_tint-ink: var(--_ink);
   }
 `;

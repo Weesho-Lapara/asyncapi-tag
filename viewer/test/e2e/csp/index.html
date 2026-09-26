@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>asyncapi-viewer CSP test</title>
+  <!-- Served with: default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'.
+       No inline script, no inline style, the IIFE build and the theme file only. -->
+  <script src="/viewer/dist/asyncapi-viewer.iife.js"></script>
+  <link rel="stylesheet" href="/viewer/theme/asyncapi-theme.css">
+</head>
+<body>
+  <h1>CSP test</h1>
+  <asyncapi-viewer id="csp-quotes" src="/viewer/test/fixtures/docs/request-reply.yaml" sidebar theme-toggle></asyncapi-viewer>
+  <asyncapi-viewer id="csp-orders" src="/docs/examples/orders-v3.yaml"></asyncapi-viewer>
+  <asyncapi-viewer id="csp-missing" src="/docs/examples/nope.yaml"></asyncapi-viewer>
+</body>
+</html>

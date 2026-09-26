@@ -56,6 +56,36 @@ jobs:
       - name: Both bundles exist
         run: test -s dist/asyncapi-viewer.js && test -s dist/asyncapi-viewer.iife.js
 
+  viewer-e2e:
+    name: Viewer (Playwright: accessibility, CSP, screenshots)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: viewer
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: viewer/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Playwright
+        run: npx playwright test
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: viewer-screenshots
+          path: |
+            viewer/test/e2e/screenshots/
+            viewer/playwright-report/
+          if-no-files-found: ignore
+
   docs:
     name: Docs site (strict build, MkDocs and Zensical)
     runs-on: ubuntu-latest

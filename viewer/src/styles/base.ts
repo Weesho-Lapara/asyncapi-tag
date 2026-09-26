@@ -25,6 +25,7 @@ export const base = css`
   code,
   .mono {
     font-family: var(--_font-mono);
+    overflow-wrap: anywhere;
   }
   .visually-hidden {
     position: absolute;
@@ -115,6 +116,7 @@ export const base = css`
     color: var(--_ink-2);
   }
   .md code {
+    overflow-wrap: anywhere;
     font-size: 0.92em;
     padding: 0.1em 0.35em;
     background: var(--_head);
@@ -122,6 +124,7 @@ export const base = css`
     border-radius: var(--_radius-sm);
   }
   .md pre {
+    max-width: 100%;
     padding: 12px 14px;
     overflow: auto;
     background: var(--_head);
@@ -147,7 +150,7 @@ export const base = css`
   }
   .pill--tint {
     background: var(--_tint);
-    color: var(--_primary-text);
+    color: var(--_tint-ink);
   }
   .pill--outline {
     border: 1px solid var(--_line-2);
@@ -159,12 +162,16 @@ export const base = css`
     gap: 6px;
     padding: 0;
     margin: 0;
+    min-width: 0;
     list-style: none;
   }
   .chip {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 6px;
+    max-width: 100%;
+    min-width: 0;
     min-height: 26px;
     padding: 3px 10px;
     border: 1px solid var(--_line);
@@ -175,6 +182,7 @@ export const base = css`
   }
   .chip .mono {
     font-size: 12px;
+    overflow-wrap: anywhere;
   }
 
   /* Icon and text buttons: 44px targets (spec 4.11). */

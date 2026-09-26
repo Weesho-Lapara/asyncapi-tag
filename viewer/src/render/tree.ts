@@ -391,7 +391,7 @@ export function renderSchema(schema: Schema | undefined, options: TreeOptions): 
   if (schema.kind === 'raw') {
     return html`<div class="raw">
       <div class="raw__bar">${schema.schemaFormat}</div>
-      <pre><code>${schema.source}</code></pre>
+      <pre tabindex="0" aria-label="Schema source, scrollable"><code>${schema.source}</code></pre>
     </div>`;
   }
   const { fields } = countNodes(schema);
