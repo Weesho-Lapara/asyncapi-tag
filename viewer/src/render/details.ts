@@ -186,17 +186,46 @@ function chipValue(value: unknown): TemplateResult {
   return html`<pre class="chip__value">${JSON.stringify(value, null, 2)}</pre>`;
 }
 
+/**
+ * Nested binding objects become one chip per leaf value with a dotted key
+ * (`topicConfiguration.retention.ms 60000000`); scalar arrays are joined; schema-shaped
+ * values (Kafka groupId) stay one chip showing the schema's type and description.
+ */
+export function flattenBinding(b: Binding): Array<{ key: string; value: unknown }> {
+  const out: Array<{ key: string; value: unknown }> = [];
+  const visit = (key: string, value: unknown) => {
+    if (Array.isArray(value)) {
+      if (value.every((v) => typeof v !== 'object' || v === null)) out.push({ key, value: value.map(String).join(' · ') });
+      else out.push({ key, value });
+      return;
+    }
+    if (typeof value === 'object' && value !== null) {
+      if (typeof (value as { type?: unknown }).type === 'string') {
+        out.push({ key, value });
+        return;
+      }
+      for (const [k, v] of Object.entries(value)) visit(`${key}.${k}`, v);
+      return;
+    }
+    out.push({ key, value });
+  };
+  visit(b.key, b.value);
+  return out;
+}
+
 /** Chips reading `<scope>.<key> <value>`; empty when there are none. */
 export function renderBindings(bindings: Binding[], title = 'Bindings'): TemplateResult | typeof nothing {
   if (bindings.length === 0) return nothing;
   return html`<div class="block">
     <h4 class="block__title">${title}</h4>
     <ul class="chips">
-      ${bindings.map(
-        (b) => html`<li class="chip" title="${b.protocol} binding">
-          <span class="mono"><span class="chip__scope">${b.scope}.</span>${b.key}</span>
-          ${chipValue(b.value)}
-        </li>`,
+      ${bindings.flatMap((b) =>
+        flattenBinding(b).map(
+          (leaf) => html`<li class="chip" title="${b.protocol} binding">
+            <span class="mono"><span class="chip__scope">${b.scope}.</span>${leaf.key}</span>
+            ${chipValue(leaf.value)}
+          </li>`,
+        ),
       )}
     </ul>
   </div>`;
