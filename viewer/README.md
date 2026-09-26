@@ -26,3 +26,4 @@ npm run build   # dist/asyncapi-viewer.js (ESM) and dist/asyncapi-viewer.iife.js
 | 2026-09-26 | 1.5 v2 normaliser | 46.3 kB |
 | 2026-09-26 | 1.6 schema tree builder complete | 46.9 kB |
 | 2026-09-26 | 1.7 traits and problems | 47.2 kB |
+| 2026-09-26 | 1.9 UI foundation (markdown-it added) | 93.8 kB |

@@ -4,17 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>asyncapi-viewer demo</title>
-  <!-- Portability test: one script tag, no build tooling. Serve this folder's parent with any
-       static file server after `npm run build`, e.g. `npx serve viewer` then open /demo/. -->
+  <!-- Portability test: one script tag and the theme file, no build tooling. Serve the
+       repository root with any static file server after `npm run build` and open /viewer/demo/. -->
   <script type="module" src="../dist/asyncapi-viewer.js"></script>
+  <link rel="stylesheet" href="../theme/asyncapi-theme.css">
   <style>
-    body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; }
+    :root { color-scheme: light dark; }
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 24px; background: #fff; color: #222; }
+    html[data-theme="dark"] body { background: #1a1c22; color: #ddd; }
+    .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
+    .column { max-width: 1180px; margin: 0 auto 32px; }
+    .narrow { max-width: 420px; }
   </style>
 </head>
 <body>
-  <h1>asyncapi-viewer demo</h1>
-  <asyncapi-viewer src="../../docs/examples/orders-v3.yaml"></asyncapi-viewer>
-  <asyncapi-viewer src="../../docs/examples/accounts-v2.json" sidebar publish-label="PUBLISH" subscribeLabel="SUBSCRIBE" theme="dark"></asyncapi-viewer>
-  <asyncapi-viewer src="missing.yaml"></asyncapi-viewer>
+  <div class="toolbar">
+    <strong>asyncapi-viewer demo</strong>
+    <button type="button" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'">Toggle page theme (html[data-theme])</button>
+  </div>
+  <div class="column">
+    <asyncapi-viewer src="../../docs/examples/orders-v3.yaml" theme-toggle></asyncapi-viewer>
+  </div>
+  <div class="column">
+    <asyncapi-viewer src="../../docs/examples/accounts-v2.json" sidebar publish-label="PUBLISH" subscribeLabel="SUBSCRIBE"></asyncapi-viewer>
+  </div>
+  <div class="column narrow">
+    <asyncapi-viewer src="missing.yaml"></asyncapi-viewer>
+  </div>
 </body>
 </html>

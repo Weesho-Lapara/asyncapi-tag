@@ -1,0 +1,18 @@
+/* asyncapi-theme.css: copy this file, change the values, load it after the viewer script.
+   Only the two accents and the optional logo are needed; everything else is derived.
+   Advanced variables (fonts, radius, example width, neutral tokens) are listed in the
+   Customising page of the documentation. */
+asyncapi-viewer {
+  --asyncapi-primary: #2944C9;                   /* send operations, links, highlights */
+  --asyncapi-secondary: #B84E1A;                 /* receive operations, required labels */
+  /* --asyncapi-logo: url("/assets/logo.svg");        optional; use a site-absolute path */
+  /* --asyncapi-logo-dark: url("/assets/logo-dark.svg"); optional */
+}
+
+/* Match a Material for MkDocs palette instead (opt-in, see ROADMAP amendment 12):
+asyncapi-viewer {
+  --asyncapi-primary: var(--md-primary-fg-color);
+  --asyncapi-font-body: var(--md-text-font-family);
+  --asyncapi-font-mono: var(--md-code-font-family);
+}
+*/
