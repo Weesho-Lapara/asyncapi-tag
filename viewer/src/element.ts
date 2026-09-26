@@ -8,6 +8,7 @@ import { parseOptions, type Options } from './options.js';
 import { headerStyles, renderHeader } from './render/header.js';
 import { infoStyles, renderInfo } from './render/info.js';
 import { operationStyles, renderOperations } from './render/operation.js';
+import { detailStyles } from './render/details.js';
 import { exampleStyles, type ExampleContext, type ExamplePanelState } from './render/example.js';
 import { TreeState, treeStyles } from './render/tree.js';
 import { base } from './styles/base.js';
@@ -27,7 +28,7 @@ let counter = 0;
  * from the resolved accent at runtime and set as private custom properties on the root.
  */
 export class AsyncAPIViewerElement extends LitElement {
-  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles, treeStyles, exampleStyles];
+  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles, treeStyles, exampleStyles, detailStyles];
 
   #options: Options = parseOptions([]);
   #observer: MutationObserver | undefined;
@@ -48,6 +49,7 @@ export class AsyncAPIViewerElement extends LitElement {
     }
     return state;
   };
+  readonly #messageIndex = new Map<string, number>();
   readonly #panels = new Map<string, ExamplePanelState>();
   readonly #example = (key: string): ExampleContext => {
     let state = this.#panels.get(key);
@@ -184,6 +186,7 @@ export class AsyncAPIViewerElement extends LitElement {
     this.#problems = [];
     this.#trees.clear();
     this.#panels.clear();
+    this.#messageIndex.clear();
     if (src === undefined) return;
     const url = resolveUrl(src, this.ownerDocument.baseURI);
     const result = await loadDocument(url);
@@ -242,7 +245,18 @@ export class AsyncAPIViewerElement extends LitElement {
       })}
       <div class="content">
         ${o.info ? renderInfo(m, `${this.id}--info`) : nothing}
-        ${o.operations ? renderOperations(m, { prefix: this.id, tree: this.#tree, example: this.#example }) : nothing}
+        ${o.operations
+          ? renderOperations(m, {
+              prefix: this.id,
+              tree: this.#tree,
+              example: this.#example,
+              messageIndex: (anchor) => this.#messageIndex.get(anchor) ?? 0,
+              selectMessage: (anchor, index) => {
+                this.#messageIndex.set(anchor, index);
+                this.requestUpdate();
+              },
+            })
+          : nothing}
         ${o.errors && this.#problems.length > 0
           ? html`<section aria-labelledby="${this.id}--problems">
               <h2 class="section-title" id="${this.id}--problems" tabindex="-1">Problems</h2>

@@ -1,6 +1,7 @@
 import { css, html, nothing, type TemplateResult } from 'lit';
 import type { Document, Message, Operation } from '../model/types.js';
 import { renderInline, renderMarkdown } from './markdown.js';
+import { renderBindings, renderParameters, renderReply, renderSecurity } from './details.js';
 import { examplesFor, isPanelOpen, renderExamplePanel, renderShowExample, type ExampleContext } from './example.js';
 import { renderSchema, type TreeState } from './tree.js';
 
@@ -8,6 +9,9 @@ export interface OperationContext {
   prefix: string;
   tree: (key: string) => TreeState;
   example: (key: string) => ExampleContext;
+  /** Selected message index per operation anchor. */
+  messageIndex: (anchor: string) => number;
+  selectMessage: (anchor: string, index: number) => void;
 }
 
 export const operationStyles = css`
@@ -133,6 +137,42 @@ export const operationStyles = css`
     color: var(--_muted);
     overflow-wrap: anywhere;
   }
+  .msg__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 14px;
+    padding-bottom: 0;
+    border-bottom: 1px solid var(--_line);
+  }
+  .msg__tab {
+    min-height: 40px;
+    padding: 0 12px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    background: none;
+    color: var(--_ink-2);
+    font: 500 13px/1 var(--_font-body);
+    cursor: pointer;
+  }
+  .msg__tab[aria-selected='true'] {
+    color: var(--_primary-text);
+    border-bottom-color: var(--_primary);
+  }
+  .msg__tab:focus-visible {
+    outline: 2px solid var(--_primary);
+    outline-offset: -2px;
+    border-radius: var(--_radius-sm);
+  }
+  .msg__part {
+    margin-top: 16px;
+  }
+  .msg__desc {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--_ink-2);
+  }
   @container viewer (max-width: 1099px) {
     .op__heading {
       font-size: 36px;
@@ -174,14 +214,54 @@ export function renderAddress(op: Operation, anchor: string): TemplateResult {
   })}</span>`;
 }
 
-function renderMessage(message: Message, anchor: string, ctx: OperationContext): TemplateResult {
+function renderMessage(op: Operation, message: Message, anchor: string, index: number, ctx: OperationContext): TemplateResult {
+  const treeKey = `${anchor}--m${index}`;
+  const name = (m: Message) => m.title ?? m.name ?? m.id;
   return html`<div class="msg">
-    <div class="msg__head">
-      <span class="label">Message</span>
-      <span class="msg__name">${message.title ?? message.name ?? message.id}</span>
-      <span class="msg__format">${message.contentType} · ${message.schemaFormat}</span>
+    ${op.messages.length > 1
+      ? html`<div class="msg__tabs" role="tablist" aria-label="Messages of ${op.heading}">
+          ${op.messages.map(
+            (m, i) => html`<button
+              class="msg__tab"
+              type="button"
+              role="tab"
+              id="${anchor}--tab-${i}"
+              aria-selected=${i === index ? 'true' : 'false'}
+              aria-controls="${anchor}--message"
+              tabindex=${i === index ? '0' : '-1'}
+              @click=${() => ctx.selectMessage(anchor, i)}
+              @keydown=${(e: KeyboardEvent) => {
+                const delta = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+                if (delta === 0) return;
+                const next = (index + delta + op.messages.length) % op.messages.length;
+                ctx.selectMessage(anchor, next);
+                e.preventDefault();
+                (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLElement>('.msg__tab')[next]?.focus();
+              }}
+            >
+              ${name(m)}
+            </button>`,
+          )}
+        </div>`
+      : nothing}
+    <div id="${anchor}--message" role=${op.messages.length > 1 ? 'tabpanel' : nothing} aria-labelledby=${op.messages.length > 1 ? `${anchor}--tab-${index}` : nothing}>
+      <div class="msg__head">
+        <span class="label">Message</span>
+        <span class="msg__name">${name(message)}</span>
+        <span class="msg__format">${message.contentType} · ${message.schemaFormat}</span>
+      </div>
+      ${message.summary ? html`<div class="msg__desc">${renderInline(message.summary)}</div>` : nothing}
+      ${message.description ? html`<div class="msg__desc">${renderMarkdown(message.description)}</div>` : nothing}
+      ${message.payload
+        ? renderSchema(message.payload, { prefix: ctx.prefix, key: `${treeKey}--payload`, state: ctx.tree(`${treeKey}--payload`) })
+        : html`<p class="tree__empty">This message has no payload schema.</p>`}
+      ${message.headers
+        ? html`<div class="msg__part">
+            <div class="msg__head"><span class="label">Headers</span></div>
+            ${renderSchema(message.headers, { prefix: ctx.prefix, key: `${treeKey}--headers`, state: ctx.tree(`${treeKey}--headers`) })}
+          </div>`
+        : nothing}
     </div>
-    ${message.payload ? renderSchema(message.payload, { prefix: ctx.prefix, key: `${anchor}--payload`, state: ctx.tree(`${anchor}--payload`) }) : html`<p class="tree__empty">This message has no payload schema.</p>`}
   </div>`;
 }
 
@@ -189,10 +269,12 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
   const prefix = ctx.prefix;
   const anchor = operationAnchor(prefix, op);
   const direction = op.action === 'send' ? 'send' : 'receive';
-  const first = op.messages[0];
-  const examples = first ? examplesFor(first) : [];
-  const exampleCtx = ctx.example(`${anchor}--example`);
+  const index = Math.min(ctx.messageIndex(anchor), Math.max(op.messages.length - 1, 0));
+  const message = op.messages[index];
+  const examples = message ? examplesFor(message) : [];
+  const exampleCtx = ctx.example(`${anchor}--example--m${index}`);
   const open = examples.length > 0 && isPanelOpen(exampleCtx);
+  const bindings = [...op.channel.bindings, ...op.bindings, ...(message?.bindings ?? [])];
   return html`
     <article class="op ${open ? 'op--split' : ''}" id=${anchor} aria-labelledby="${anchor}--heading">
       <div class="op__content">
@@ -208,9 +290,13 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
         ${op.summary ? html`<p class="summary op__summary">${renderInline(op.summary)}</p>` : nothing}
         ${op.description ? html`<div class="op__desc">${renderMarkdown(op.description)}</div>` : nothing}
         ${examples.length > 0 && !open ? html`<div class="op__show">${renderShowExample(exampleCtx)}</div>` : nothing}
-        ${first ? renderMessage(first, anchor, ctx) : nothing}
+        ${renderParameters(op.channel.parameters, anchor)}
+        ${message ? renderMessage(op, message, anchor, index, ctx) : html`<p class="tree__empty block">This operation has no messages.</p>`}
+        ${op.reply ? renderReply(op.reply, prefix) : nothing}
+        ${renderBindings(bindings)}
+        ${renderSecurity(op.security, `#${prefix}--servers`)}
       </div>
-      ${open && first ? html`<div class="op__example">${renderExamplePanel(first, examples, exampleCtx, `${anchor}--example`)}</div>` : nothing}
+      ${open && message ? html`<div class="op__example">${renderExamplePanel(message, examples, exampleCtx, `${anchor}--example`)}</div>` : nothing}
     </article>
   `;
 }

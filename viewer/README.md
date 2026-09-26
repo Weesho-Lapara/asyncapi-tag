@@ -30,3 +30,4 @@ npm run build   # dist/asyncapi-viewer.js (ESM) and dist/asyncapi-viewer.iife.js
 | 2026-09-26 | 1.10 operation block, part 1 | 94.7 kB |
 | 2026-09-26 | 1.11 payload tree | 97.4 kB |
 | 2026-09-26 | 1.12 example panel and generator | 100.9 kB |
+| 2026-09-26 | 1.13 operation block, part 2 | 102.5 kB |
