@@ -147,6 +147,12 @@ export const detailStyles = css`
     color: var(--_ink-2);
     font-size: 13px;
   }
+  .reply__row--bindings {
+    align-items: flex-start;
+  }
+  .reply__row--bindings .label {
+    padding-top: 6px;
+  }
 `;
 
 export function renderParameters(parameters: Parameter[], anchor: string): TemplateResult | typeof nothing {
@@ -269,6 +275,21 @@ export function renderReply(reply: Reply, prefix: string): TemplateResult {
             <span class="label">Messages</span>
             <ul class="reply__messages">
               ${reply.messages.map((m) => html`<li><a class="chip" href="#${prefix}--messages--${m.anchor}">${m.title ?? m.name ?? m.id}</a></li>`)}
+            </ul>
+          </div>`
+        : nothing}
+      ${reply.channel && reply.channel.bindings.length > 0
+        ? html`<div class="reply__row reply__row--bindings">
+            <span class="label">Bindings</span>
+            <ul class="chips">
+              ${reply.channel.bindings.flatMap((b) =>
+                flattenBinding(b).map(
+                  (leaf) => html`<li class="chip" title="${b.protocol} binding of the reply channel">
+                    <span class="mono"><span class="chip__scope">reply.channel.</span>${leaf.key}</span>
+                    ${chipValue(leaf.value)}
+                  </li>`,
+                ),
+              )}
             </ul>
           </div>`
         : nothing}
