@@ -408,7 +408,7 @@ export class AsyncAPIViewerElement extends LitElement {
         ${o.errors ? renderProblems(this.#problems, this.id) : nothing}
       </div>
     `;
-    if (!o.sidebar) return main;
+    if (!o.sidebar) return html`<div class="layout"><div class="main">${main}</div></div>`;
     return html`<div
       class="layout layout--sidebar ${this.#drawerOpen ? 'layout--open' : ''}"
       @keydown=${(e: KeyboardEvent) => {

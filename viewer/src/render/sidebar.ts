@@ -10,6 +10,11 @@ export const sidebarStyles = css`
     display: grid;
     grid-template-columns: minmax(0, 1fr);
   }
+  .main {
+    min-width: 0;
+    container-type: inline-size;
+    container-name: main;
+  }
   @container viewer (min-width: 1100px) {
     .layout--sidebar {
       grid-template-columns: 292px minmax(0, 1fr);

@@ -28,7 +28,9 @@ export const operationStyles = css`
     gap: 24px;
     align-items: start;
   }
-  @container viewer (min-width: 1100px) {
+  /* The split depends on the main column's width (a container of its own), so a sidebar
+     narrows the threshold's reference and the panel stacks until both columns have room. */
+  @container main (min-width: 1100px) {
     .op--split .op__body {
       grid-template-columns: minmax(0, 1fr) var(--_example-width);
       gap: 32px;

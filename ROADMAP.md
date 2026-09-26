@@ -63,6 +63,11 @@ These override the imported spec where they differ:
    the viewer's own tokens. Matching a Material site's palette is a documented two-line override in
    the theme file (`--asyncapi-primary: var(--md-primary-fg-color)` and the font variables), not the
    default, so every site looks right without tuning. Decided 2026-09-26.
+13. **Example panel layout.** The operation block is an intro (badge, heading, channel, summary,
+   description, parameters) at full width, then a body with the message on the left and the
+   example panel on the right, so the panel starts level with the payload tree. The two-column
+   body needs the *main column* (viewer minus sidebar) to be 1100px or wider; below that the
+   panel stacks under the message. Decided 2026-09-26 after review.
 
 ### Work plan in session-sized chunks
 
