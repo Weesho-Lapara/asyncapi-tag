@@ -2,8 +2,41 @@ asyncapi: 3.0.0
 info:
   title: Composition
   version: 1.0.0
-channels: {}
-operations: {}
+channels:
+  shapes:
+    address: shapes
+    messages:
+      Shape:
+        name: Shape
+        payload:
+          $ref: '#/components/schemas/Shape'
+      Contact:
+        name: Contact
+        payload:
+          $ref: '#/components/schemas/Contact'
+      Pet:
+        name: Pet
+        payload:
+          $ref: '#/components/schemas/Pet'
+operations:
+  drawShape:
+    action: send
+    channel:
+      $ref: '#/channels/shapes'
+    messages:
+      - $ref: '#/channels/shapes/messages/Shape'
+  addContact:
+    action: receive
+    channel:
+      $ref: '#/channels/shapes'
+    messages:
+      - $ref: '#/channels/shapes/messages/Contact'
+  registerPet:
+    action: receive
+    channel:
+      $ref: '#/channels/shapes'
+    messages:
+      - $ref: '#/channels/shapes/messages/Pet'
 components:
   schemas:
     Base:

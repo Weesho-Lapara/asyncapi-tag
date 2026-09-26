@@ -2,8 +2,18 @@ asyncapi: 3.0.0
 info:
   title: Six levels
   version: 1.0.0
-channels: {}
-operations: {}
+channels:
+  orders:
+    address: orders
+    messages:
+      Order:
+        payload:
+          $ref: '#/components/schemas/Order'
+operations:
+  placeOrder:
+    action: send
+    channel:
+      $ref: '#/channels/orders'
 components:
   schemas:
     Order:

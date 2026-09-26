@@ -1,6 +1,12 @@
 import { css, html, nothing, type TemplateResult } from 'lit';
-import type { Document, Operation } from '../model/types.js';
+import type { Document, Message, Operation } from '../model/types.js';
 import { renderInline, renderMarkdown } from './markdown.js';
+import { renderSchema, type TreeState } from './tree.js';
+
+export interface OperationContext {
+  prefix: string;
+  tree: (key: string) => TreeState;
+}
 
 export const operationStyles = css`
   .ops__list {
@@ -83,6 +89,26 @@ export const operationStyles = css`
   .op__desc {
     max-width: 72ch;
   }
+  .msg {
+    margin-top: 22px;
+  }
+  .msg__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+    margin-bottom: 10px;
+  }
+  .msg__name {
+    font: 600 15px/1.4 var(--_font-heading);
+    color: var(--_ink);
+  }
+  .msg__format {
+    margin-left: auto;
+    font: 400 12px/1.5 var(--_font-mono);
+    color: var(--_muted);
+    overflow-wrap: anywhere;
+  }
   @container viewer (max-width: 1099px) {
     .op__heading {
       font-size: 36px;
@@ -124,8 +150,21 @@ export function renderAddress(op: Operation, anchor: string): TemplateResult {
   })}</span>`;
 }
 
-export function renderOperation(op: Operation, prefix: string): TemplateResult {
+function renderMessage(message: Message, anchor: string, ctx: OperationContext): TemplateResult {
+  return html`<div class="msg">
+    <div class="msg__head">
+      <span class="label">Message</span>
+      <span class="msg__name">${message.title ?? message.name ?? message.id}</span>
+      <span class="msg__format">${message.contentType} · ${message.schemaFormat}</span>
+    </div>
+    ${message.payload ? renderSchema(message.payload, { prefix: ctx.prefix, key: `${anchor}--payload`, state: ctx.tree(`${anchor}--payload`) }) : html`<p class="tree__empty">This message has no payload schema.</p>`}
+  </div>`;
+}
+
+export function renderOperation(op: Operation, ctx: OperationContext): TemplateResult {
+  const prefix = ctx.prefix;
   const anchor = operationAnchor(prefix, op);
+  const first = op.messages[0];
   const direction = op.action === 'send' ? 'send' : 'receive';
   return html`
     <article class="op" id=${anchor} aria-labelledby="${anchor}--heading">
@@ -140,17 +179,18 @@ export function renderOperation(op: Operation, prefix: string): TemplateResult {
       </div>
       ${op.summary ? html`<p class="summary op__summary">${renderInline(op.summary)}</p>` : nothing}
       ${op.description ? html`<div class="op__desc">${renderMarkdown(op.description)}</div>` : nothing}
+      ${first ? renderMessage(first, anchor, ctx) : nothing}
     </article>
   `;
 }
 
-export function renderOperations(doc: Document, prefix: string): TemplateResult | typeof nothing {
+export function renderOperations(doc: Document, ctx: OperationContext): TemplateResult | typeof nothing {
   if (doc.operations.length === 0) return nothing;
-  const id = `${prefix}--operations`;
+  const id = `${ctx.prefix}--operations`;
   return html`
     <section class="ops" aria-labelledby=${id}>
       <h2 class="section-title" id=${id} tabindex="-1">Operations</h2>
-      <div class="ops__list">${doc.operations.map((op) => renderOperation(op, prefix))}</div>
+      <div class="ops__list">${doc.operations.map((op) => renderOperation(op, ctx))}</div>
     </section>
   `;
 }

@@ -3,7 +3,495 @@
 exports[`schema tree builder > composition fixture satisfies the invariants and matches its snapshot 1`] = `
 {
   "messages": [],
-  "operations": [],
+  "operations": [
+    {
+      "action": "send",
+      "anchor": "drawShape",
+      "badgeLabel": "SEND",
+      "bindings": [],
+      "channel": {
+        "address": "shapes",
+        "bindings": [],
+        "id": "shapes",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "drawShape",
+      "id": "drawShape",
+      "kind": "send",
+      "locationHint": "drawShape",
+      "messages": [
+        {
+          "anchor": "shapes-Shape",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Shape",
+          "name": "Shape",
+          "payload": {
+            "children": [],
+            "composition": {
+              "kind": "oneOf",
+              "variants": [
+                {
+                  "node": {
+                    "children": [
+                      {
+                        "children": [],
+                        "constraints": [
+                          {
+                            "key": "exclusiveMinimum",
+                            "value": 0,
+                          },
+                        ],
+                        "kind": "node",
+                        "name": "radius",
+                        "path": [],
+                        "required": true,
+                        "types": [
+                          "number",
+                        ],
+                      },
+                    ],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "",
+                    "path": [],
+                    "required": false,
+                    "title": "Circle",
+                    "types": [
+                      "object",
+                    ],
+                  },
+                  "title": "Circle",
+                },
+                {
+                  "node": {
+                    "children": [
+                      {
+                        "children": [],
+                        "constraints": [],
+                        "kind": "node",
+                        "name": "side",
+                        "path": [],
+                        "required": false,
+                        "types": [
+                          "number",
+                        ],
+                      },
+                    ],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "",
+                    "path": [],
+                    "refName": "Square",
+                    "required": false,
+                    "types": [
+                      "object",
+                    ],
+                  },
+                  "title": "Square",
+                },
+                {
+                  "node": {
+                    "children": [
+                      {
+                        "children": [],
+                        "constraints": [],
+                        "kind": "node",
+                        "name": "sides",
+                        "path": [],
+                        "required": false,
+                        "types": [
+                          "integer",
+                        ],
+                      },
+                    ],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "",
+                    "path": [],
+                    "required": false,
+                    "types": [
+                      "object",
+                    ],
+                  },
+                  "title": "Variant 3",
+                },
+              ],
+            },
+            "constraints": [],
+            "description": "One of several shapes",
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "refName": "Shape",
+            "required": false,
+            "types": [],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+    {
+      "action": "receive",
+      "anchor": "addContact",
+      "badgeLabel": "RECEIVE",
+      "bindings": [],
+      "channel": {
+        "address": "shapes",
+        "bindings": [],
+        "id": "shapes",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "addContact",
+      "id": "addContact",
+      "kind": "receive",
+      "locationHint": "addContact",
+      "messages": [
+        {
+          "anchor": "shapes-Contact",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Contact",
+          "name": "Contact",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "composition": {
+                  "kind": "anyOf",
+                  "variants": [
+                    {
+                      "node": {
+                        "children": [],
+                        "constraints": [],
+                        "format": "email",
+                        "kind": "node",
+                        "name": "channel",
+                        "path": [],
+                        "required": false,
+                        "types": [
+                          "string",
+                        ],
+                      },
+                      "title": "Variant 1",
+                    },
+                    {
+                      "node": {
+                        "children": [],
+                        "constraints": [
+                          {
+                            "key": "pattern",
+                            "value": "^\\+[0-9]+$",
+                          },
+                        ],
+                        "kind": "node",
+                        "name": "channel",
+                        "path": [],
+                        "required": false,
+                        "types": [
+                          "string",
+                        ],
+                      },
+                      "title": "Variant 2",
+                    },
+                  ],
+                },
+                "constraints": [],
+                "kind": "node",
+                "name": "channel",
+                "path": [],
+                "required": false,
+                "types": [],
+              },
+              {
+                "children": [
+                  {
+                    "children": [],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "[0]",
+                    "path": [
+                      "tags",
+                    ],
+                    "required": false,
+                    "types": [
+                      "string",
+                    ],
+                  },
+                  {
+                    "children": [],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "[1]",
+                    "path": [
+                      "tags",
+                    ],
+                    "required": false,
+                    "types": [
+                      "integer",
+                    ],
+                  },
+                ],
+                "constraints": [],
+                "kind": "node",
+                "name": "tags",
+                "path": [],
+                "required": false,
+                "types": [
+                  "array",
+                ],
+              },
+              {
+                "children": [
+                  {
+                    "children": [],
+                    "constraints": [
+                      {
+                        "key": "maxLength",
+                        "value": 20,
+                      },
+                    ],
+                    "kind": "node",
+                    "name": "*",
+                    "path": [
+                      "labels",
+                    ],
+                    "required": false,
+                    "types": [
+                      "string",
+                    ],
+                  },
+                ],
+                "constraints": [],
+                "kind": "node",
+                "name": "labels",
+                "path": [],
+                "required": false,
+                "types": [
+                  "object",
+                ],
+              },
+              {
+                "children": [
+                  {
+                    "children": [],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "/^x-/",
+                    "path": [
+                      "meta",
+                    ],
+                    "required": false,
+                    "types": [
+                      "boolean",
+                    ],
+                  },
+                ],
+                "constraints": [],
+                "kind": "node",
+                "name": "meta",
+                "path": [],
+                "required": false,
+                "types": [
+                  "object",
+                ],
+              },
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "nullable",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                  "null",
+                ],
+              },
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "anything",
+                "path": [],
+                "required": false,
+                "types": [],
+              },
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "nothing",
+                "path": [],
+                "required": false,
+                "types": [
+                  "never",
+                ],
+              },
+              {
+                "children": [
+                  {
+                    "children": [],
+                    "constraints": [],
+                    "kind": "node",
+                    "name": "[]",
+                    "path": [
+                      "untypedList",
+                    ],
+                    "required": false,
+                    "types": [
+                      "string",
+                    ],
+                  },
+                ],
+                "constraints": [],
+                "kind": "node",
+                "name": "untypedList",
+                "path": [],
+                "required": false,
+                "types": [
+                  "array",
+                ],
+              },
+              {
+                "children": [],
+                "const": "fixed",
+                "constraints": [],
+                "deprecated": true,
+                "kind": "node",
+                "name": "deprecatedField",
+                "path": [],
+                "readOnly": true,
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "refName": "Contact",
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+    {
+      "action": "receive",
+      "anchor": "registerPet",
+      "badgeLabel": "RECEIVE",
+      "bindings": [],
+      "channel": {
+        "address": "shapes",
+        "bindings": [],
+        "id": "shapes",
+        "parameters": [],
+        "servers": [],
+        "tags": [],
+      },
+      "heading": "registerPet",
+      "id": "registerPet",
+      "kind": "receive",
+      "locationHint": "registerPet",
+      "messages": [
+        {
+          "anchor": "shapes-Pet",
+          "bindings": [],
+          "contentType": "application/json",
+          "examples": [],
+          "id": "Pet",
+          "name": "Pet",
+          "payload": {
+            "children": [
+              {
+                "children": [],
+                "constraints": [],
+                "format": "uuid",
+                "kind": "node",
+                "name": "id",
+                "path": [],
+                "required": true,
+                "types": [
+                  "string",
+                ],
+              },
+              {
+                "children": [],
+                "constraints": [],
+                "description": "Overrides the Base description",
+                "kind": "node",
+                "name": "createdAt",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+              {
+                "children": [],
+                "constraints": [
+                  {
+                    "key": "minLength",
+                    "value": 1,
+                  },
+                ],
+                "kind": "node",
+                "name": "name",
+                "path": [],
+                "required": true,
+                "types": [
+                  "string",
+                ],
+              },
+              {
+                "children": [],
+                "constraints": [],
+                "kind": "node",
+                "name": "nickname",
+                "path": [],
+                "required": false,
+                "types": [
+                  "string",
+                ],
+              },
+            ],
+            "constraints": [],
+            "description": "Common fields",
+            "kind": "node",
+            "name": "",
+            "path": [],
+            "refName": "Pet",
+            "required": false,
+            "types": [
+              "object",
+            ],
+          },
+          "schemaFormat": "application/vnd.aai.asyncapi+json;version=3.0.0",
+          "tags": [],
+        },
+      ],
+      "security": [],
+      "tags": [],
+    },
+  ],
   "problems": [],
   "schemas": [
     {
