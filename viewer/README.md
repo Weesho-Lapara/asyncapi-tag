@@ -33,3 +33,4 @@ npm run build   # dist/asyncapi-viewer.js (ESM) and dist/asyncapi-viewer.iife.js
 | 2026-09-26 | 1.13 operation block, part 2 | 102.5 kB |
 | 2026-09-26 | 1.14 remaining sections | 104.3 kB |
 | 2026-09-26 | 1.15 sidebar and drawer | 107.0 kB |
+| 2026-09-26 | 1.16 breakpoints verified | 107.1 kB |

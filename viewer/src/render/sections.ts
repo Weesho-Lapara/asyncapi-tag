@@ -11,9 +11,11 @@ import { renderSchema, typeLabel, type TreeState } from './tree.js';
 export const sectionStyles = css`
   .cards {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
   .card {
+    min-width: 0;
     padding: 16px 18px;
     border: 1px solid var(--_line);
     border-radius: var(--_radius);
@@ -39,6 +41,8 @@ export const sectionStyles = css`
   .card__meta {
     font: 400 12.5px/1.5 var(--_font-mono);
     color: var(--_muted);
+    overflow-wrap: anywhere;
+    min-width: 0;
   }
   .card__host {
     font: 400 14px/1.5 var(--_font-mono);
@@ -82,6 +86,7 @@ export const sectionStyles = css`
   }
   .msgs {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 24px;
   }
   .msgs .card__head {
@@ -175,7 +180,8 @@ export const sectionStyles = css`
   }
   .selector select {
     min-height: 40px;
-    max-width: 100%;
+    max-width: 34ch;
+    text-overflow: ellipsis;
     padding: 0 10px;
     border: 1px solid var(--_line);
     border-radius: var(--_radius-sm);
@@ -195,6 +201,7 @@ export const sectionStyles = css`
     }
     .selector select {
       flex: 1;
+      max-width: none;
     }
   }
   .filtered {

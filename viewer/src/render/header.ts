@@ -21,8 +21,9 @@ export interface HeaderInput {
 export const headerStyles = css`
   .header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 14px;
+    gap: 12px 14px;
     min-height: 68px;
     padding: 12px 24px;
     background: var(--_surface);
@@ -38,7 +39,8 @@ export const headerStyles = css`
     margin: 0;
     font: 600 18px/1.3 var(--_font-heading);
     color: var(--_ink);
-    min-width: 0;
+    flex: 1 1 auto;
+    min-width: 12ch;
     overflow-wrap: anywhere;
   }
   .header__pills {
@@ -47,7 +49,7 @@ export const headerStyles = css`
     flex: none;
   }
   .header__spacer {
-    flex: 1;
+    flex: 0 0 0;
   }
   .header__actions {
     display: flex;
