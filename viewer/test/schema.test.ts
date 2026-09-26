@@ -124,6 +124,27 @@ describe('schema tree builder', () => {
     expect(engraving.children[0]).toMatchObject({ name: 'text', constraints: [{ key: 'maxLength', value: 40 }] });
   });
 
+  it('a root-level array: the item node is "[]" and its children carry a bare "[]" segment', async () => {
+    const doc = await load(`asyncapi: 3.0.0
+info: {title: Root array, version: 1.0.0}
+channels: {}
+operations: {}
+components:
+  schemas:
+    Events:
+      type: array
+      items:
+        type: object
+        properties:
+          price:
+            type: number
+`);
+    expect(checkDocument(doc)).toEqual([]);
+    const events = schema(doc, 'Events');
+    expect(events.children[0]).toMatchObject({ name: '[]', path: [] });
+    expect(events.children[0]!.children[0]).toMatchObject({ name: 'price', path: ['[]'] });
+  });
+
   it('Avro and Protobuf payloads are raw blocks; JSON Schema multi-format is a tree (v3)', async () => {
     const doc = await load(avroV3Yaml);
     expect(checkDocument(doc)).toEqual([]);

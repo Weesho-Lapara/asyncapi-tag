@@ -8,7 +8,7 @@ Review this file by hand after each run; chunk 1.8b of the roadmap fixes what it
 | Documents | 68 |
 | Normalised | 59 |
 | With problems | 6 |
-| With invariant violations | 2 |
+| With invariant violations | 0 |
 | Failed (threw or unparsable) | 0 |
 | Skipped (not AsyncAPI 2 or 3) | 9 |
 
@@ -63,7 +63,7 @@ Ops msgs: messages reached through operations. No payload: messages without a pa
 | asyncapi/spec examples (master) | streetlights-kafka-asyncapi.yml | 3.1.0 | 2 | 4 | 4 | 3 |  |  | 4 | 0 |  |
 | asyncapi/spec examples (master) | streetlights-mqtt-asyncapi.yml | 3.1.0 | 1 | 4 | 4 | 3 |  |  | 4 | 0 |  |
 | asyncapi/spec examples (master) | streetlights-operation-security-asyncapi.yml | 3.1.0 | 2 | 4 | 4 | 3 |  |  | 4 | 0 |  |
-| asyncapi/spec examples (master) | websocket-gemini-asyncapi.yml | 3.1.0 | 1 | 1 | 1 | 1 |  |  | 5 | 0 | 6 |
+| asyncapi/spec examples (master) | websocket-gemini-asyncapi.yml | 3.1.0 | 1 | 1 | 1 | 1 |  |  | 5 | 0 |  |
 | asyncapi/spec examples (v2.6.0) | anyof.yml | 2.6.0 | 0 | 1 | 1 | 1 |  |  | 2 | 0 |  |
 | asyncapi/spec examples (v2.6.0) | application-headers.yml | 2.6.0 | 1 | 1 | 1 | 1 |  |  | 3 | 0 |  |
 | asyncapi/spec examples (v2.6.0) | correlation-id.yml | 2.6.0 | 1 | 2 | 2 | 2 |  |  | 3 | 0 |  |
@@ -87,7 +87,7 @@ Ops msgs: messages reached through operations. No payload: messages without a pa
 | asyncapi/spec examples (v2.6.0) | streetlights-kafka.yml | 2.6.0 | 2 | 4 | 4 | 3 |  |  | 4 | 0 |  |
 | asyncapi/spec examples (v2.6.0) | streetlights-mqtt.yml | 2.6.0 | 1 | 4 | 4 | 3 |  |  | 4 | 0 |  |
 | asyncapi/spec examples (v2.6.0) | streetlights-operation-security.yml | 2.6.0 | 2 | 4 | 4 | 3 |  |  | 4 | 0 |  |
-| asyncapi/spec examples (v2.6.0) | websocket-gemini.yml | 2.6.0 | 1 | 1 | 1 | 1 |  |  | 5 | 0 | 6 |
+| asyncapi/spec examples (v2.6.0) | websocket-gemini.yml | 2.6.0 | 1 | 1 | 1 | 1 |  |  | 5 | 0 |  |
 | docs/examples | accounts-v2.json | 2.6.0 | 2 | 2 | 2 | 2 |  |  | 0 | 0 |  |
 | docs/examples | orders-v3.yaml | 3.0.0 | 2 | 2 | 2 | 2 |  |  | 1 | 0 |  |
 | viewer/test/fixtures/docs | avro-v2.yaml | 2.6.0 | 0 | 1 | 1 | 1 |  | 1 | 0 | 0 |  |
@@ -118,24 +118,6 @@ Ops msgs: messages reached through operations. No payload: messages without a pa
 - **viewer/test/fixtures/docs / shared/schemas.yaml**: skipped: not an AsyncAPI document (no "asyncapi" field)
 
 ## Problems and violations per document
-
-### asyncapi/spec examples (master) / websocket-gemini-asyncapi.yml
-
-- invariant: schema events › type: path [[]] should be [undefined[]]
-- invariant: schema events › price: path [[]] should be [undefined[]]
-- invariant: schema events › side: path [[]] should be [undefined[]]
-- invariant: schema events › reason: path [[]] should be [undefined[]]
-- invariant: schema events › remaining: path [[]] should be [undefined[]]
-- invariant: schema events › delta: path [[]] should be [undefined[]]
-
-### asyncapi/spec examples (v2.6.0) / websocket-gemini.yml
-
-- invariant: schema events › type: path [[]] should be [undefined[]]
-- invariant: schema events › price: path [[]] should be [undefined[]]
-- invariant: schema events › side: path [[]] should be [undefined[]]
-- invariant: schema events › reason: path [[]] should be [undefined[]]
-- invariant: schema events › remaining: path [[]] should be [undefined[]]
-- invariant: schema events › delta: path [[]] should be [undefined[]]
 
 ### viewer/test/fixtures/docs / circular.yaml
 

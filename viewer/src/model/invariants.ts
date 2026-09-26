@@ -114,11 +114,11 @@ function checkNode(
   if (itemChildren.length === 1 && node.children.length !== 1) fail(`${here}: array with properties besides "[]"`);
 
   // Children's path: root contributes nothing; an item node contributes "<array>[]" in place of
-  // its parent's segment; every other node contributes its name.
+  // its parent's segment (just "[]" when the array is the root); every other node its name.
   const childPath = isRoot
     ? []
     : node.name === '[]'
-      ? [...expectedPath.slice(0, -1), `${expectedPath[expectedPath.length - 1]}[]`]
+      ? [...expectedPath.slice(0, -1), `${expectedPath[expectedPath.length - 1] ?? ''}[]`]
       : [...expectedPath, node.name];
   for (const child of node.children) checkNode(child, at, childPath, false, schemaIds, fail);
   if (node.composition) {
