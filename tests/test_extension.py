@@ -18,8 +18,10 @@ from tests.conftest import node_check
 
 
 def render(text: str, warnings_list=None, **config) -> str:
+    """Render with the legacy (1.x) renderer, which these tests describe; see test_viewer_renderer.py."""
     if warnings_list is not None:
         config["warn"] = warnings_list.append
+    config.setdefault("renderer", "legacy")
     return markdown.markdown(text, extensions=[AsyncAPIViewerExtension(**config), "fenced_code"])
 
 
@@ -180,7 +182,7 @@ def test_multiline_tag_and_entities():
 
 
 def test_counter_resets_between_documents():
-    md = markdown.Markdown(extensions=[AsyncAPIViewerExtension()])
+    md = markdown.Markdown(extensions=[AsyncAPIViewerExtension(renderer="legacy")])
     first = md.convert('<asyncapi-viewer src="a.yaml"/>')
     md.reset()
     second = md.convert('<asyncapi-viewer src="a.yaml"/>')
@@ -219,7 +221,7 @@ def test_integrity_hashes_look_like_sri(value):
 
 def test_extension_loads_by_name_and_via_makeExtension():
     out = markdown.markdown('<asyncapi-viewer src="a.yaml"/>', extensions=["asyncapi_viewer"])
-    assert "data-asyncapi-src" in out
+    assert '<asyncapi-viewer id="asyncapi-viewer-1" src="a.yaml">' in out  # default renderer
     from asyncapi_viewer import makeExtension
 
     assert isinstance(makeExtension(load_assets=False), AsyncAPIViewerExtension)
@@ -307,7 +309,7 @@ def test_fence_and_tag_share_numbering_and_assets():
 
 def test_fenced_block_works_with_superfences():
     pytest.importorskip("pymdownx")
-    out = markdown.markdown(FENCE, extensions=[AsyncAPIViewerExtension(), "pymdownx.superfences"])
+    out = markdown.markdown(FENCE, extensions=[AsyncAPIViewerExtension(renderer="legacy"), "pymdownx.superfences"])
     assert 'data-asyncapi-src="api/events.yaml"' in out and "<code" not in out
     out = markdown.markdown("```python\nprint(1)\n```", extensions=[AsyncAPIViewerExtension(), "pymdownx.superfences"])
     assert "<code" in out
@@ -326,7 +328,7 @@ def test_old_element_name_and_extension_names_still_work():
     assert out.count('class="asyncapi-viewer asyncapi-tag"') == 2
     assert 'id="asyncapi-viewer-1"' in out and 'id="asyncapi-viewer-2"' in out
     for name in ("asyncapi_viewer", "asyncapi_tag"):
-        assert "data-asyncapi-src" in markdown.markdown('<asyncapi-tag src="a.yaml"/>', extensions=[name])
+        assert "<asyncapi-viewer " in markdown.markdown('<asyncapi-tag src="a.yaml"/>', extensions=[name])
     from asyncapi_viewer import AsyncAPITagExtension
 
     assert AsyncAPITagExtension is AsyncAPIViewerExtension

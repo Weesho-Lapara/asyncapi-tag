@@ -43,10 +43,12 @@ theme:
 
 plugins:
   - search
-  - asyncapi-viewer
+  - asyncapi-viewer:
+      renderer: legacy   # the docs site moves to the new viewer in Phase 3 (ROADMAP.md)
 
 markdown_extensions:
-  - asyncapi_viewer
+  - asyncapi_viewer:
+      renderer: legacy
   - admonition
   - attr_list
   - tables

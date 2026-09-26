@@ -57,6 +57,9 @@ version = { attr = "asyncapi_viewer.__version__" }
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+asyncapi_viewer = ["options.schema.json", "static/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"

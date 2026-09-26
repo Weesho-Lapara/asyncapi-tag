@@ -126,7 +126,7 @@ stays main-only.
 
 | # | Chunk | Depends on | Done when |
 |---|---|---|---|
-| 2.1 | Emit `<asyncapi-viewer ...>` (kebab-case, escaped), validate against the copied schema, deprecations (`schemaID`, `embed_css`, unsupported `parserOptions`), `renderer: legacy` switch keeping the 1.x path. | 1.1 | Existing tests pass with minimal updates; new tests for every option |
+| 2.1 | ~~Emit `<asyncapi-viewer ...>` (kebab-case, escaped), validate against the copied schema, deprecations (`schemaID`, `embed_css`, unsupported `parserOptions`), `renderer: legacy` switch keeping the 1.x path.~~ Done 2026-09-26. `asyncapi_viewer/options.py` reads the schema copy made by `scripts/sync_viewer.py` (the test suite copies it itself); the element is registered as block-level; asset options default to `auto` and resolve per renderer; the docs site and the old tests pin `renderer: legacy` until Phase 3. | 1.1 | Existing tests pass with minimal updates; new tests for every option |
 | 2.2 | Assets: built files in the wheel, `copy_assets(dest)`, serve-from-site default, `viewer_theme` plus deprecated `viewer_css`, module vs IIFE decision written down, `RUNNER_JS` deprecation shim. | 1.18, 2.1 | Wheel contains viewer; MkDocs and Zensical builds serve it locally |
 | 2.3 | `search_fallback`: hidden list of headings/addresses/messages for local files only (PyYAML optional dependency), removed by the viewer on render. | 2.1 | Tests on and off; remote `src` never fetched at build |
 | 2.4 | Playwright test: a page produced by plain Python-Markdown renders both example documents. | 2.2 | Test in CI |

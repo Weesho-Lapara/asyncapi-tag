@@ -30,7 +30,8 @@ def build_site(config_file: Path, strict: bool = True) -> Path:
     return Path(cfg["site_dir"])
 
 
-BASIC_YML = "site_name: Demo\nplugins:\n  - asyncapi-viewer\n"
+# The plugin tests describe the 1.x output; the new renderer is covered in test_viewer_renderer.py.
+BASIC_YML = "site_name: Demo\nplugins:\n  - asyncapi-viewer:\n      renderer: legacy\n"
 
 
 def src_of(html_text: str) -> list[str]:
@@ -122,7 +123,7 @@ def test_invalid_attribute_is_a_mkdocs_warning(tmp_path, caplog):
 def test_assets_once_per_page_and_plugin_options(tmp_path):
     cfg = write_site(
         tmp_path,
-        "site_name: Demo\nplugins:\n  - asyncapi-viewer:\n      viewer_js: js/viewer.js\n      viewer_js_integrity: ''\n"
+        "site_name: Demo\nplugins:\n  - asyncapi-viewer:\n      renderer: legacy\n      viewer_js: js/viewer.js\n      viewer_js_integrity: ''\n"
         "      viewer_css: https://cdn.example.com/viewer.css\n      viewer_css_integrity: 'sha384-abc'\n",
         {
             "schema.json": MINIMAL_SCHEMA,
@@ -143,7 +144,7 @@ def test_assets_once_per_page_and_plugin_options(tmp_path):
 def test_load_assets_false(tmp_path):
     cfg = write_site(
         tmp_path,
-        "site_name: Demo\nplugins:\n  - asyncapi-viewer:\n      load_assets: false\n      embed_css: false\n",
+        "site_name: Demo\nplugins:\n  - asyncapi-viewer:\n      renderer: legacy\n      load_assets: false\n      embed_css: false\n",
         {"schema.json": MINIMAL_SCHEMA, "index.md": '<asyncapi-viewer src="schema.json"/>\n'},
     )
     index = (build_site(cfg) / "index.html").read_text()
@@ -162,7 +163,7 @@ def test_default_assets_are_pinned_with_integrity(tmp_path):
 def test_deprecated_asyncapi_file_option_warns_but_works(tmp_path, caplog):
     cfg = write_site(
         tmp_path,
-        "site_name: Demo\nplugins:\n  - asyncapi-viewer:\n      asyncapi_file: schema.json\n",
+        "site_name: Demo\nplugins:\n  - asyncapi-viewer:\n      renderer: legacy\n      asyncapi_file: schema.json\n",
         {"schema.json": MINIMAL_SCHEMA, "index.md": '<asyncapi-viewer src="schema.json"/>\n'},
     )
     with caplog.at_level(logging.WARNING, logger="mkdocs"):
@@ -184,7 +185,7 @@ def test_user_listed_extension_is_not_duplicated(tmp_path):
 def test_old_plugin_id_and_extension_name_still_work(tmp_path):
     cfg = write_site(
         tmp_path,
-        "site_name: Demo\nplugins:\n  - asyncapi-tag\nmarkdown_extensions:\n  - asyncapi_tag\n",
+        "site_name: Demo\nplugins:\n  - asyncapi-tag:\n      renderer: legacy\nmarkdown_extensions:\n  - asyncapi_tag:\n      renderer: legacy\n",
         {"schema.json": MINIMAL_SCHEMA, "api/page.md": '<asyncapi-tag src="../schema.json"/>\n'},
     )
     site = build_site(cfg)

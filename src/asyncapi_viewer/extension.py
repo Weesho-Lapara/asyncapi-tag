@@ -24,10 +24,15 @@ The extension runs as a single preprocessor before fenced code is stashed. It
 walks the document line by line, tracking fences itself, so ``asyncapi``
 fences are recognised only at the top level (a fence nested inside a longer
 fence stays code) and elements inside fenced blocks, indented code and inline
-code spans are left alone. Each match becomes a container ``<div>`` carrying
-the document URL and the viewer configuration as data attributes. The first
-match on a page also emits the viewer's stylesheet, script and a small runner
-script (see :mod:`asyncapi_viewer.assets`).
+code spans are left alone.
+
+With the default ``renderer`` (``"viewer"``) each match becomes an
+``<asyncapi-viewer>`` element with kebab-case attributes, validated against the
+options schema the viewer ships (see :mod:`asyncapi_viewer.options`); the first
+match on a page also emits the module script and the theme stylesheet. With
+``renderer="legacy"`` the 1.x output is produced instead: a container ``<div>``
+with data attributes plus the React-based viewer and its runner script (see
+:mod:`asyncapi_viewer.assets`). The legacy renderer stays for one major version.
 """
 
 from __future__ import annotations
@@ -42,9 +47,12 @@ from markdown import Markdown
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
-from asyncapi_viewer import assets
+from asyncapi_viewer import assets, options
 
 log = logging.getLogger("asyncapi_viewer")
+
+RENDERERS = ("viewer", "legacy")
+AUTO = "auto"  # asset options: resolved per renderer (Python-Markdown coerces None defaults)
 
 TAG_RE = re.compile(
     r"<asyncapi-(?:viewer|tag)\b(?P<attrs>(?:[^>'\"]|\"[^\"]*\"|'[^']*')*?)\s*/?>"
@@ -232,6 +240,7 @@ class AsyncAPIViewerPreprocessor(Preprocessor):
     def reset(self) -> None:
         self.counter = 0
         self.assets_emitted = False
+        self._deprecations_reported = False
 
     # -- helpers -----------------------------------------------------------
     def _warn(self, message: str) -> None:
@@ -240,7 +249,47 @@ class AsyncAPIViewerPreprocessor(Preprocessor):
     def _resolve(self, url: str) -> str:
         return self.extension.getConfig("url_resolver")(url)
 
+    def _renderer(self) -> str:
+        return self.extension.getConfig("renderer")
+
+    def _asset(self, name: str, legacy_default: str, viewer_default: str) -> str:
+        value = self.extension.getConfig(name)
+        if value == AUTO:
+            return legacy_default if self._renderer() == "legacy" else viewer_default
+        return value
+
+    def _report_deprecations(self) -> None:
+        """Extension options that mean nothing to the new renderer, warned once per document."""
+        if self._deprecations_reported or self._renderer() == "legacy":
+            return
+        self._deprecations_reported = True
+        cfg = self.extension.getConfig
+        if cfg("embed_css") is not True:
+            self._warn("asyncapi-viewer: the 'embed_css' option is deprecated and does nothing with the new viewer.")
+        if cfg("viewer_css") != AUTO:
+            self._warn("asyncapi-viewer: 'viewer_css' is deprecated; use 'viewer_theme' for the theme stylesheet.")
+
+    def _element(self, attrs: Dict[str, Optional[str]]) -> str:
+        """The ``<asyncapi-viewer>`` element with validated, kebab-case, HTML-escaped attributes."""
+        self.counter += 1
+        element_id = attrs.get("id") or f"{assets.CONTAINER_CLASS}-{self.counter}"
+        if not attrs.get("src"):
+            self._warn("asyncapi-viewer: missing required 'src'; nothing was rendered.")
+        normalised = options.normalise(attrs, self._warn)
+        normalised.pop("id", None)
+        src = normalised.pop("src", None)
+        parts = [f'id="{html.escape(element_id, quote=True)}"']
+        if src:
+            parts.append(f'src="{html.escape(self._resolve(src), quote=True)}"')
+        for attribute, value in options.to_attributes(normalised):
+            if value is None:
+                parts.append(html.escape(attribute, quote=True))
+            else:
+                parts.append(f'{html.escape(attribute, quote=True)}="{html.escape(value, quote=True)}"')
+        return f"<asyncapi-viewer {' '.join(parts)}></asyncapi-viewer>"
+
     def _container(self, attrs: Dict[str, Optional[str]]) -> str:
+        """Legacy renderer: the 1.x container ``<div>`` with data attributes."""
         self.counter += 1
         container_id = attrs.get("id") or f"{assets.CONTAINER_CLASS}-{self.counter}"
         src = attrs.get("src")
@@ -261,20 +310,38 @@ class AsyncAPIViewerPreprocessor(Preprocessor):
 
     def _loader(self) -> str:
         cfg = self.extension.getConfig
-        return assets.loader_html(
-            js_url=self._resolve(cfg("viewer_js")) if cfg("viewer_js") else "",
-            css_url=self._resolve(cfg("viewer_css")) if cfg("viewer_css") else "",
-            js_integrity=cfg("viewer_js_integrity"),
-            css_integrity=cfg("viewer_css_integrity"),
-            embed_css=cfg("embed_css"),
+        if self._renderer() == "legacy":
+            js = self._asset("viewer_js", assets.VIEWER_JS_URL, "")
+            css = self._asset("viewer_css", assets.VIEWER_CSS_URL, "")
+            return assets.loader_html(
+                js_url=self._resolve(js) if js else "",
+                css_url=self._resolve(css) if css else "",
+                js_integrity=self._asset("viewer_js_integrity", assets.VIEWER_JS_INTEGRITY, ""),
+                css_integrity=self._asset("viewer_css_integrity", assets.VIEWER_CSS_INTEGRITY, ""),
+                embed_css=cfg("embed_css"),
+            )
+        # New viewer: a module script and the theme stylesheet. Defaults (assets served from
+        # the site) arrive with the packaged viewer; until then empty means "emit nothing".
+        js = self._asset("viewer_js", "", "")
+        theme = cfg("viewer_theme")
+        if theme == AUTO:
+            theme = self._asset("viewer_css", "", "")  # deprecated alias
+        return assets.viewer_loader_html(
+            js_url=self._resolve(js) if js else "",
+            theme_url=self._resolve(theme) if theme else "",
+            js_integrity=self._asset("viewer_js_integrity", "", ""),
+            theme_integrity=self._asset("viewer_theme_integrity", "", ""),
         )
 
     def _block(self, attrs: Dict[str, Optional[str]]) -> str:
-        """Container (plus the loader for the first one on the page) as a stash placeholder."""
-        block = self._container(attrs)
+        """Element or container (plus the loader for the first one) as a stash placeholder."""
+        self._report_deprecations()
+        block = self._element(attrs) if self._renderer() == "viewer" else self._container(attrs)
         if self.extension.getConfig("load_assets") and not self.assets_emitted:
             self.assets_emitted = True
-            block += "\n" + self._loader()
+            loader = self._loader()
+            if loader:
+                block += "\n" + loader
         return self.md.htmlStash.store(block)
 
     def _replace_tags(self, text: str) -> str:
@@ -337,19 +404,24 @@ class AsyncAPIViewerExtension(Extension):
 
     def __init__(self, **kwargs: Any) -> None:
         self.config = {
-            "viewer_js": [assets.VIEWER_JS_URL, "URL of the AsyncAPI standalone viewer script."],
-            "viewer_js_integrity": [
-                assets.VIEWER_JS_INTEGRITY,
-                "Subresource Integrity hash for viewer_js; empty to omit.",
+            "renderer": [
+                "viewer",
+                "'viewer' emits the <asyncapi-viewer> element (default); 'legacy' keeps the 1.x "
+                "container and React-based viewer for one major version.",
             ],
-            "viewer_css": [assets.VIEWER_CSS_URL, "URL of the viewer stylesheet."],
-            "viewer_css_integrity": [
-                assets.VIEWER_CSS_INTEGRITY,
-                "Subresource Integrity hash for viewer_css; empty to omit.",
+            "viewer_js": [AUTO, "URL of the viewer script; 'auto' picks the renderer's default."],
+            "viewer_js_integrity": [AUTO, "Subresource Integrity hash for viewer_js; empty to omit."],
+            "viewer_theme": [AUTO, "URL of the theme stylesheet (new viewer); 'auto' picks the default."],
+            "viewer_theme_integrity": [AUTO, "Subresource Integrity hash for viewer_theme; empty to omit."],
+            "viewer_css": [
+                AUTO,
+                "Legacy renderer: URL of the viewer stylesheet. New viewer: deprecated alias of viewer_theme.",
             ],
+            "viewer_css_integrity": [AUTO, "Subresource Integrity hash for viewer_css; empty to omit."],
             "embed_css": [
                 True,
-                "Emit the small stylesheet that keeps the viewer inside its container.",
+                "Legacy renderer: emit the small stylesheet that keeps the viewer inside its container. "
+                "Deprecated and ignored by the new viewer.",
             ],
             "load_assets": [
                 True,
@@ -366,7 +438,14 @@ class AsyncAPIViewerExtension(Extension):
         super().__init__(**kwargs)
 
     def extendMarkdown(self, md: Markdown) -> None:
+        renderer = self.getConfig("renderer")
+        if renderer not in RENDERERS:
+            raise ValueError(f"asyncapi-viewer: renderer must be one of {', '.join(RENDERERS)}; got {renderer!r}")
         md.registerExtension(self)
+        # Block-level, so the stashed element is not wrapped in a paragraph.
+        for tag in ("asyncapi-viewer", "asyncapi-tag"):
+            if tag not in md.block_level_elements:
+                md.block_level_elements.append(tag)
         self.preprocessor = AsyncAPIViewerPreprocessor(md, self)
         # Before fenced_code / superfences (25) stash fences, so ```asyncapi blocks are
         # still visible; the preprocessor tracks other fences itself.

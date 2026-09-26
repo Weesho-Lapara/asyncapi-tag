@@ -25,8 +25,6 @@ from mkdocs.structure.files import Files
 from mkdocs.structure.pages import Page
 from mkdocs.utils import get_relative_url
 
-from asyncapi_viewer import assets
-
 log = get_plugin_logger("asyncapi-viewer")
 
 EXTENSION_NAME = "asyncapi_viewer"
@@ -45,10 +43,13 @@ def _docs_relative(url: str) -> str:
 
 
 class AsyncAPIPluginConfig(Config):
-    viewer_js = config_options.Type(str, default=assets.VIEWER_JS_URL)
-    viewer_js_integrity = config_options.Type(str, default=assets.VIEWER_JS_INTEGRITY)
-    viewer_css = config_options.Type(str, default=assets.VIEWER_CSS_URL)
-    viewer_css_integrity = config_options.Type(str, default=assets.VIEWER_CSS_INTEGRITY)
+    renderer = config_options.Choice(("viewer", "legacy"), default="viewer")
+    viewer_js = config_options.Type(str, default="auto")
+    viewer_js_integrity = config_options.Type(str, default="auto")
+    viewer_theme = config_options.Type(str, default="auto")
+    viewer_theme_integrity = config_options.Type(str, default="auto")
+    viewer_css = config_options.Type(str, default="auto")
+    viewer_css_integrity = config_options.Type(str, default="auto")
     load_assets = config_options.Type(bool, default=True)
     embed_css = config_options.Type(bool, default=True)
     asyncapi_file = config_options.Deprecated(
@@ -71,10 +72,16 @@ class AsyncAPIPlugin(BasePlugin[AsyncAPIPluginConfig]):
             config["markdown_extensions"].append(name)
         if config["mdx_configs"] is None:
             config["mdx_configs"] = {}
+        def asset(value: str) -> str:
+            return value if value == "auto" else _docs_relative(value)
+
         config["mdx_configs"][name] = {
-            "viewer_js": _docs_relative(self.config.viewer_js),
+            "renderer": self.config.renderer,
+            "viewer_js": asset(self.config.viewer_js),
             "viewer_js_integrity": self.config.viewer_js_integrity,
-            "viewer_css": _docs_relative(self.config.viewer_css),
+            "viewer_theme": asset(self.config.viewer_theme),
+            "viewer_theme_integrity": self.config.viewer_theme_integrity,
+            "viewer_css": asset(self.config.viewer_css),
             "viewer_css_integrity": self.config.viewer_css_integrity,
             "load_assets": self.config.load_assets,
             "embed_css": self.config.embed_css,

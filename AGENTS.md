@@ -71,7 +71,15 @@ cd viewer && npm run sync-examples       # refresh demo/spec-examples/ (spec cor
   `scripts/update_viewer.py`; bump them in a dedicated commit and mention the upstream version in
   `CHANGELOG.md`.
 - `url_resolver` and `warn` extension options must have non-`None`, non-bool defaults:
-  Python-Markdown coerces `None`-default config values with `parseBoolValue`.
+  Python-Markdown coerces `None`-default config values with `parseBoolValue`. Asset options use
+  the string `auto` for "the renderer's default" for the same reason.
+- `src/asyncapi_viewer/options.schema.json` and `src/asyncapi_viewer/static/` are copies made by
+  `scripts/sync_viewer.py` from `viewer/`; they are ignored by git and shipped in the wheel. The
+  test suite copies the schema itself; CI runs the script before building the wheel and the docs.
+- The extension has two renderers: `viewer` (default, emits `<asyncapi-viewer>` validated against
+  the schema) and `legacy` (the 1.x container plus the React-based viewer, kept for one major
+  version). Tests in `test_extension.py` and `test_mkdocs_plugin.py` describe the legacy output;
+  `test_viewer_renderer.py` the new one.
 - The preprocessor runs at priority 26, before `fenced_code`/`superfences` (25) stash fences, and
   tracks fences itself: a top-level ```` ```asyncapi ```` fence becomes a viewer, any other fence is
   passed through untouched (so tags inside it stay code), and tags in indented code or inline code

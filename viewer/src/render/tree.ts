@@ -206,6 +206,19 @@ export const treeStyles = css`
     outline: 2px solid var(--_primary);
     outline-offset: -2px;
   }
+  /* At the top of a tree the switcher hangs off the toolbar as a full-width strip. */
+  .tree__body > .variants {
+    display: flex;
+    margin: 0;
+    padding: 6px 12px;
+    border: 0;
+    border-bottom: 1px solid var(--_line);
+    border-radius: 0;
+    background: var(--_head);
+  }
+  .tree__body > .row__desc {
+    padding: 10px 16px 4px;
+  }
   .variants__label {
     align-self: center;
     padding: 0 6px 0 8px;

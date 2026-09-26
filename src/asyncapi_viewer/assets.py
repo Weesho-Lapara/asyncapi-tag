@@ -113,6 +113,31 @@ def _attr(name: str, value: str) -> str:
     return f' {name}="{html.escape(value, quote=True)}"'
 
 
+def viewer_loader_html(
+    js_url: str,
+    theme_url: str,
+    js_integrity: str = "",
+    theme_integrity: str = "",
+) -> str:
+    """Return the HTML that loads the new viewer: a module script and the theme stylesheet.
+
+    The element renders itself, so there is no runner script. Each part is emitted only when
+    its URL is set; integrity attributes only when a hash is given.
+    """
+    parts = []
+    if theme_url:
+        attrs = _attr("rel", "stylesheet") + _attr("href", theme_url)
+        if theme_integrity:
+            attrs += _attr("integrity", theme_integrity) + _attr("crossorigin", "anonymous")
+        parts.append(f"<link{attrs}>")
+    if js_url:
+        attrs = _attr("type", "module") + _attr("src", js_url)
+        if js_integrity:
+            attrs += _attr("integrity", js_integrity) + _attr("crossorigin", "anonymous")
+        parts.append(f"<script{attrs}></script>")
+    return "\n".join(parts)
+
+
 def loader_html(
     js_url: str,
     css_url: str,

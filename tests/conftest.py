@@ -2,9 +2,22 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 import textwrap
+from pathlib import Path
 
 import pytest
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+import sync_viewer  # noqa: E402  (scripts/sync_viewer.py)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def packaged_schema():
+    """The extension validates against viewer/src/options.schema.json; make sure the package copy exists."""
+    sync_viewer.sync_schema()
+    sync_viewer.sync_static()  # harmless when the viewer is not built
 
 MINIMAL_SCHEMA = textwrap.dedent(
     """\
