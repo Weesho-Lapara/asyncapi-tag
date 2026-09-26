@@ -57,7 +57,7 @@ jobs:
         run: test -s dist/asyncapi-viewer.js && test -s dist/asyncapi-viewer.iife.js
 
   viewer-e2e:
-    name: Viewer (Playwright: accessibility, CSP, screenshots)
+    name: "Viewer (Playwright: accessibility, CSP, screenshots)"
     runs-on: ubuntu-latest
     defaults:
       run:
