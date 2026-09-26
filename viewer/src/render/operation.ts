@@ -282,14 +282,14 @@ function renderMessage(
       : nothing}
     <div id="${anchor}--message" role=${op.messages.length > 1 ? 'tabpanel' : nothing} aria-labelledby=${op.messages.length > 1 ? `${anchor}--tab-${index}` : nothing}>
       <h4 class="sub-title">
-        Message <span class="mono">${message.id}</span>
+        Message <span class="mono">${message.title ?? message.name ?? message.id}</span>
         <span class="sub-title__meta">${message.contentType} · ${schemaFormatLabel(message.schemaFormat)}</span>
         ${showExample}
       </h4>
       ${message.summary ? html`<div class="msg__desc">${renderInline(message.summary)}</div>` : nothing}
       ${message.description ? html`<div class="msg__desc">${renderMarkdown(message.description)}</div>` : nothing}
       ${message.payload
-        ? renderSchema(message.payload, { prefix: ctx.prefix, key: `${treeKey}--payload`, state: ctx.tree(`${treeKey}--payload`) })
+        ? renderSchema(message.payload, { label: message.id, prefix: ctx.prefix, key: `${treeKey}--payload`, state: ctx.tree(`${treeKey}--payload`) })
         : html`<p class="tree__empty">This message has no payload schema.</p>`}
       ${message.headers
         ? html`<div class="msg__part">

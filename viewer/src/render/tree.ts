@@ -303,6 +303,8 @@ export class TreeState {
 }
 
 export interface TreeOptions {
+  /** Toolbar text at the left; the field count when absent. */
+  label?: string;
   /** Anchor prefix of the viewer, for links to the Schemas section. */
   prefix: string;
   /** Unique within the viewer, e.g. the message anchor plus "payload". */
@@ -398,7 +400,7 @@ export function renderSchema(schema: Schema | undefined, options: TreeOptions): 
   const allOpen = options.state.allExpanded;
   return html`<div class="tree">
     <div class="tree__bar">
-      <span>${fields} field${fields === 1 ? '' : 's'}</span>
+      <span class=${options.label ? 'mono' : ''}>${options.label ?? `${fields} field${fields === 1 ? '' : 's'}`}</span>
       <span class="spacer"></span>
       <button type="button" @click=${() => options.state.setAll(!allOpen)}>${allOpen ? 'Collapse all' : 'Expand all'}</button>
     </div>

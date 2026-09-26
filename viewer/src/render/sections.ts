@@ -249,7 +249,7 @@ function messageEntry(message: Message, ctx: SectionContext, showExamples: boole
     ${message.description ? html`<div class="entry__desc">${renderMarkdown(message.description)}</div>` : nothing}
     <div class="entry__body">
       ${message.payload
-        ? html`<div class="block"><h4 class="block__title">Payload</h4>${renderSchema(message.payload, { prefix: ctx.prefix, key: `${anchor}--payload`, state: ctx.tree(`${anchor}--payload`) })}</div>`
+        ? html`<div class="block"><h4 class="block__title">Payload</h4>${renderSchema(message.payload, { label: message.id, prefix: ctx.prefix, key: `${anchor}--payload`, state: ctx.tree(`${anchor}--payload`) })}</div>`
         : nothing}
       ${message.headers
         ? html`<div class="block"><h4 class="block__title">Headers</h4>${renderSchema(message.headers, { prefix: ctx.prefix, key: `${anchor}--headers`, state: ctx.tree(`${anchor}--headers`) })}</div>`
