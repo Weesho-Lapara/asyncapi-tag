@@ -26,7 +26,8 @@
     "test:watch": "vitest",
     "coverage": "tsx scripts/coverage.ts",
     "e2e": "playwright test",
-    "e2e:install": "playwright install --with-deps"
+    "e2e:install": "playwright install --with-deps",
+    "sync-examples": "tsx scripts/sync-spec-examples.ts"
   },
   "dependencies": {
     "lit": "^3.3.0",

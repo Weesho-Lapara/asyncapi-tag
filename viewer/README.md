@@ -15,11 +15,14 @@ npm run build         # dist/asyncapi-viewer.js (ESM) and dist/asyncapi-viewer.i
 npm run coverage      # normaliser over the AsyncAPI example corpus -> test/coverage/REPORT.md
 npm run e2e:install   # Playwright browsers (once)
 npm run e2e           # Playwright: axe-core accessibility, CSP page, screenshot capture
+npm run sync-examples # refresh demo/spec-examples/ from the coverage corpus (after npm run coverage)
 ```
 
-The demo at `demo/index.html` is a visual test bench: one viewer, a dropdown of every example
-and fixture document, option checkboxes and a width switch. Serve the repository root
-(`node scripts/serve.mjs`, or any static server) and open `/viewer/demo/`.
+The demo at `demo/index.html` is a visual test bench: one viewer, a dropdown of every
+asyncapi/spec example (a verbatim copy under `demo/spec-examples/`, listed by its
+`index.json`), the docs examples and every test fixture, option checkboxes and a width switch.
+Serve the repository root (`node scripts/serve.mjs`, or any static server) and open
+`/viewer/demo/`; `?doc=<path>` selects a document.
 
 ## Browser suite (Playwright)
 

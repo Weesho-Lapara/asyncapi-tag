@@ -32,10 +32,20 @@ export const sidebarStyles = css`
       overflow: auto;
     }
   }
+  .side__panel {
+    display: flex;
+    flex-direction: column;
+  }
+  @container viewer (min-width: 1100px) {
+    .side__panel {
+      min-height: 100%;
+    }
+  }
   .side__inner {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
+    flex: 1 0 auto;
+    min-height: 0;
     padding: 16px 12px 24px;
   }
   /* Items under a group heading sit a step in from it (specific enough to beat the list reset). */

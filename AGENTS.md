@@ -28,6 +28,8 @@ viewer/                              the 2.0 web component (Lit + TypeScript, Vi
   src/model/types.ts                 the normalised model, the contract between normalisers and UI
   src/model/invariants.ts            structural rules every model must satisfy (used by tests)
   test/fixtures/expected/            hand-written expected models for the docs example documents
+  demo/                              visual test bench; demo/spec-examples/ is a generated copy of
+                                     asyncapi/spec examples (npm run sync-examples), never edited by hand
 legacy/asyncapi-tag/                 deprecated shim package (own pyproject, no entry points)
 scripts/update_viewer.py             bumps the pinned viewer, rewrites assets.py, adds a CHANGELOG line
 prototypes/docusaurus/               unpublished proof of concept, see ROADMAP.md
@@ -58,6 +60,7 @@ pip install zensical && zensical build             # same site under Zensical
 cd viewer && npm ci && npm run check && npm test && npm run build   # the 2.0 viewer (Node 22)
 cd viewer && npm run coverage            # normaliser over the AsyncAPI example corpus -> test/coverage/REPORT.md
 cd viewer && npm run e2e:install && npm run e2e   # Playwright: accessibility, CSP page, screenshots
+cd viewer && npm run sync-examples       # refresh demo/spec-examples/ (spec corpus copy) after npm run coverage
 ```
 
 ## Conventions and constraints

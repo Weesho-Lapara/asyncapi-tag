@@ -8,10 +8,10 @@ import { viewersReady } from './helpers.js';
  * pixel comparison across platforms is not attempted, so the assertions are structural.
  */
 const docs = [
-  ['anyof', '/docs/examples/anyof.yaml'],
-  ['adeo', '/docs/examples/adeo-kafka-request-reply.yaml'],
-  ['kraken', '/docs/examples/kraken-websocket-request-reply.yaml'],
-  ['gitter', '/docs/examples/gitter-streaming.yaml'],
+  ['anyof', '/viewer/demo/spec-examples/anyof-asyncapi.yml'],
+  ['adeo', '/viewer/demo/spec-examples/adeo-kafka-request-reply-asyncapi.yml'],
+  ['kraken', '/viewer/demo/spec-examples/kraken-websocket-request-reply-message-filter-in-reply-asyncapi.yml'],
+  ['gitter', '/viewer/demo/spec-examples/gitter-streaming-asyncapi.yml'],
   ['orders', '/docs/examples/orders-v3.yaml'],
   ['accounts', '/docs/examples/accounts-v2.json'],
 ] as const;

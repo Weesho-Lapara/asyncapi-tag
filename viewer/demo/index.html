@@ -27,11 +27,8 @@
     <strong>asyncapi-viewer demo</strong>
     <label>Document
       <select id="doc">
+        <optgroup label="asyncapi/spec examples" id="spec-group"></optgroup>
         <optgroup label="AsyncAPI 3">
-          <option value="../../docs/examples/anyof.yaml">anyOf example (spec)</option>
-          <option value="../../docs/examples/adeo-kafka-request-reply.yaml">Adeo Kafka request/reply (spec)</option>
-          <option value="../../docs/examples/kraken-websocket-request-reply.yaml">Kraken websocket request/reply (spec)</option>
-          <option value="../../docs/examples/gitter-streaming.yaml">Gitter streaming (spec)</option>
           <option value="../../docs/examples/orders-v3.yaml">Orders service (docs)</option>
           <option value="../test/fixtures/docs/request-reply.yaml">Quotes request/reply (fixture)</option>
           <option value="../test/fixtures/docs/composition.yaml">Composition: allOf, oneOf, anyOf (fixture)</option>
@@ -67,13 +64,23 @@
     </label>
   </div>
   <div class="stage" id="stage">
-    <asyncapi-viewer id="viewer" src="../../docs/examples/anyof.yaml" sidebar theme-toggle></asyncapi-viewer>
+    <asyncapi-viewer id="viewer" src="spec-examples/anyof-asyncapi.yml" sidebar theme-toggle></asyncapi-viewer>
   </div>
-  <script>
+  <script type="module">
     const viewer = document.getElementById('viewer');
     const doc = document.getElementById('doc');
     const params = new URLSearchParams(location.search);
-    if (params.get('doc')) doc.value = params.get('doc');
+    // The spec examples come from spec-examples/index.json (npm run sync-examples).
+    const manifest = await fetch('spec-examples/index.json').then((r) => r.json());
+    const group = document.getElementById('spec-group');
+    for (const d of manifest.documents) {
+      const option = document.createElement('option');
+      option.value = `spec-examples/${d.path}`;
+      option.textContent = `${d.title} — ${d.path}`;
+      group.appendChild(option);
+    }
+    group.label = `asyncapi/spec examples (${manifest.commit.slice(0, 7)})`;
+    doc.value = params.get('doc') && [...doc.options].some((o) => o.value === params.get('doc')) ? params.get('doc') : 'spec-examples/anyof-asyncapi.yml';
     const apply = () => {
       viewer.setAttribute('src', doc.value);
       viewer.toggleAttribute('sidebar', document.getElementById('sidebar').checked);

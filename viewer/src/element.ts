@@ -176,6 +176,10 @@ export class AsyncAPIViewerElement extends LitElement {
 
   #openDrawer(): void {
     this.#drawerOpen = true;
+    // The drawer is anchored to the viewer's top edge and fills one viewport height, so bring
+    // that edge to the top of the viewport first when the viewer starts further down the page.
+    const top = this.getBoundingClientRect().top;
+    if (top > 0) this.ownerDocument.defaultView?.scrollBy({ top, behavior: 'smooth' });
     this.requestUpdate();
     this.updateComplete.then(() => (this.renderRoot as ShadowRoot).querySelector<HTMLInputElement>('.side__search')?.focus()).catch(() => undefined);
   }

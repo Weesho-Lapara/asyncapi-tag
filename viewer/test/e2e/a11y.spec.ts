@@ -5,7 +5,7 @@ import { viewersReady } from './helpers.js';
 const widths = [1280, 380] as const;
 const themes = ['light', 'dark'] as const;
 const docs = [
-  ['adeo', '../../docs/examples/adeo-kafka-request-reply.yaml'],
+  ['adeo', 'spec-examples/adeo-kafka-request-reply-asyncapi.yml'],
   ['orders', '../../docs/examples/orders-v3.yaml'],
   ['accounts', '../../docs/examples/accounts-v2.json'],
 ] as const;

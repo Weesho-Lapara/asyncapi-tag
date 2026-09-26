@@ -1,0 +1,150 @@
+{
+  "source": "https://github.com/asyncapi/spec/tree/master/examples",
+  "commit": "1dd65fd2c1ed13f06365c1e870c61cdc82d8a981",
+  "documents": [
+    {
+      "path": "simple-asyncapi.yml",
+      "title": "Account Service",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "adeo-kafka-request-reply-asyncapi.yml",
+      "title": "Adeo AsyncAPI Case Study",
+      "version": "%REPLACED_BY_MAVEN%",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "anyof-asyncapi.yml",
+      "title": "AnyOf example",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "application-headers-asyncapi.yml",
+      "title": "Application Headers example",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "social-media/comments-service/asyncapi.yaml",
+      "title": "Comments Service",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "correlation-id-asyncapi.yml",
+      "title": "Correlation ID Example",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "websocket-gemini-asyncapi.yml",
+      "title": "Gemini Market Data Websocket API",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "gitter-streaming-asyncapi.yml",
+      "title": "Gitter Streaming API",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "kraken-websocket-request-reply-message-filter-in-reply-asyncapi.yml",
+      "title": "Kraken Websockets API",
+      "version": "1.8.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "kraken-websocket-request-reply-multiple-channels-asyncapi.yml",
+      "title": "Kraken Websockets API",
+      "version": "1.8.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "mercure-asyncapi.yml",
+      "title": "Mercure Hub Example",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "not-asyncapi.yml",
+      "title": "Not example",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "operation-security-asyncapi.yml",
+      "title": "Notifications",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "social-media/notification-service/asyncapi.yaml",
+      "title": "Notifications Service",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "oneof-asyncapi.yml",
+      "title": "OneOf example",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "social-media/public-api/asyncapi.yaml",
+      "title": "Public API",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "rpc-client-asyncapi.yml",
+      "title": "RPC Client Example",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "rpc-server-asyncapi.yml",
+      "title": "RPC Server Example",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "slack-rtm-asyncapi.yml",
+      "title": "Slack Real Time Messaging API",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "streetlights-kafka-asyncapi.yml",
+      "title": "Streetlights Kafka API",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "streetlights-operation-security-asyncapi.yml",
+      "title": "Streetlights Kafka API",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "streetlights-mqtt-asyncapi.yml",
+      "title": "Streetlights MQTT API",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "social-media/backend/asyncapi.yaml",
+      "title": "Website Backend",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    },
+    {
+      "path": "social-media/frontend/asyncapi.yaml",
+      "title": "Website WebSocket Client",
+      "version": "1.0.0",
+      "asyncapi": "3.1.0"
+    }
+  ]
+}
