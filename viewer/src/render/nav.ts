@@ -35,7 +35,7 @@ export interface NavOptions {
 
 export function buildNavItems(doc: Document, operations: Operation[], prefix: string, options: NavOptions): NavItem[] {
   const items: NavItem[] = [];
-  if (options.info) items.push({ kind: 'section', label: 'Overview', anchor: `${prefix}--info`, search: [] });
+  if (options.info) items.push({ kind: 'section', label: doc.title, anchor: `${prefix}--info`, search: [] });
   if (options.servers && doc.servers.length > 0) {
     items.push({ kind: 'section', label: 'Servers', anchor: `${prefix}--servers`, count: doc.servers.length, search: [] });
     if (options.showServers !== 'byDefault') {

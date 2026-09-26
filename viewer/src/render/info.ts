@@ -10,9 +10,8 @@ export const infoStyles = css`
     gap: 8px 12px;
     margin-bottom: 14px;
   }
-  .info__title {
+  .info__lead .section-title {
     margin: 0;
-    font: 600 20px/1.3 var(--_font-heading);
   }
   .info__version {
     color: var(--_muted);
@@ -52,9 +51,8 @@ export function renderInfo(doc: Document, anchorId: string): TemplateResult {
   }
   return html`
     <section class="info" aria-labelledby=${anchorId}>
-      <h2 class="section-title" id=${anchorId} tabindex="-1">Overview</h2>
       <div class="info__lead">
-        <h3 class="info__title">${doc.title}</h3>
+        <h2 class="section-title" id=${anchorId} tabindex="-1">${doc.title}</h2>
         ${doc.version ? html`<span class="info__version">v${doc.version}</span>` : nothing}
       </div>
       <div class="info__desc">${renderMarkdown(doc.description)}</div>
