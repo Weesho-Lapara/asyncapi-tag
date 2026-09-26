@@ -70,23 +70,36 @@ export const detailStyles = css`
   .chip__value {
     color: var(--_ink);
   }
-  .chip__head {
+  /* Bindings: the key sits in a pill, the value beside it; described ones take a full row. */
+  .binding {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .binding__head {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
+    gap: 6px 10px;
     min-width: 0;
   }
-  /* A described binding takes the full width: key and type first, the text underneath. */
-  .chip--row {
-    display: grid;
-    gap: 4px;
+  .binding .chip__value {
+    font-size: 13px;
+    color: var(--_ink);
+    overflow-wrap: anywhere;
+  }
+  .binding--described {
+    flex-direction: column;
+    align-items: flex-start;
     width: 100%;
-    padding: 10px 14px;
-    border-radius: var(--_radius-sm);
+    gap: 4px;
   }
   .chip__desc {
     min-width: 0;
+    padding-left: 2px;
     font-size: 12.5px;
     line-height: 1.5;
     color: var(--_ink-2);
@@ -207,12 +220,12 @@ function chipValue(value: unknown): TemplateResult {
   return html`<pre class="chip__value">${JSON.stringify(value, null, 2)}</pre>`;
 }
 
-/** A binding chip; one with a description becomes a full-width row with the text underneath. */
+/** A binding: the key in a pill, the value beside it, a description underneath when there is one. */
 function bindingChip(scopeLabel: string, protocol: string, leaf: { key: string; value: unknown }, title: string): TemplateResult {
   const description = isSchemaShaped(leaf.value) && typeof leaf.value.description === 'string' ? leaf.value.description : undefined;
-  return html`<li class="chip ${description ? 'chip--row' : ''}" title=${title}>
-    <span class="chip__head">
-      <span class="mono"><span class="chip__scope">${scopeLabel}</span>${leaf.key}</span>
+  return html`<li class="binding ${description ? 'binding--described' : ''}" title=${title}>
+    <span class="binding__head">
+      <span class="chip mono"><span class="chip__scope">${scopeLabel}</span>${leaf.key}</span>
       ${chipValue(leaf.value)}
     </span>
     ${description ? html`<span class="chip__desc">${renderInline(description)}</span>` : nothing}

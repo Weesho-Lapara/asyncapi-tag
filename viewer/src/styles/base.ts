@@ -159,7 +159,7 @@ export const base = css`
   .chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px 14px;
     padding: 0;
     margin: 0;
     min-width: 0;
