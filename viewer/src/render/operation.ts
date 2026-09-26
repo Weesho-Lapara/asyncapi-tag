@@ -113,7 +113,7 @@ export const operationStyles = css`
   }
   .op__heading {
     margin: 0;
-    font: 500 13px/1.5 var(--_font-mono);
+    font: 500 15px/1.5 var(--_font-mono);
     color: var(--_ink);
     overflow-wrap: anywhere;
   }
