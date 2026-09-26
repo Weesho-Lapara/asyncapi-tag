@@ -119,7 +119,7 @@ export const sidebarStyles = css`
     grid-column: 2;
   }
   .side__badge {
-    grid-row: 1 / span 2;
+    align-self: center;
     height: 18px;
     padding: 0 6px;
     border-radius: 5px;
@@ -137,6 +137,7 @@ export const sidebarStyles = css`
   }
   .side__label {
     grid-column: 2;
+    align-self: center;
     overflow-wrap: anywhere;
   }
   .side__sub {
