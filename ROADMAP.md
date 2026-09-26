@@ -70,6 +70,10 @@ These override the imported spec where they differ:
    panel stacks under the message. Decided 2026-09-26 after review.
 14. **Messages and Schemas entries are collapsible**, closed by default (native `<details>`).
    A link into either section opens the entry it targets. Decided 2026-09-26 after review.
+15. **Avro schemas render as trees** (overrides spec 3.3 "Non-JSON-Schema formats become
+   RawSchema" for Avro only): records, unions, arrays, maps, enums, fixed, logical types and named
+   references map onto the same model, so Kafka documents get rows and generated examples.
+   Protobuf and other formats stay code blocks. Decided 2026-09-26 after reviewing the Adeo document.
 
 ### Work plan in session-sized chunks
 

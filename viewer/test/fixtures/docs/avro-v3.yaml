@@ -28,7 +28,7 @@ components:
             - name: id
               type: string
             - name: age
-              type: [null, int]
+              type: ['null', int]
     Proto:
       name: Proto
       payload:

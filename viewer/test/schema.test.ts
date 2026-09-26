@@ -145,15 +145,18 @@ components:
     expect(events.children[0]!.children[0]).toMatchObject({ name: 'price', path: ['[]'] });
   });
 
-  it('Avro and Protobuf payloads are raw blocks; JSON Schema multi-format is a tree (v3)', async () => {
+  it('Avro payloads become trees, Protobuf stays a raw block; JSON Schema multi-format is a tree (v3)', async () => {
     const doc = await load(avroV3Yaml);
     expect(checkDocument(doc)).toEqual([]);
     const [avro, proto, plain] = doc.messages;
     expect(avro?.schemaFormat).toBe('application/vnd.apache.avro;version=1.9.0');
-    expect(avro?.payload).toEqual({
-      kind: 'raw',
-      schemaFormat: 'application/vnd.apache.avro;version=1.9.0',
-      source: JSON.stringify({ type: 'record', name: 'UserEvent', fields: [{ name: 'id', type: 'string' }, { name: 'age', type: [null, 'int'] }] }, null, 2),
+    expect(avro?.payload).toMatchObject({
+      kind: 'node',
+      title: 'UserEvent',
+      children: [
+        { name: 'id', types: ['string'], required: true },
+        { name: 'age', types: ['integer', 'null'], required: false },
+      ],
     });
     expect(proto?.payload).toEqual({
       kind: 'raw',
@@ -164,12 +167,12 @@ components:
     expect(plain?.payload).toMatchObject({ kind: 'node', children: [{ name: 'ok', types: ['boolean'] }] });
   });
 
-  it('a v2 message-level Avro schemaFormat makes the payload raw while headers stay a tree', async () => {
+  it('a v2 message-level Avro schemaFormat builds the payload from Avro while headers stay JSON Schema', async () => {
     const doc = await load(avroV2Yaml);
     expect(checkDocument(doc)).toEqual([]);
     const m = doc.messages[0]!;
     expect(m.schemaFormat).toBe('application/vnd.apache.avro;version=1.9.0');
-    expect(m.payload?.kind).toBe('raw');
+    expect(m.payload).toMatchObject({ kind: 'node', title: 'UserEvent', children: [{ name: 'id', types: ['string'] }] });
     expect(m.headers).toMatchObject({ kind: 'node', children: [{ name: 'traceId' }] });
   });
 });

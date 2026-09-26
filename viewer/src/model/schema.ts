@@ -16,6 +16,7 @@
  * - A `$ref` to a schema already on the way down becomes a leaf with `circularRef`.
  * - Formats we cannot render as a tree (Avro, Protobuf, ...) become `RawSchema`.
  */
+import { avroToNode, isAvroFormat } from './avro.js';
 import { Context, isObj, str, type Obj } from './context.js';
 import type { Composition, Constraint, ConstraintKey, RawSchema, Schema, SchemaNode } from './types.js';
 
@@ -78,6 +79,12 @@ export function buildSchema(ctx: Context, input: BuildInput): Schema | undefined
     id = inner.id ?? id;
   }
 
+  if (isAvroFormat(format)) {
+    const node = avroToNode(value, input.name, true);
+    if (node) return node;
+    ctx.problem('warning', `The Avro schema at "${input.where}" could not be read as a tree; it is shown as a code block.`, input.where);
+    return rawSchema(format, value);
+  }
   if (!isTreeFormat(format)) return rawSchema(format, value);
   // A root built from its own location still needs an identity so a schema that refers to
   // itself (components.schemas.Node -> #/components/schemas/Node) is caught at the first hop.

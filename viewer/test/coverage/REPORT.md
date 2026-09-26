@@ -5,8 +5,8 @@ Review this file by hand after each run; chunk 1.8b of the roadmap fixes what it
 
 | | Count |
 |---|---|
-| Documents | 68 |
-| Normalised | 59 |
+| Documents | 69 |
+| Normalised | 60 |
 | With problems | 6 |
 | With invariant violations | 0 |
 | Failed (threw or unparsable) | 0 |
@@ -36,7 +36,7 @@ Ops msgs: messages reached through operations. No payload: messages without a pa
 
 | Set | Document | Version | Servers | Ops | Ops msgs | Component msgs | No payload | Raw | Schemas | Problems | Violations |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| asyncapi/spec examples (master) | adeo-kafka-request-reply-asyncapi.yml | 3.1.0 | 3 | 1 | 1 | 2 |  | 2 | 10 | 0 |  |
+| asyncapi/spec examples (master) | adeo-kafka-request-reply-asyncapi.yml | 3.1.0 | 3 | 1 | 1 | 2 |  |  | 10 | 0 |  |
 | asyncapi/spec examples (master) | anyof-asyncapi.yml | 3.1.0 | 0 | 1 | 1 | 1 |  |  | 2 | 0 |  |
 | asyncapi/spec examples (master) | application-headers-asyncapi.yml | 3.1.0 | 1 | 1 | 1 | 1 |  |  | 3 | 0 |  |
 | asyncapi/spec examples (master) | correlation-id-asyncapi.yml | 3.1.0 | 1 | 2 | 2 | 2 |  |  | 3 | 0 |  |
@@ -89,14 +89,15 @@ Ops msgs: messages reached through operations. No payload: messages without a pa
 | asyncapi/spec examples (v2.6.0) | streetlights-operation-security.yml | 2.6.0 | 2 | 4 | 4 | 3 |  |  | 4 | 0 |  |
 | asyncapi/spec examples (v2.6.0) | websocket-gemini.yml | 2.6.0 | 1 | 1 | 1 | 1 |  |  | 5 | 0 |  |
 | docs/examples | accounts-v2.json | 2.6.0 | 2 | 2 | 2 | 2 |  |  | 0 | 0 |  |
+| docs/examples | adeo-kafka-request-reply.yaml | 3.1.0 | 3 | 1 | 1 | 2 |  |  | 10 | 0 |  |
 | docs/examples | orders-v3.yaml | 3.0.0 | 2 | 2 | 2 | 2 |  |  | 1 | 0 |  |
-| viewer/test/fixtures/docs | avro-v2.yaml | 2.6.0 | 0 | 1 | 1 | 1 |  | 1 | 0 | 0 |  |
-| viewer/test/fixtures/docs | avro-v3.yaml | 3.0.0 | 0 | 1 | 2 | 3 |  | 2 | 0 | 0 |  |
+| viewer/test/fixtures/docs | avro-v2.yaml | 2.6.0 | 0 | 1 | 1 | 1 |  |  | 0 | 0 |  |
+| viewer/test/fixtures/docs | avro-v3.yaml | 3.0.0 | 0 | 1 | 2 | 3 |  | 1 | 0 | 0 |  |
 | viewer/test/fixtures/docs | circular.yaml | 3.0.0 | 0 | 0 | 0 | 0 |  |  | 2 | 2 |  |
-| viewer/test/fixtures/docs | composition.yaml | 3.0.0 | 0 | 0 | 0 | 0 |  |  | 5 | 0 |  |
+| viewer/test/fixtures/docs | composition.yaml | 3.0.0 | 0 | 3 | 3 | 0 |  |  | 5 | 0 |  |
 | viewer/test/fixtures/docs | external-ref.yaml | 3.0.0 | 0 | 1 | 1 | 0 |  |  | 1 | 4 |  |
 | viewer/test/fixtures/docs | multi-message.yaml | 3.0.0 | 0 | 2 | 5 | 2 |  |  | 0 | 3 |  |
-| viewer/test/fixtures/docs | nested-six.yaml | 3.0.0 | 0 | 0 | 0 | 0 |  |  | 1 | 0 |  |
+| viewer/test/fixtures/docs | nested-six.yaml | 3.0.0 | 0 | 1 | 1 | 0 |  |  | 1 | 0 |  |
 | viewer/test/fixtures/docs | oneof-v2.yaml | 2.4.0 | 0 | 3 | 5 | 2 |  |  | 0 | 0 |  |
 | viewer/test/fixtures/docs | parameters-v2.yaml | 2.6.0 | 2 | 2 | 2 | 1 |  |  | 0 | 2 |  |
 | viewer/test/fixtures/docs | request-reply.yaml | 3.0.0 | 1 | 2 | 3 | 2 |  |  | 0 | 0 |  |
