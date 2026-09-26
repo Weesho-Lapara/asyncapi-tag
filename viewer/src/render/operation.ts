@@ -165,9 +165,6 @@ export const operationStyles = css`
   }
   .param {
     color: var(--_primary-text);
-    text-decoration: underline dotted;
-    text-underline-offset: 3px;
-    text-decoration-thickness: 1px;
   }
   .op__summary {
     margin: 0 0 12px;
@@ -245,17 +242,12 @@ export function operationAnchor(prefix: string, op: Operation): string {
   return `${prefix}--operations--${op.anchor}`;
 }
 
-/** The address with `{parameters}` turned into links to the Parameters table (chunk 1.13). */
-export function renderAddress(op: Operation, anchor: string): TemplateResult {
+/** The address; `{parameters}` are set off in the accent colour, without links. */
+export function renderAddress(op: Operation): TemplateResult {
   const address = op.channel.address;
   if (address === null) return html`<span class="op__address op__address--none">Address not specified</span>`;
-  const known = new Set(op.channel.parameters.map((p) => p.name));
   const parts = address.split(/(\{[^}]+\})/g).filter((s) => s !== '');
-  return html`<span class="op__address">${parts.map((part) => {
-    const m = /^\{([^}]+)\}$/.exec(part);
-    if (m && known.has(m[1]!)) return html`<a class="param" href="#${anchor}--parameters">${part}</a>`;
-    return part;
-  })}</span>`;
+  return html`<span class="op__address">${parts.map((part) => (/^\{[^}]+\}$/.test(part) ? html`<span class="param">${part}</span>` : part))}</span>`;
 }
 
 function renderMessage(
@@ -341,7 +333,7 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
             ${op.locationHint !== op.id && op.locationHint !== op.heading ? html`<span class="op__hint">${op.locationHint}</span>` : nothing}
           </span>
           <span class="label">Channel</span>
-          ${renderAddress(op, anchor)}
+          ${renderAddress(op)}
           ${op.channel.servers.length > 0
             ? html`<span class="label">Available on</span>
                 <span class="op__servers">
