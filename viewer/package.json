@@ -1,0 +1,39 @@
+{
+  "name": "asyncapi-viewer",
+  "version": "2.0.0-dev",
+  "description": "Renders AsyncAPI 2 and 3 documents as a web component: <asyncapi-viewer src=\"...\">",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "files": ["dist", "theme"],
+  "main": "./dist/asyncapi-viewer.js",
+  "module": "./dist/asyncapi-viewer.js",
+  "exports": {
+    ".": "./dist/asyncapi-viewer.js",
+    "./iife": "./dist/asyncapi-viewer.iife.js",
+    "./theme/asyncapi-theme.css": "./theme/asyncapi-theme.css"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "check": "npm run typecheck && npm run lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "lit": "^3.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "eslint": "^10.0.0",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.70.0",
+    "vite": "^8.0.0",
+    "vitest": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>asyncapi-viewer demo</title>
+  <!-- Portability test: one script tag, no build tooling. Serve this folder's parent with any
+       static file server after `npm run build`, e.g. `npx serve viewer` then open /demo/. -->
+  <script type="module" src="../dist/asyncapi-viewer.js"></script>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; }
+  </style>
+</head>
+<body>
+  <h1>asyncapi-viewer demo</h1>
+  <asyncapi-viewer src="../../docs/examples/orders-v3.yaml"></asyncapi-viewer>
+  <asyncapi-viewer src="../../docs/examples/accounts-v2.json"></asyncapi-viewer>
+</body>
+</html>

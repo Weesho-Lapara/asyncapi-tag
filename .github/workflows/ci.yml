@@ -32,6 +32,30 @@ jobs:
       - name: Test
         run: python -m pytest
 
+  viewer:
+    name: Viewer (Node build, lint, tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: viewer
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: viewer/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Typecheck and lint
+        run: npm run check
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Both bundles exist
+        run: test -s dist/asyncapi-viewer.js && test -s dist/asyncapi-viewer.iife.js
+
   docs:
     name: Docs site (strict build, MkDocs and Zensical)
     runs-on: ubuntu-latest

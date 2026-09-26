@@ -23,6 +23,11 @@ src/asyncapi_viewer/
   assets.py          pinned viewer version/URLs/SRI hashes, RUNNER_JS, loader_html()
   extension.py       Markdown extension: tag regex, attribute parsing, config building, preprocessor
   mkdocs_plugin.py   MkDocs plugin: config options, registers the extension, resolves src per page
+viewer/                              the 2.0 web component (Lit + TypeScript, Vite library build,
+                                     Vitest); work in progress on the viewer-2 branch, see ROADMAP.md
+  src/model/types.ts                 the normalised model, the contract between normalisers and UI
+  src/model/invariants.ts            structural rules every model must satisfy (used by tests)
+  test/fixtures/expected/            hand-written expected models for the docs example documents
 legacy/asyncapi-tag/                 deprecated shim package (own pyproject, no entry points)
 scripts/update_viewer.py             bumps the pinned viewer, rewrites assets.py, adds a CHANGELOG line
 prototypes/docusaurus/               unpublished proof of concept, see ROADMAP.md
@@ -50,6 +55,7 @@ python -m build legacy/asyncapi-tag
 python scripts/update_viewer.py [version]   # --check exits 1 when a newer viewer exists
 pip install -e ".[docs]" && mkdocs build --strict   # docs site; `mkdocs serve` to preview
 pip install zensical && zensical build             # same site under Zensical
+cd viewer && npm ci && npm run check && npm test && npm run build   # the 2.0 viewer (Node 22)
 ```
 
 ## Conventions and constraints
@@ -83,6 +89,9 @@ pip install zensical && zensical build             # same site under Zensical
   duplicate an extension the user already listed. Keep both.
 - The docs site is the end-to-end test. New behaviour should be visible on `docs/demo.md` when it
   makes sense, and `mkdocs build --strict` must stay clean.
+- All 2.0 viewer work lives on the `viewer-2` branch until release; `main` keeps 1.x fixes and is
+  merged into the branch when needed. CI runs on pushes to both. `viewer/dist/` and
+  `viewer/node_modules/` are never committed; `package-lock.json` is.
 - Viewer bumps arrive as PRs from `update-viewer.yml`. PRs opened with `GITHUB_TOKEN` do not trigger
   CI, so that workflow runs the tests itself before opening the PR; re-run CI manually if in doubt.
 

@@ -34,3 +34,9 @@ scratch/
 
 # Docs site build output (any --site-dir name used in CI)
 site-*/
+
+# Viewer (Node project under viewer/); built files are copied into the wheel at build time
+viewer/node_modules/
+viewer/dist/
+src/asyncapi_viewer/static/
+src/asyncapi_viewer/options.schema.json

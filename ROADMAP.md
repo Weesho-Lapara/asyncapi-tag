@@ -72,7 +72,7 @@ stays main-only.
 | # | Chunk | Depends on | Done when |
 |---|---|---|---|
 | 0.1 | ~~Rename to `asyncapi-viewer` (repo, packages, docs, shim for the old name).~~ Done 2026-09-26 (1.2.0). | | Old configs still work; new name on PyPI |
-| 0.2 | `viewer/` skeleton: Vite library mode, Lit, TypeScript, Vitest, ESLint. An empty `<asyncapi-viewer>` that renders its `src` attribute as text. `demo/index.html`. CI job: Node build, then Python tests. | 0.1 | `npm run build` yields one ESM and one IIFE file; CI green |
+| 0.2 | ~~`viewer/` skeleton: Vite library mode, Lit, TypeScript, Vitest, ESLint. An empty `<asyncapi-viewer>` that renders its `src` attribute as text. `demo/index.html`. CI job: Node build, then Python tests.~~ Done 2026-09-26, plus the model types (`src/model/types.ts`), the invariants checker and hand-written expected models for both example documents, which are the design reference for 1.4 and 1.5. | 0.1 | `npm run build` yields one ESM and one IIFE file; CI green |
 
 **Phase 1: the viewer**
 

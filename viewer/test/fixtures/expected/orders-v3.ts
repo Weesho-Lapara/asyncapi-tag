@@ -1,0 +1,248 @@
+/**
+ * Hand-written normalised model for docs/examples/orders-v3.yaml with default options.
+ * This is the design reference for the v3 normaliser (ROADMAP chunk 1.4): the normaliser must
+ * produce exactly this. Edit deliberately; every change here is a model decision.
+ */
+import type { Document, Message, SchemaNode } from '../../../src/model/types.js';
+
+const SCHEMA_FORMAT = 'application/vnd.aai.asyncapi+json;version=3.0.0';
+
+/** Children of the `Order` object, shared by the component schema and the OrderPlaced payload. */
+function orderChildren(): SchemaNode[] {
+  return [
+    {
+      kind: 'node',
+      name: 'orderId',
+      path: [],
+      types: ['string'],
+      required: true,
+      description: 'Unique order identifier',
+      constraints: [],
+      children: [],
+    },
+    { kind: 'node', name: 'customerId', path: [], types: ['string'], required: true, constraints: [], children: [] },
+    {
+      kind: 'node',
+      name: 'items',
+      path: [],
+      types: ['array'],
+      required: true,
+      constraints: [],
+      children: [
+        {
+          kind: 'node',
+          name: '[]',
+          path: ['items'],
+          types: ['object'],
+          required: false,
+          constraints: [],
+          children: [
+            { kind: 'node', name: 'sku', path: ['items[]'], types: ['string'], required: true, constraints: [], children: [] },
+            {
+              kind: 'node',
+              name: 'quantity',
+              path: ['items[]'],
+              types: ['integer'],
+              required: true,
+              constraints: [{ key: 'minimum', value: 1 }],
+              children: [],
+            },
+            {
+              kind: 'node',
+              name: 'unitPrice',
+              path: ['items[]'],
+              types: ['number'],
+              required: true,
+              constraints: [{ key: 'minimum', value: 0 }],
+              children: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'node',
+      name: 'total',
+      path: [],
+      types: ['number'],
+      required: true,
+      constraints: [{ key: 'minimum', value: 0 }],
+      children: [],
+    },
+  ];
+}
+
+const orderPlaced: Message = {
+  id: 'OrderPlaced',
+  anchor: 'OrderPlaced',
+  name: 'OrderPlaced',
+  title: 'Order placed',
+  contentType: 'application/json',
+  schemaFormat: SCHEMA_FORMAT,
+  payload: {
+    kind: 'node',
+    name: '',
+    path: [],
+    types: ['object'],
+    required: false,
+    constraints: [],
+    children: orderChildren(),
+    refName: 'Order',
+  },
+  examples: [
+    {
+      name: 'two-items',
+      payload: {
+        orderId: 'ord_01HZ3',
+        customerId: 'cus_4711',
+        items: [{ sku: 'mug-teal', quantity: 2, unitPrice: 12.5 }],
+        total: 25,
+      },
+    },
+  ],
+  tags: [],
+  bindings: [],
+};
+
+const orderShipped: Message = {
+  id: 'OrderShipped',
+  anchor: 'OrderShipped',
+  name: 'OrderShipped',
+  title: 'Order shipped',
+  contentType: 'application/json',
+  schemaFormat: SCHEMA_FORMAT,
+  payload: {
+    kind: 'node',
+    name: '',
+    path: [],
+    types: ['object'],
+    required: false,
+    constraints: [],
+    children: [
+      { kind: 'node', name: 'orderId', path: [], types: ['string'], required: true, constraints: [], children: [] },
+      {
+        kind: 'node',
+        name: 'carrier',
+        path: [],
+        types: ['string'],
+        required: true,
+        enum: ['dhl', 'ups', 'fedex'],
+        constraints: [],
+        children: [],
+      },
+      { kind: 'node', name: 'trackingNumber', path: [], types: ['string'], required: true, constraints: [], children: [] },
+      {
+        kind: 'node',
+        name: 'shippedAt',
+        path: [],
+        types: ['string'],
+        format: 'date-time',
+        required: false,
+        constraints: [],
+        children: [],
+      },
+    ],
+  },
+  examples: [],
+  tags: [],
+  bindings: [],
+};
+
+export const ordersV3: Document = {
+  specVersion: '3.0.0',
+  specMajor: 3,
+  title: 'Orders service',
+  version: '2.1.0',
+  description:
+    'Events emitted and consumed by the orders service. This document is an\n' +
+    '**AsyncAPI 3** example used by the asyncapi-viewer documentation.\n',
+  license: { name: 'MIT' },
+  tags: [],
+  servers: [
+    {
+      id: 'production',
+      anchor: 'production',
+      protocol: 'kafka',
+      hostDisplay: 'broker.example.com:9092',
+      description: 'Production Kafka cluster',
+      variables: [],
+      security: [],
+      tags: [{ name: 'env:production' }],
+      bindings: [],
+    },
+    {
+      id: 'staging',
+      anchor: 'staging',
+      protocol: 'kafka',
+      hostDisplay: 'broker.staging.example.com:9092',
+      variables: [],
+      security: [],
+      tags: [{ name: 'env:staging' }],
+      bindings: [],
+    },
+  ],
+  operations: [
+    {
+      id: 'emitOrderPlaced',
+      anchor: 'emitOrderPlaced',
+      heading: 'emitOrderPlaced',
+      action: 'send',
+      kind: 'send',
+      badgeLabel: 'SEND',
+      locationHint: 'emitOrderPlaced',
+      channel: {
+        id: 'orderPlaced',
+        address: 'orders.placed',
+        description: 'A customer completed checkout.',
+        parameters: [],
+        servers: [],
+        tags: [],
+        bindings: [],
+      },
+      summary: 'Emit when an order is placed',
+      tags: [{ name: 'orders' }],
+      messages: [orderPlaced],
+      security: [],
+      bindings: [],
+    },
+    {
+      id: 'onOrderShipped',
+      anchor: 'onOrderShipped',
+      heading: 'onOrderShipped',
+      action: 'receive',
+      kind: 'receive',
+      badgeLabel: 'RECEIVE',
+      locationHint: 'onOrderShipped',
+      channel: {
+        id: 'orderShipped',
+        address: 'orders.shipped',
+        parameters: [],
+        servers: [],
+        tags: [],
+        bindings: [],
+      },
+      summary: 'React to shipments from the fulfilment service',
+      tags: [{ name: 'fulfilment' }],
+      messages: [orderShipped],
+      security: [],
+      bindings: [],
+    },
+  ],
+  messages: [orderPlaced, orderShipped],
+  schemas: [
+    {
+      id: 'Order',
+      anchor: 'Order',
+      schema: {
+        kind: 'node',
+        name: 'Order',
+        path: [],
+        types: ['object'],
+        required: false,
+        constraints: [],
+        children: orderChildren(),
+      },
+    },
+  ],
+  problems: [],
+};
