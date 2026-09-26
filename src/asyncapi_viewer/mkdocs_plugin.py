@@ -14,6 +14,7 @@ relative to the Markdown file, and relative to ``docs_dir`` when it starts with
 from __future__ import annotations
 
 import posixpath
+from pathlib import Path
 from typing import Optional
 from urllib.parse import urlsplit, urlunsplit
 
@@ -21,9 +22,11 @@ from mkdocs.config import config_options
 from mkdocs.config.base import Config
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import BasePlugin, get_plugin_logger
-from mkdocs.structure.files import Files
+from mkdocs.structure.files import File, Files
 from mkdocs.structure.pages import Page
 from mkdocs.utils import get_relative_url
+
+from asyncapi_viewer import assets
 
 log = get_plugin_logger("asyncapi-viewer")
 
@@ -65,6 +68,12 @@ class AsyncAPIPlugin(BasePlugin[AsyncAPIPluginConfig]):
         self._page: Optional[Page] = None
         self._files: Optional[Files] = None
 
+    def _serves_viewer(self) -> bool:
+        """Default for the new renderer: publish the packaged viewer into the site."""
+        return self.config.renderer == "viewer" and assets.packaged() and (
+            self.config.viewer_js == "auto" or self.config.viewer_theme == "auto"
+        )
+
     def on_config(self, config: MkDocsConfig) -> MkDocsConfig:
         listed = [n for n in EXTENSION_ALIASES if n in config["markdown_extensions"]]
         name = listed[0] if listed else EXTENSION_NAME
@@ -72,15 +81,28 @@ class AsyncAPIPlugin(BasePlugin[AsyncAPIPluginConfig]):
             config["markdown_extensions"].append(name)
         if config["mdx_configs"] is None:
             config["mdx_configs"] = {}
+
         def asset(value: str) -> str:
             return value if value == "auto" else _docs_relative(value)
 
+        viewer_js, js_integrity = asset(self.config.viewer_js), self.config.viewer_js_integrity
+        viewer_theme, theme_integrity = asset(self.config.viewer_theme), self.config.viewer_theme_integrity
+        if self._serves_viewer():
+            if self.config.viewer_js == "auto":
+                viewer_js = f"/{assets.SITE_ASSET_DIR}/{assets.VIEWER_MODULE}"
+                if js_integrity == "auto":
+                    js_integrity = assets.integrity(assets.VIEWER_MODULE)
+            if self.config.viewer_theme == "auto" and self.config.viewer_css == "auto":
+                viewer_theme = f"/{assets.SITE_ASSET_DIR}/{assets.VIEWER_THEME}"
+                if theme_integrity == "auto":
+                    theme_integrity = assets.integrity(assets.VIEWER_THEME)
+
         config["mdx_configs"][name] = {
             "renderer": self.config.renderer,
-            "viewer_js": asset(self.config.viewer_js),
-            "viewer_js_integrity": self.config.viewer_js_integrity,
-            "viewer_theme": asset(self.config.viewer_theme),
-            "viewer_theme_integrity": self.config.viewer_theme_integrity,
+            "viewer_js": viewer_js,
+            "viewer_js_integrity": js_integrity,
+            "viewer_theme": viewer_theme,
+            "viewer_theme_integrity": theme_integrity,
             "viewer_css": asset(self.config.viewer_css),
             "viewer_css_integrity": self.config.viewer_css_integrity,
             "load_assets": self.config.load_assets,
@@ -89,6 +111,25 @@ class AsyncAPIPlugin(BasePlugin[AsyncAPIPluginConfig]):
             "warn": log.warning,
         }
         return config
+
+    def on_files(self, files: Files, config: MkDocsConfig) -> Files:
+        """Add the packaged viewer files to the site under assets/asyncapi-viewer/."""
+        if not self._serves_viewer():
+            return files
+        for name in assets.VIEWER_FILES:
+            uri = f"{assets.SITE_ASSET_DIR}/{name}"
+            if files.get_file_from_path(uri) is not None:
+                continue
+            if hasattr(File, "generated"):  # MkDocs 1.6+
+                files.append(File.generated(config, uri, content=assets.static_path(name).read_bytes()))
+            else:  # MkDocs 1.5: a File whose source lives in the package
+                f = File(name, str(assets.STATIC_DIR), config["site_dir"], config["use_directory_urls"])
+                f.src_uri = uri
+                f.dest_uri = uri
+                f.url = uri
+                f.abs_dest_path = str(Path(config["site_dir"]) / uri)
+                files.append(f)
+        return files
 
     def on_page_markdown(
         self, markdown: str, page: Page, config: MkDocsConfig, files: Files

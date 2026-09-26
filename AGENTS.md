@@ -20,13 +20,16 @@ are in [ROADMAP.md](ROADMAP.md); keep this file to how the repository works.
 ```
 src/asyncapi_viewer/
   __init__.py        version, public exports
-  assets.py          pinned viewer version/URLs/SRI hashes, RUNNER_JS, loader_html()
-  extension.py       Markdown extension: tag regex, attribute parsing, config building, preprocessor
+  assets.py          legacy: pinned React viewer URLs/SRI, RUNNER_JS, loader_html(); new: static/ files,
+                     manifest, copy_assets(), cdn_url(), viewer_loader_html()
+  options.py         reads options.schema.json (copied from viewer/); validation shared with the viewer
+  extension.py       Markdown extension: tag regex, attribute parsing, both renderers, preprocessor
   mkdocs_plugin.py   MkDocs plugin: config options, registers the extension, resolves src per page
 viewer/                              the 2.0 web component (Lit + TypeScript, Vite library build,
                                      Vitest); work in progress on the viewer-2 branch, see ROADMAP.md
   src/model/types.ts                 the normalised model, the contract between normalisers and UI
   src/model/invariants.ts            structural rules every model must satisfy (used by tests)
+  test/e2e/                          Playwright: accessibility (axe), CSP page, screenshot capture
   test/fixtures/expected/            hand-written expected models for the docs example documents
   demo/                              visual test bench; demo/spec-examples/ is a generated copy of
                                      asyncapi/spec examples (npm run sync-examples), never edited by hand
@@ -61,6 +64,7 @@ cd viewer && npm ci && npm run check && npm test && npm run build   # the 2.0 vi
 cd viewer && npm run coverage            # normaliser over the AsyncAPI example corpus -> test/coverage/REPORT.md
 cd viewer && npm run e2e:install && npm run e2e   # Playwright: accessibility, CSP page, screenshots
 cd viewer && npm run sync-examples       # refresh demo/spec-examples/ (spec corpus copy) after npm run coverage
+python scripts/sync_viewer.py            # copy the built viewer, theme, manifest and schema into the package
 ```
 
 ## Conventions and constraints

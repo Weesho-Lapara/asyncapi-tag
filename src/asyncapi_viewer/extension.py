@@ -320,17 +320,28 @@ class AsyncAPIViewerPreprocessor(Preprocessor):
                 css_integrity=self._asset("viewer_css_integrity", assets.VIEWER_CSS_INTEGRITY, ""),
                 embed_css=cfg("embed_css"),
             )
-        # New viewer: a module script and the theme stylesheet. Defaults (assets served from
-        # the site) arrive with the packaged viewer; until then empty means "emit nothing".
-        js = self._asset("viewer_js", "", "")
+        # New viewer: a module script and the theme stylesheet. The bare extension defaults
+        # to the CDN copy of the packaged version with its integrity hash; the MkDocs plugin
+        # overrides these with files served from the site.
+        if not assets.packaged() and (cfg("viewer_js") == AUTO or cfg("viewer_theme") == AUTO):
+            self._warn(
+                "asyncapi-viewer: the viewer is not packaged in this installation, so no script or "
+                "theme was emitted; set viewer_js and viewer_theme, or build the viewer and run "
+                "scripts/sync_viewer.py."
+            )
+        js = self._asset("viewer_js", "", assets.cdn_url(assets.VIEWER_MODULE))
         theme = cfg("viewer_theme")
         if theme == AUTO:
-            theme = self._asset("viewer_css", "", "")  # deprecated alias
+            theme = self._asset("viewer_css", "", assets.cdn_url(assets.VIEWER_THEME))  # deprecated alias
+        js_integrity = self._asset("viewer_js_integrity", "", assets.integrity(assets.VIEWER_MODULE) if cfg("viewer_js") == AUTO else "")
+        theme_integrity = self._asset(
+            "viewer_theme_integrity", "", assets.integrity(assets.VIEWER_THEME) if cfg("viewer_theme") == AUTO and cfg("viewer_css") == AUTO else ""
+        )
         return assets.viewer_loader_html(
             js_url=self._resolve(js) if js else "",
             theme_url=self._resolve(theme) if theme else "",
-            js_integrity=self._asset("viewer_js_integrity", "", ""),
-            theme_integrity=self._asset("viewer_theme_integrity", "", ""),
+            js_integrity=js_integrity,
+            theme_integrity=theme_integrity,
         )
 
     def _block(self, attrs: Dict[str, Optional[str]]) -> str:

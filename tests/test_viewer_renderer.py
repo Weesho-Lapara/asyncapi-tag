@@ -118,11 +118,32 @@ def test_viewer_loader_is_emitted_once_with_integrity_and_only_when_configured()
     assert out.count('<script type="module" src="v.js" integrity="sha384-x" crossorigin="anonymous"></script>') == 1
     assert out.count('<link rel="stylesheet" href="t.css" integrity="sha384-y" crossorigin="anonymous">') == 1
     assert "<style>" not in out and assets.RUNNER_JS not in out
-    # nothing configured yet: the element alone
-    out = render('<asyncapi-viewer src="a.yaml"/>')
-    assert "<script" not in out and "<link" not in out
     out = render('<asyncapi-viewer src="a.yaml"/>', viewer_js="v.js", load_assets=False)
     assert "<script" not in out
+
+
+def test_bare_extension_defaults_to_the_cdn_copy_of_the_packaged_version():
+    if not assets.packaged():
+        pytest.skip("viewer not packaged (build it and run scripts/sync_viewer.py)")
+    out = render('<asyncapi-viewer src="a.yaml"/>')
+    version = assets.viewer_version()
+    assert f'<script type="module" src="https://cdn.jsdelivr.net/npm/asyncapi-viewer@{version}/dist/asyncapi-viewer.js" integrity="{assets.integrity("asyncapi-viewer.js")}" crossorigin="anonymous"></script>' in out
+    assert f'<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/asyncapi-viewer@{version}/theme/asyncapi-theme.css" integrity="{assets.integrity("asyncapi-theme.css")}" crossorigin="anonymous">' in out
+    assert "@latest" not in out
+    for name in assets.VIEWER_FILES:
+        assert re.fullmatch(r"sha384-[A-Za-z0-9+/]{64}", assets.integrity(name))
+
+
+def test_copy_assets_writes_the_three_files_with_matching_hashes(tmp_path):
+    if not assets.packaged():
+        pytest.skip("viewer not packaged")
+    hashes = assets.copy_assets(tmp_path / "v")
+    assert sorted(hashes) == sorted(assets.VIEWER_FILES)
+    for name, sri in hashes.items():
+        assert (tmp_path / "v" / name).read_bytes() == assets.static_path(name).read_bytes()
+        assert sri == assets.integrity(name)
+    with pytest.raises(ValueError):
+        assets.static_path("nope.js")
 
 
 def test_deprecated_extension_options_warn_once_per_document(warnings_list):

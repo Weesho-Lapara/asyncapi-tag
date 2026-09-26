@@ -192,3 +192,45 @@ def test_old_plugin_id_and_extension_name_still_work(tmp_path):
     page = (site / "api/page/index.html").read_text()
     assert page.count('class="asyncapi-viewer asyncapi-tag"') == 1
     assert src_of(page) == ["../../schema.json"]  # the plugin's resolver was wired to the old extension name
+
+
+# --- the new renderer: viewer served from the site ---------------------------------------------
+
+def test_default_renderer_serves_the_packaged_viewer_from_the_site(tmp_path):
+    if not assets.packaged():
+        pytest.skip("viewer not packaged (build it and run scripts/sync_viewer.py)")
+    cfg = write_site(
+        tmp_path,
+        "site_name: Demo\nplugins:\n  - asyncapi-viewer\n",
+        {
+            "schema.json": MINIMAL_SCHEMA,
+            "index.md": '<asyncapi-viewer src="schema.json"/>\n\n<asyncapi-viewer src="schema.json" sidebar="true"/>\n',
+            "api/page.md": '<asyncapi-viewer src="../schema.json"/>\n',
+        },
+    )
+    site = build_site(cfg)
+    for name in assets.VIEWER_FILES:
+        assert (site / "assets/asyncapi-viewer" / name).read_bytes() == assets.static_path(name).read_bytes()
+    index = (site / "index.html").read_text()
+    assert index.count("<asyncapi-viewer ") == 2
+    assert 'id="asyncapi-viewer-2" src="schema.json" sidebar>' in index
+    assert index.count(f'<script type="module" src="assets/asyncapi-viewer/asyncapi-viewer.js" integrity="{assets.integrity("asyncapi-viewer.js")}" crossorigin="anonymous"></script>') == 1
+    assert f'<link rel="stylesheet" href="assets/asyncapi-viewer/asyncapi-theme.css" integrity="{assets.integrity("asyncapi-theme.css")}" crossorigin="anonymous">' in index
+    assert "querySelectorAll" not in index and "data-asyncapi-" not in index
+    nested = (site / "api/page/index.html").read_text()
+    assert 'src="../../assets/asyncapi-viewer/asyncapi-viewer.js"' in nested
+    assert 'href="../../assets/asyncapi-viewer/asyncapi-theme.css"' in nested
+
+
+def test_custom_viewer_urls_replace_the_served_copy(tmp_path):
+    cfg = write_site(
+        tmp_path,
+        "site_name: Demo\nplugins:\n  - asyncapi-viewer:\n      viewer_js: https://cdn.example.com/viewer.js\n"
+        "      viewer_js_integrity: sha384-abc\n      viewer_theme: css/my-theme.css\n      viewer_theme_integrity: ''\n",
+        {"schema.json": MINIMAL_SCHEMA, "css/my-theme.css": "asyncapi-viewer{}", "index.md": '<asyncapi-viewer src="schema.json"/>\n'},
+    )
+    site = build_site(cfg)
+    index = (site / "index.html").read_text()
+    assert '<script type="module" src="https://cdn.example.com/viewer.js" integrity="sha384-abc" crossorigin="anonymous"></script>' in index
+    assert '<link rel="stylesheet" href="css/my-theme.css">' in index
+    assert not (site / "assets/asyncapi-viewer").exists()

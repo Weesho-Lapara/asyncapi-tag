@@ -14,6 +14,9 @@ needed for the asset tests and the wheel.
 
 from __future__ import annotations
 
+import base64
+import hashlib
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -47,14 +50,31 @@ def sync_schema() -> bool:
     return False
 
 
+def sri(path: Path) -> str:
+    return "sha384-" + base64.b64encode(hashlib.sha384(path.read_bytes()).digest()).decode("ascii")
+
+
 def sync_static() -> list[str]:
-    """Copy the built viewer and theme when present. Returns the names copied."""
+    """Copy the built viewer and theme when present and write static/manifest.json.
+
+    The manifest carries the viewer version (from viewer/package.json) and the SRI hash of
+    each file; the extension uses it for the CDN URLs and integrity attributes.
+    """
     copied = []
     for src, dst in STATIC_FILES.items():
         if src.exists() and stale(src, dst):
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(src, dst)
             copied.append(dst.name)
+    present = [dst for dst in STATIC_FILES.values() if dst.exists()]
+    if present:
+        version = json.loads((VIEWER / "package.json").read_text(encoding="utf-8"))["version"]
+        manifest = {"version": version, "files": {dst.name: sri(dst) for dst in present}}
+        manifest_path = STATIC_DST / "manifest.json"
+        text = json.dumps(manifest, indent=2) + "\n"
+        if not manifest_path.exists() or manifest_path.read_text(encoding="utf-8") != text:
+            manifest_path.write_text(text, encoding="utf-8")
+            copied.append(manifest_path.name)
     return copied
 
 

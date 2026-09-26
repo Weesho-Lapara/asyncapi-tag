@@ -8,6 +8,11 @@ with ``scripts/update_viewer.py``; do not edit them by hand.
 from __future__ import annotations
 
 import html
+import json
+import shutil
+from functools import lru_cache
+from pathlib import Path
+from typing import Dict, Optional
 
 # --- managed by scripts/update_viewer.py ------------------------------------
 VIEWER_VERSION = "3.2.1"
@@ -19,6 +24,84 @@ VIEWER_CSS_INTEGRITY = "sha384-oo9RoQcacP++XdMX6CjTucTvASEORHX3chFik0/V2kHcsHiVb
 
 CONTAINER_CLASS = "asyncapi-viewer"
 LEGACY_CLASS = "asyncapi-tag"  # also set on containers so pre-rename CSS keeps applying
+
+# --- the new viewer (2.0), shipped inside the wheel -------------------------
+# scripts/sync_viewer.py copies the built files from viewer/ into static/ together with
+# manifest.json (viewer version and SRI hashes). A git checkout has them only after the
+# Node build and the script have run; the wheel always has them.
+STATIC_DIR = Path(__file__).with_name("static")
+VIEWER_MODULE = "asyncapi-viewer.js"  # ES module: the default (deferred, runs once per URL)
+VIEWER_IIFE = "asyncapi-viewer.iife.js"  # classic script for pages that cannot use modules
+VIEWER_THEME = "asyncapi-theme.css"
+VIEWER_FILES = (VIEWER_MODULE, VIEWER_IIFE, VIEWER_THEME)
+#: Site-relative folder the MkDocs plugin publishes the viewer to.
+SITE_ASSET_DIR = "assets/asyncapi-viewer"
+CDN_BASE = "https://cdn.jsdelivr.net/npm/asyncapi-viewer@{version}/"
+CDN_PATHS = {VIEWER_MODULE: "dist/", VIEWER_IIFE: "dist/", VIEWER_THEME: "theme/"}
+
+
+@lru_cache(maxsize=1)
+def manifest() -> Optional[Dict[str, object]]:
+    """The packaged viewer's manifest, or None when the viewer is not packaged."""
+    path = STATIC_DIR / "manifest.json"
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def packaged() -> bool:
+    """True when the built viewer is inside this installation."""
+    return manifest() is not None and all((STATIC_DIR / name).exists() for name in VIEWER_FILES)
+
+
+def viewer_version() -> str:
+    """The packaged viewer's version (the npm package version), or an empty string."""
+    m = manifest()
+    return str(m["version"]) if m else ""
+
+
+def static_path(name: str) -> Path:
+    """Path of a packaged viewer file (`VIEWER_MODULE`, `VIEWER_IIFE`, `VIEWER_THEME`)."""
+    if name not in VIEWER_FILES:
+        raise ValueError(f"unknown viewer file {name!r}; expected one of {', '.join(VIEWER_FILES)}")
+    path = STATIC_DIR / name
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} is missing: the viewer is not packaged in this installation. In a git checkout run "
+            "'npm --prefix viewer run build && python scripts/sync_viewer.py'."
+        )
+    return path
+
+
+def integrity(name: str) -> str:
+    """The Subresource Integrity hash of a packaged viewer file, or an empty string."""
+    m = manifest()
+    files = m["files"] if m else {}
+    return str(files.get(name, "")) if isinstance(files, dict) else ""
+
+
+def cdn_url(name: str) -> str:
+    """The jsDelivr URL of a packaged viewer file at the packaged version, or an empty string."""
+    version = viewer_version()
+    if not version:
+        return ""
+    return CDN_BASE.format(version=version) + CDN_PATHS[name] + name
+
+
+def copy_assets(dest_dir: "str | Path") -> Dict[str, str]:
+    """Copy the viewer files into ``dest_dir`` and return ``{file name: integrity hash}``.
+
+    For sites that serve the viewer themselves: point ``viewer_js`` at the copied module (or
+    IIFE) and ``viewer_theme`` at the copied theme, and pass the hashes as the integrity options.
+    """
+    dest = Path(dest_dir)
+    dest.mkdir(parents=True, exist_ok=True)
+    out = {}
+    for name in VIEWER_FILES:
+        shutil.copyfile(static_path(name), dest / name)
+        out[name] = integrity(name)
+    return out
+
 
 # The viewer is designed for a full-width page. Inside a documentation column it
 # switches to its compact layout (container queries), whose sidebar toggle and
