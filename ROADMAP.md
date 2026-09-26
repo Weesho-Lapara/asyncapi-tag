@@ -61,8 +61,11 @@ These override the imported spec where they differ:
 
 ### Work plan in session-sized chunks
 
-Each chunk is 1 to 3 hours, has its own acceptance check, and ends in a green CI run on `main`
-(feature flags or unused code are fine between chunks). Do them in order unless noted.
+Each chunk is 1 to 3 hours, has its own acceptance check, and ends in a green CI run on the
+feature branch `viewer-2` (feature flags or unused code are fine between chunks). Do them in order
+unless noted. All 2.0 work stays on `viewer-2` until the release; `main` keeps receiving 1.x fixes
+and is merged into the branch when needed. `ci.yml` runs on pushes to `viewer-2`; the docs deploy
+stays main-only.
 
 **Phase 0: groundwork**
 
