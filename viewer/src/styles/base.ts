@@ -70,7 +70,7 @@ export const base = css`
     margin-left: auto;
     font: 400 12px/1.5 var(--_font-mono);
     color: var(--_muted);
-    overflow-wrap: anywhere;
+    white-space: nowrap;
   }
 
   section + section {

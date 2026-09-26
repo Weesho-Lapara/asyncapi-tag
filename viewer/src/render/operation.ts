@@ -112,24 +112,25 @@ export const operationStyles = css`
     overflow-wrap: anywhere;
   }
   .op__heading {
-    margin: 0 0 18px;
-    font: 600 42px/1.1 var(--_font-heading);
-    letter-spacing: -0.01em;
+    margin: 0;
+    font: 500 13px/1.5 var(--_font-mono);
     color: var(--_ink);
     overflow-wrap: anywhere;
   }
   .op__heading:focus-visible {
     outline: 2px solid var(--_primary);
-    outline-offset: 6px;
+    outline-offset: 4px;
     border-radius: 2px;
   }
   .op__channel {
-    display: grid;
-    gap: 6px;
-    margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    margin-bottom: 16px;
   }
   .op__address {
-    font: 400 19px/1.35 var(--_font-mono);
+    font: 400 13px/1.5 var(--_font-mono);
     color: var(--_ink);
     word-break: break-all;
   }
@@ -150,7 +151,7 @@ export const operationStyles = css`
     max-width: 72ch;
   }
   .msg {
-    margin-top: 22px;
+    margin-top: 32px;
   }
   .msg__head {
     display: flex;
@@ -205,21 +206,7 @@ export const operationStyles = css`
     font-size: 13px;
     color: var(--_ink-2);
   }
-  @container viewer (max-width: 1099px) {
-    .op__heading {
-      font-size: 36px;
-    }
-    .op__address {
-      font-size: 17px;
-    }
-  }
   @container viewer (max-width: 699px) {
-    .op__heading {
-      font-size: 28px;
-    }
-    .op__address {
-      font-size: 15px;
-    }
     .op + .op {
       padding-top: 28px;
     }
@@ -255,7 +242,6 @@ function renderMessage(
   showExample: TemplateResult | typeof nothing,
 ): TemplateResult {
   const treeKey = `${anchor}--m${index}`;
-  const name = (m: Message) => m.title ?? m.name ?? m.id;
   return html`<div class="msg">
     ${op.messages.length > 1
       ? html`<div class="msg__tabs" role="tablist" aria-label="Messages of ${op.heading}">
@@ -278,14 +264,14 @@ function renderMessage(
                 (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLElement>('.msg__tab')[next]?.focus();
               }}
             >
-              ${name(m)}
+              ${m.id}
             </button>`,
           )}
         </div>`
       : nothing}
     <div id="${anchor}--message" role=${op.messages.length > 1 ? 'tabpanel' : nothing} aria-labelledby=${op.messages.length > 1 ? `${anchor}--tab-${index}` : nothing}>
       <h4 class="sub-title">
-        Message <span class="mono">${name(message)}</span>
+        Message <span class="mono">${message.id}</span>
         <span class="sub-title__meta">${message.contentType} · ${schemaFormatLabel(message.schemaFormat)}</span>
         ${showExample}
       </h4>
@@ -320,9 +306,9 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
         <div class="op__crumb"><span>Operations</span>${op.tags[0] ? html`<span>${capitalise(op.tags[0].name)}</span>` : nothing}</div>
         <div class="op__meta">
           <span class="badge badge--${direction}">${op.badgeLabel}</span>
-          <span class="op__hint">${op.locationHint}</span>
+          <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
+          ${op.locationHint !== op.heading ? html`<span class="op__hint">${op.locationHint}</span>` : nothing}
         </div>
-        <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
         <div class="op__channel">
           <span class="label">Channel</span>
           ${renderAddress(op, anchor)}

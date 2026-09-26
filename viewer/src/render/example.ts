@@ -280,10 +280,10 @@ export function renderExamplePanel(message: Message, examples: ResolvedExample[]
       ctx.onChange();
     }, 2000);
   };
-  return html`<aside class="ex" aria-label="Example for ${message.title ?? message.name ?? message.id}">
+  return html`<aside class="ex" aria-label="Example for ${message.id}">
     <div class="ex__head">
       <span class="ex__label">Example</span>
-      <span class="ex__name">${message.title ?? message.name ?? message.id}</span>
+      <span class="ex__name">${message.id}</span>
       ${example.generated ? html`<span class="pill ex__generated" title="No example in the document; this one was generated from the schema">Generated from schema</span>` : nothing}
     </div>
     <div class="ex__bar">

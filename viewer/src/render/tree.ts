@@ -272,6 +272,11 @@ export class TreeState {
     return depth <= 2; // levels 1 to 3 open by default
   }
 
+  /** True once "Expand all" was used and nothing has been collapsed since. */
+  get allExpanded(): boolean {
+    return this.#all === true && this.#collapsed.size === 0;
+  }
+
   toggle(key: string, depth: number): void {
     const next = !this.isExpanded(key, depth);
     this.#expanded.delete(key);
@@ -387,15 +392,15 @@ export function renderSchema(schema: Schema | undefined, options: TreeOptions): 
       <pre><code>${schema.source}</code></pre>
     </div>`;
   }
-  const { fields, levels } = countNodes(schema);
+  const { fields } = countNodes(schema);
   const rows = displayChildren(schema);
   const composition = displayComposition(schema);
+  const allOpen = options.state.allExpanded;
   return html`<div class="tree">
     <div class="tree__bar">
-      <span>${fields} field${fields === 1 ? '' : 's'} · ${levels} level${levels === 1 ? '' : 's'}</span>
+      <span>${fields} field${fields === 1 ? '' : 's'}</span>
       <span class="spacer"></span>
-      <button type="button" @click=${() => options.state.setAll(true)}>Expand all</button>
-      <button type="button" @click=${() => options.state.setAll(false)}>Collapse all</button>
+      <button type="button" @click=${() => options.state.setAll(!allOpen)}>${allOpen ? 'Collapse all' : 'Expand all'}</button>
     </div>
     <div class="tree__body">
       ${composition ? renderVariants(schema, composition, options, options.key, 1) : nothing}
