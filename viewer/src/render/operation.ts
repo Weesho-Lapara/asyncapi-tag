@@ -22,14 +22,14 @@ export const operationStyles = css`
   .op {
     scroll-margin-top: 16px;
   }
-  .op--split {
+  .op__body {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     align-items: start;
   }
   @container viewer (min-width: 1100px) {
-    .op--split {
+    .op--split .op__body {
       grid-template-columns: minmax(0, 1fr) var(--_example-width);
       gap: 32px;
     }
@@ -40,6 +40,10 @@ export const operationStyles = css`
   }
   .op__content {
     min-width: 0;
+  }
+  .op__content > .block:first-child,
+  .op__content > .msg:first-child {
+    margin-top: 0;
   }
   .op__show {
     margin-top: 22px;
@@ -277,7 +281,7 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
   const bindings = [...op.channel.bindings, ...op.bindings, ...(message?.bindings ?? [])];
   return html`
     <article class="op ${open ? 'op--split' : ''}" id=${anchor} aria-labelledby="${anchor}--heading">
-      <div class="op__content">
+      <div class="op__intro">
         <div class="op__meta">
           <span class="badge badge--${direction}">${op.badgeLabel}</span>
           <span class="op__hint">${op.locationHint}</span>
@@ -291,12 +295,16 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
         ${op.description ? html`<div class="op__desc">${renderMarkdown(op.description)}</div>` : nothing}
         ${examples.length > 0 && !open ? html`<div class="op__show">${renderShowExample(exampleCtx)}</div>` : nothing}
         ${renderParameters(op.channel.parameters, anchor)}
-        ${message ? renderMessage(op, message, anchor, index, ctx) : html`<p class="tree__empty block">This operation has no messages.</p>`}
-        ${op.reply ? renderReply(op.reply, prefix) : nothing}
-        ${renderBindings(bindings)}
-        ${renderSecurity(op.security, `#${prefix}--servers`)}
       </div>
-      ${open && message ? html`<div class="op__example">${renderExamplePanel(message, examples, exampleCtx, `${anchor}--example`)}</div>` : nothing}
+      <div class="op__body">
+        <div class="op__content">
+          ${message ? renderMessage(op, message, anchor, index, ctx) : html`<p class="tree__empty block">This operation has no messages.</p>`}
+          ${op.reply ? renderReply(op.reply, prefix) : nothing}
+          ${renderBindings(bindings)}
+          ${renderSecurity(op.security, `#${prefix}--servers`)}
+        </div>
+        ${open && message ? html`<div class="op__example">${renderExamplePanel(message, examples, exampleCtx, `${anchor}--example`)}</div>` : nothing}
+      </div>
     </article>
   `;
 }

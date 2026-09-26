@@ -74,14 +74,18 @@ components:
         properties:
           orderId:
             type: string
+            description: Identifier of the shipped order
           carrier:
             type: string
             enum: [dhl, ups, fedex]
+            description: Carrier that picked up the parcel
           trackingNumber:
             type: string
+            description: Tracking number issued by the carrier
           shippedAt:
             type: string
             format: date-time
+            description: When the parcel left the warehouse
   schemas:
     Order:
       type: object
@@ -92,20 +96,26 @@ components:
           description: Unique order identifier
         customerId:
           type: string
+          description: Identifier of the customer who placed the order
         items:
           type: array
+          description: Line items in the order, one per product
           items:
             type: object
             required: [sku, quantity, unitPrice]
             properties:
               sku:
                 type: string
+                description: Stock keeping unit of the product
               quantity:
                 type: integer
                 minimum: 1
+                description: Number of units ordered
               unitPrice:
                 type: number
                 minimum: 0
+                description: Price per unit at the time of ordering
         total:
           type: number
           minimum: 0
+          description: Order total before shipping
