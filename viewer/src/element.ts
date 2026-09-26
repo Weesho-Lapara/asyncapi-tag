@@ -1,20 +1,16 @@
 import { LitElement, css, html } from 'lit';
+import { parseOptions, type Options } from './options.js';
 
 /**
  * <asyncapi-viewer src="..."> renders an AsyncAPI document.
  *
- * Chunk 0.2 skeleton: renders the `src` attribute as text. Loading, the model and the
- * sections arrive in later chunks (see ROADMAP.md).
+ * Options are read from the element's attributes (see options.schema.json). Attributes are
+ * watched with a MutationObserver rather than Lit properties because each option has several
+ * accepted spellings and hand-written HTML lowercases camelCase names.
+ *
+ * Skeleton state: renders the parsed options. Loading and the sections arrive in later chunks.
  */
 export class AsyncAPIViewerElement extends LitElement {
-  // Reactive properties are declared statically (no decorators), so the build needs no
-  // decorator transform and the class works the same when loaded as ESM or IIFE.
-  static override properties = {
-    src: { type: String },
-  };
-
-  declare src: string | undefined;
-
   static override styles = css`
     :host {
       display: block;
@@ -22,8 +18,34 @@ export class AsyncAPIViewerElement extends LitElement {
     }
   `;
 
+  #options: Options = parseOptions([]);
+  #observer: MutationObserver | undefined;
+
+  /** The validated options, re-read whenever an attribute changes. */
+  get options(): Options {
+    return this.#options;
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.#readOptions();
+    this.#observer = new MutationObserver(() => this.#readOptions());
+    this.#observer.observe(this, { attributes: true });
+  }
+
+  override disconnectedCallback(): void {
+    this.#observer?.disconnect();
+    this.#observer = undefined;
+    super.disconnectedCallback();
+  }
+
+  #readOptions(): void {
+    this.#options = parseOptions(this.getAttributeNames().map((n) => [n, this.getAttribute(n)] as const));
+    this.requestUpdate();
+  }
+
   override render() {
-    return html`<p>asyncapi-viewer: ${this.src ?? '(no src attribute)'}</p>`;
+    return html`<pre>${JSON.stringify(this.#options, null, 2)}</pre>`;
   }
 }
 
