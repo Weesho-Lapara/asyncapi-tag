@@ -156,14 +156,18 @@ export const exampleStyles = css`
     color: var(--_ex-muted);
   }
   .ex__foot {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
     justify-content: space-between;
-    gap: 4px 12px;
+    gap: 6px 16px;
     padding: 12px 18px 14px;
     border-top: 1px solid var(--_ex-divider);
     font: 12px/1.5 var(--_font-body);
     color: var(--_ex-muted);
+  }
+  .ex__foot code {
+    text-align: right;
+    overflow-wrap: anywhere;
   }
   .ex__foot code {
     font: 12px/1.5 var(--_font-mono);
@@ -277,10 +281,10 @@ export function renderExamplePanel(message: Message, examples: ResolvedExample[]
       ctx.onChange();
     }, 2000);
   };
-  return html`<aside class="ex" aria-label="Example for ${message.id}">
+  return html`<aside class="ex" aria-label="Example for ${message.title ?? message.name ?? message.id}">
     <div class="ex__head">
       <span class="ex__label">Example</span>
-      <span class="ex__name">${message.id}</span>
+      <span class="ex__name">${message.title ?? message.name ?? message.id}</span>
       ${example.generated ? html`<span class="pill ex__generated" title="No example in the document; this one was generated from the schema">Generated from schema</span>` : nothing}
     </div>
     <div class="ex__bar">
@@ -331,9 +335,10 @@ export function renderExamplePanel(message: Message, examples: ResolvedExample[]
       <span class="ex__live" aria-live="polite">${state.copied === 'copied' ? 'Copied to clipboard' : state.copied === 'failed' ? 'Copying failed; select the text to copy it' : ''}</span>
     </div>
     <pre class="ex__code" id="${panelId}--code" role=${hasHeaders ? 'tabpanel' : nothing} aria-labelledby=${hasHeaders ? `${panelId}--tab-${tab}` : nothing}><code>${highlight(text)}</code></pre>
-    ${message.correlationId
-      ? html`<div class="ex__foot"><span>Correlation ID</span><code>${message.correlationId.location}</code></div>`
-      : nothing}
+    <div class="ex__foot">
+      ${message.correlationId ? html`<span>Correlation ID</span><code>${message.correlationId.location}</code>` : nothing}
+      <span>Message ID</span><code>${message.id}</code>
+    </div>
   </aside>`;
 }
 
