@@ -38,10 +38,6 @@ export const sidebarStyles = css`
     min-height: 100%;
     padding: 16px 12px 24px;
   }
-  /* Items under a group heading sit a step in from it. */
-  .side__block--grouped ul {
-    padding-left: 12px;
-  }
   .side__block--components {
     margin-top: auto;
     padding-top: 12px;
@@ -276,7 +272,7 @@ export function renderSidebar(input: SidebarInput): TemplateResult {
         />
         <span class="side__live" aria-live="polite">${input.liveText}</span>
         ${groups.map(
-          (g) => html`<div class="side__block ${g.group !== undefined ? 'side__block--grouped' : ''} ${g.group === 'Components' ? 'side__block--components' : ''}">
+          (g) => html`<div class="side__block ${g.group === 'Components' ? 'side__block--components' : ''}">
             ${g.group !== undefined
               ? html`<div class="side__group">
                   <span>${g.group}</span>

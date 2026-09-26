@@ -106,6 +106,14 @@ export const operationStyles = css`
     background: var(--_receive);
     color: var(--_badge-ink-receive);
   }
+  .op__tags {
+    margin-left: auto;
+  }
+  .op__tags .chip {
+    min-height: 24px;
+    padding: 2px 9px;
+    font-size: 12px;
+  }
   .op__hint {
     font: 400 12.5px/1.4 var(--_font-mono);
     color: var(--_muted);
@@ -319,6 +327,11 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
           <span class="badge badge--${direction}">${op.badgeLabel}</span>
           <h3 class="op__heading" id="${anchor}--heading" tabindex="-1">${op.heading}</h3>
           ${op.locationHint !== op.heading ? html`<span class="op__hint">${op.locationHint}</span>` : nothing}
+          ${op.tags.length > 0
+            ? html`<ul class="chips op__tags" aria-label="Tags">
+                ${op.tags.map((t) => html`<li class="chip" title=${t.description ?? ''}>${t.name}</li>`)}
+              </ul>`
+            : nothing}
         </div>
         <div class="op__channel">
           <span class="label">Channel</span>
