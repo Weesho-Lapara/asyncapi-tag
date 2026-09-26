@@ -10,7 +10,9 @@ import { infoStyles, renderInfo } from './render/info.js';
 import { operationStyles, renderOperations } from './render/operation.js';
 import { detailStyles } from './render/details.js';
 import { exampleStyles, type ExampleContext, type ExamplePanelState } from './render/example.js';
+import { buildNavItems, filterNav } from './render/nav.js';
 import { operationsOn, renderMessages, renderProblems, renderSchemas, renderServerSelector, renderServers, sectionStyles } from './render/sections.js';
+import { menuIcon, renderSidebar, sidebarStyles } from './render/sidebar.js';
 import { TreeState, treeStyles } from './render/tree.js';
 import { base } from './styles/base.js';
 import { tokens } from './styles/tokens.js';
@@ -29,7 +31,7 @@ let counter = 0;
  * from the resolved accent at runtime and set as private custom properties on the root.
  */
 export class AsyncAPIViewerElement extends LitElement {
-  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles, treeStyles, exampleStyles, detailStyles, sectionStyles];
+  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles, treeStyles, exampleStyles, detailStyles, sectionStyles, sidebarStyles];
 
   #options: Options = parseOptions([]);
   #observer: MutationObserver | undefined;
@@ -53,6 +55,13 @@ export class AsyncAPIViewerElement extends LitElement {
   readonly #messageIndex = new Map<string, number>();
   #server = '';
   #downloadUrl: string | undefined;
+  #query = '';
+  #drawerOpen = false;
+  #current: string | undefined;
+  #liveText = '';
+  #liveTimer: ReturnType<typeof setTimeout> | undefined;
+  #intersection: IntersectionObserver | undefined;
+  #visible = new Set<string>();
   readonly #panels = new Map<string, ExamplePanelState>();
   readonly #example = (key: string): ExampleContext => {
     let state = this.#panels.get(key);
@@ -107,6 +116,8 @@ export class AsyncAPIViewerElement extends LitElement {
     this.#observer?.disconnect();
     this.#observer = undefined;
     this.#theme.disconnect();
+    this.#intersection?.disconnect();
+    this.#intersection = undefined;
     this.ownerDocument.defaultView?.removeEventListener('hashchange', this.#onHashChange);
     super.disconnectedCallback();
   }
@@ -117,6 +128,87 @@ export class AsyncAPIViewerElement extends LitElement {
 
   protected override updated(): void {
     this.#scrollToHash();
+    this.#observeSections();
+  }
+
+  /**
+   * Spec 4.9: the sidebar highlights the block currently in view. Observed targets are the
+   * section headings and operation blocks; the first visible one in document order wins.
+   */
+  #observeSections(): void {
+    if (!this.#options.sidebar || !this.#model) {
+      this.#intersection?.disconnect();
+      this.#intersection = undefined;
+      return;
+    }
+    const root = this.renderRoot as ShadowRoot;
+    // The Operations section wrapper is skipped: its articles are the items, and the wrapper
+    // would otherwise be "visible" whenever any of them is.
+    const targets = [...root.querySelectorAll<HTMLElement>('section[aria-labelledby]:not(.ops), article.op')];
+    this.#intersection?.disconnect();
+    this.#visible.clear();
+    this.#intersection = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const id = e.target.id || e.target.getAttribute('aria-labelledby') || '';
+          if (e.isIntersecting) this.#visible.add(id);
+          else this.#visible.delete(id);
+        }
+        const order = targets.map((t) => t.id || t.getAttribute('aria-labelledby') || '');
+        const first = order.find((id) => this.#visible.has(id));
+        if (first !== this.#current) {
+          this.#current = first;
+          this.requestUpdate();
+        }
+      },
+      { rootMargin: '0px 0px -60% 0px', threshold: 0 },
+    );
+    for (const t of targets) this.#intersection.observe(t);
+  }
+
+  #setQuery(query: string, shown: number, total: number): void {
+    this.#query = query;
+    clearTimeout(this.#liveTimer);
+    this.#liveTimer = setTimeout(() => {
+      this.#liveText = query.trim() === '' ? '' : `${shown} of ${total} operations shown`;
+      this.requestUpdate();
+    }, 300);
+    this.requestUpdate();
+  }
+
+  #openDrawer(): void {
+    this.#drawerOpen = true;
+    this.requestUpdate();
+    this.updateComplete.then(() => (this.renderRoot as ShadowRoot).querySelector<HTMLInputElement>('.side__search')?.focus()).catch(() => undefined);
+  }
+
+  /** Close the drawer; focus returns to the menu button unless an item was chosen (amendment 10). */
+  #closeDrawer(chosen = false): void {
+    if (!this.#drawerOpen) return;
+    this.#drawerOpen = false;
+    this.requestUpdate();
+    if (!chosen) {
+      this.updateComplete.then(() => (this.renderRoot as ShadowRoot).querySelector<HTMLButtonElement>('.menu')?.focus()).catch(() => undefined);
+    }
+  }
+
+  /** Keep Tab inside the open drawer. */
+  #trapFocus(e: KeyboardEvent): void {
+    if (e.key !== 'Tab' || !this.#drawerOpen) return;
+    const panel = (this.renderRoot as ShadowRoot).querySelector<HTMLElement>('.side__panel');
+    if (!panel) return;
+    const focusable = [...panel.querySelectorAll<HTMLElement>('a[href], button, input, select, [tabindex="0"]')].filter((el) => !el.hasAttribute('disabled'));
+    if (focusable.length === 0) return;
+    const first = focusable[0]!;
+    const last = focusable[focusable.length - 1]!;
+    const active = (this.renderRoot as ShadowRoot).activeElement;
+    if (e.shiftKey && active === first) {
+      last.focus();
+      e.preventDefault();
+    } else if (!e.shiftKey && active === last) {
+      first.focus();
+      e.preventDefault();
+    }
   }
 
   /** Spec 4.11: a URL hash naming an anchor inside this viewer scrolls to it and focuses it. */
@@ -191,6 +283,9 @@ export class AsyncAPIViewerElement extends LitElement {
     this.#panels.clear();
     this.#messageIndex.clear();
     this.#server = '';
+    this.#query = '';
+    this.#drawerOpen = false;
+    this.#current = undefined;
     if (this.#downloadUrl) URL.revokeObjectURL(this.#downloadUrl);
     this.#downloadUrl = undefined;
     if (src === undefined) return;
@@ -245,7 +340,30 @@ export class AsyncAPIViewerElement extends LitElement {
     const operations = operationsOn(m, this.#server);
     const selected = m.servers.find((s) => s.id === this.#server);
     const sectionCtx = { prefix: this.id, tree: this.#tree, example: this.#example };
-    return html`
+    const navItems = o.sidebar
+      ? buildNavItems(m, operations, this.id, {
+          info: o.info,
+          servers: o.servers,
+          messages: o.messages,
+          schemas: o.schemas,
+          showServers: o.showServers,
+          showOperations: o.showOperations,
+        })
+      : [];
+    const filtered = filterNav(navItems, this.#query, o.searchKeepSections);
+    const menu = o.sidebar
+      ? html`<button
+          class="menu"
+          type="button"
+          aria-label="Open navigation"
+          aria-expanded=${this.#drawerOpen ? 'true' : 'false'}
+          aria-controls="${this.id}--sidebar"
+          @click=${() => (this.#drawerOpen ? this.#closeDrawer() : this.#openDrawer())}
+        >
+          ${menuIcon}
+        </button>`
+      : nothing;
+    const main = html`
       ${renderHeader({
         doc: m,
         src: r.url,
@@ -254,6 +372,7 @@ export class AsyncAPIViewerElement extends LitElement {
         themeToggle: o.themeToggle,
         resolvedTheme: this.#resolved,
         onToggleTheme: () => this.#theme.toggle(),
+        menu,
         extra: o.servers
           ? renderServerSelector(
               m,
@@ -289,6 +408,32 @@ export class AsyncAPIViewerElement extends LitElement {
         ${o.errors ? renderProblems(this.#problems, this.id) : nothing}
       </div>
     `;
+    if (!o.sidebar) return main;
+    return html`<div
+      class="layout layout--sidebar ${this.#drawerOpen ? 'layout--open' : ''}"
+      @keydown=${(e: KeyboardEvent) => {
+        if (e.key === 'Escape' && this.#drawerOpen && !(e.target as HTMLElement).classList?.contains('side__search')) {
+          this.#closeDrawer();
+          e.preventDefault();
+        }
+        this.#trapFocus(e);
+      }}
+    >
+      ${renderSidebar({
+        items: navItems,
+        query: this.#query,
+        keepSections: o.searchKeepSections,
+        current: this.#current,
+        open: this.#drawerOpen,
+        liveText: this.#liveText,
+        onQuery: (q) => this.#setQuery(q, filterNav(navItems, q, o.searchKeepSections).shown, filtered.total),
+        onEscape: () => this.#closeDrawer(),
+        onChoose: () => this.#closeDrawer(true),
+        onClose: () => this.#closeDrawer(),
+        id: this.id,
+      })}
+      <div class="main" ?inert=${this.#drawerOpen}>${main}</div>
+    </div>`;
   }
 }
 

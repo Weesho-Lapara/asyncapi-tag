@@ -14,6 +14,8 @@ export interface HeaderInput {
   onToggleTheme: () => void;
   /** Rendered into the right-hand group (server selector, chunk 1.14). */
   extra?: TemplateResult | typeof nothing;
+  /** Rendered first: the drawer menu button on narrow containers with the sidebar on. */
+  menu?: TemplateResult | typeof nothing;
 }
 
 export const headerStyles = css`
@@ -90,6 +92,7 @@ export function renderHeader(input: HeaderInput): TemplateResult {
   const fileName = input.src ? (input.src.split('/').pop()?.split('?')[0] || 'asyncapi') : 'asyncapi';
   return html`
     <header class="header">
+      ${input.menu ?? nothing}
       ${input.hasLogo ? html`<span class="header__logo" aria-hidden="true"></span>` : nothing}
       <h2 class="header__title">${doc.title}</h2>
       <div class="header__pills">
