@@ -7,6 +7,7 @@ import type { Document, Problem } from './model/types.js';
 import { parseOptions, type Options } from './options.js';
 import { headerStyles, renderHeader } from './render/header.js';
 import { infoStyles, renderInfo } from './render/info.js';
+import { operationStyles, renderOperations } from './render/operation.js';
 import { base } from './styles/base.js';
 import { tokens } from './styles/tokens.js';
 import { ThemeController, type Resolved } from './theme/theme.js';
@@ -24,7 +25,7 @@ let counter = 0;
  * from the resolved accent at runtime and set as private custom properties on the root.
  */
 export class AsyncAPIViewerElement extends LitElement {
-  static override styles = [tokens, base, headerStyles, infoStyles];
+  static override styles = [tokens, base, headerStyles, infoStyles, operationStyles];
 
   #options: Options = parseOptions([]);
   #observer: MutationObserver | undefined;
@@ -35,6 +36,11 @@ export class AsyncAPIViewerElement extends LitElement {
   #resolved: Resolved = 'light';
   #derived: Record<string, string> = {};
   #hasLogo = false;
+  #hashHandled: string | undefined;
+  readonly #onHashChange = () => {
+    this.#hashHandled = undefined;
+    this.#scrollToHash();
+  };
   readonly #theme = new ThemeController(this, (resolved) => this.#onTheme(resolved));
 
   /** The validated options, re-read whenever an attribute changes. */
@@ -69,17 +75,36 @@ export class AsyncAPIViewerElement extends LitElement {
     this.#observer = new MutationObserver(() => this.#readOptions());
     this.#observer.observe(this, { attributes: true });
     this.#theme.connect();
+    this.ownerDocument.defaultView?.addEventListener('hashchange', this.#onHashChange);
   }
 
   override disconnectedCallback(): void {
     this.#observer?.disconnect();
     this.#observer = undefined;
     this.#theme.disconnect();
+    this.ownerDocument.defaultView?.removeEventListener('hashchange', this.#onHashChange);
     super.disconnectedCallback();
   }
 
   protected override firstUpdated(): void {
     this.#deriveColors();
+  }
+
+  protected override updated(): void {
+    this.#scrollToHash();
+  }
+
+  /** Spec 4.11: a URL hash naming an anchor inside this viewer scrolls to it and focuses it. */
+  #scrollToHash(): void {
+    const hash = this.ownerDocument.defaultView?.location.hash ?? '';
+    if (!this.#model || hash.length < 2 || hash === this.#hashHandled) return;
+    const id = decodeURIComponent(hash.slice(1));
+    if (!id.startsWith(`${this.id}--`)) return;
+    const target = (this.renderRoot as ShadowRoot).getElementById(id) ?? (this.renderRoot as ShadowRoot).getElementById(`${id}--heading`);
+    if (!target) return;
+    this.#hashHandled = hash;
+    target.scrollIntoView({ block: 'start' });
+    (target.querySelector<HTMLElement>('[tabindex="-1"]') ?? target).focus({ preventScroll: true });
   }
 
   #readOptions(): void {
@@ -195,6 +220,7 @@ export class AsyncAPIViewerElement extends LitElement {
       })}
       <div class="content">
         ${o.info ? renderInfo(m, `${this.id}--info`) : nothing}
+        ${o.operations ? renderOperations(m, this.id) : nothing}
         ${o.errors && this.#problems.length > 0
           ? html`<section aria-labelledby="${this.id}--problems">
               <h2 class="section-title" id="${this.id}--problems" tabindex="-1">Problems</h2>
