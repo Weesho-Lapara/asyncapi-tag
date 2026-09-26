@@ -6,14 +6,13 @@ export const infoStyles = css`
   .info__desc {
     margin-bottom: 20px;
     padding: 14px 18px;
-    border-left: 3px solid var(--_primary);
-    border-radius: 0 var(--_radius-sm) var(--_radius-sm) 0;
-    background: var(--_surface);
+    border: 1px solid var(--_line);
+    border-radius: var(--_radius);
   }
   .info__desc .md p {
     font-size: 15px;
     line-height: 1.65;
-    color: var(--_ink);
+    color: var(--_ink-2);
   }
 `;
 
