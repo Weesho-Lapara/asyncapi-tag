@@ -13,11 +13,11 @@ describe('typeLabel', () => {
     expect(typeLabel(node({ name: 'a', types: ['string'], format: 'uuid' }))).toBe('string · uuid');
     expect(typeLabel(node({ name: 'a', format: 'email' }))).toBe('string · email');
     const tags = node({ name: 'tags', types: ['array'], children: [node({ name: '[]', types: ['string'] })] });
-    expect(typeLabel(tags)).toBe('array of string');
+    expect(typeLabel(tags)).toBe('array<string>');
     const matrix = node({ name: 'm', types: ['array'], children: [node({ name: '[]', types: ['array'], children: [node({ name: '[]', types: ['number'] })] })] });
-    expect(typeLabel(matrix)).toBe('array of array of number');
+    expect(typeLabel(matrix)).toBe('array<array<number>>');
     const items = node({ name: 'items', types: ['array'], children: [node({ name: '[]', types: ['object'], children: [node({ name: 'sku' })] })] });
-    expect(typeLabel(items)).toBe('array of object');
+    expect(typeLabel(items)).toBe('array<object>');
     expect(typeLabel(node({ name: 'x', composition: { kind: 'oneOf', variants: [] } }))).toBe('oneOf');
     expect(typeLabel(node({ name: 'x', circularRef: 'Node' }))).toBe('object');
     expect(typeLabel(node({ name: 'x' }))).toBe('');

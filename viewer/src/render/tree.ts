@@ -51,7 +51,7 @@ export const treeStyles = css`
     outline-offset: -2px;
   }
   .tree__body {
-    padding: 8px 12px 10px 12px;
+    padding: 0;
   }
   .tree__empty {
     margin: 0;
@@ -65,9 +65,13 @@ export const treeStyles = css`
     padding: 0;
   }
   ul.branch ul.branch {
-    margin-left: 12px;
+    margin-left: 28px;
     padding-left: 22px;
     border-left: 1px solid var(--_line-2);
+  }
+  li.row + li.row,
+  li.row > div > ul.branch > li.row:first-child {
+    border-top: 1px solid var(--_line);
   }
   ul.branch[data-depth='4'] ul.branch,
   ul.branch[data-depth='5'] ul.branch,
@@ -81,7 +85,10 @@ export const treeStyles = css`
     display: grid;
     grid-template-columns: 26px minmax(0, 1fr);
     column-gap: 10px;
-    padding: 7px 0;
+    padding: 11px 16px 11px 12px;
+  }
+  .row > div {
+    min-width: 0;
   }
   .row__toggle {
     width: 26px;
@@ -127,12 +134,9 @@ export const treeStyles = css`
     min-height: 26px;
   }
   .row__name {
-    font: 500 13px/1.5 var(--_font-mono);
+    font: 600 13px/1.5 var(--_font-mono);
     color: var(--_ink);
     overflow-wrap: anywhere;
-  }
-  .row--top > .row__line1 .row__name {
-    font-weight: 600;
   }
   .row__type {
     font: 400 12px/1.5 var(--_font-mono);
@@ -232,8 +236,11 @@ export const treeStyles = css`
   }
   @container viewer (max-width: 699px) {
     ul.branch ul.branch {
-      margin-left: 8px;
-      padding-left: 14px;
+      margin-left: 14px;
+      padding-left: 12px;
+    }
+    .row {
+      padding: 10px 10px 10px 6px;
     }
     ul.branch[data-depth='4'] ul.branch,
     ul.branch[data-depth='5'] ul.branch,
@@ -320,10 +327,11 @@ export function typeLabel(node: SchemaNode): string {
   const item = arrayItem(node);
   if (item && node.types.length <= 1) {
     const inner = typeLabel(item);
-    return inner ? `array of ${inner}` : 'array';
+    return inner ? `array<${inner}>` : 'array';
   }
   let label = node.types.join(' | ');
   if (node.format) label = `${label || 'string'} · ${node.format}`;
+  if (node.enum && node.enum.length > 0) label = `${label || 'string'} · enum`;
   if (!label && node.composition) label = node.composition.kind;
   if (!label && node.circularRef) label = 'object';
   return label;

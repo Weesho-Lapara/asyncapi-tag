@@ -33,7 +33,15 @@ export const sidebarStyles = css`
     }
   }
   .side__inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
     padding: 16px 12px 24px;
+  }
+  .side__block--components {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--_line);
   }
   .side__search {
     display: block;
@@ -52,11 +60,16 @@ export const sidebarStyles = css`
     outline-offset: 1px;
   }
   .side__group {
-    margin: 14px 8px 6px;
+    display: flex;
+    justify-content: space-between;
+    margin: 18px 10px 6px;
     font: 500 11px/1 var(--_font-body);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--_muted);
+  }
+  .side__group .mono {
+    letter-spacing: 0;
   }
   .side ul {
     list-style: none;
@@ -248,10 +261,17 @@ export function renderSidebar(input: SidebarInput): TemplateResult {
         />
         <span class="side__live" aria-live="polite">${input.liveText}</span>
         ${groups.map(
-          (g) => html`${g.group !== undefined ? html`<div class="side__group">${g.group}</div>` : nothing}
+          (g) => html`<div class="side__block ${g.group === 'Components' ? 'side__block--components' : ''}">
+            ${g.group !== undefined
+              ? html`<div class="side__group">
+                  <span>${g.group}</span>
+                  ${g.group !== 'Components' ? html`<span class="mono">${g.items.length}</span>` : nothing}
+                </div>`
+              : nothing}
             <ul>
               ${g.items.map((item) => renderItem(item, input))}
-            </ul>`,
+            </ul>
+          </div>`,
         )}
         ${filtered.active && filtered.shown === 0 ? html`<p class="side__empty">No operations match</p>` : nothing}
       </nav>

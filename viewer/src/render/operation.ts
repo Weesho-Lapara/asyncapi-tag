@@ -3,6 +3,7 @@ import type { Document, Message, Operation } from '../model/types.js';
 import { renderInline, renderMarkdown } from './markdown.js';
 import { renderBindings, renderParameters, renderReply, renderSecurity } from './details.js';
 import { examplesFor, isPanelOpen, renderExamplePanel, renderShowExample, type ExampleContext } from './example.js';
+import { schemaFormatLabel } from './format.js';
 import { renderSchema, type TreeState } from './tree.js';
 
 export interface OperationContext {
@@ -22,6 +23,18 @@ export const operationStyles = css`
   .op {
     scroll-margin-top: 16px;
   }
+  .op + .op {
+    padding-top: 40px;
+    border-top: 1px solid var(--_line);
+  }
+  .op__crumb {
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: var(--_muted);
+  }
+  .op__crumb span + span::before {
+    content: ' / ';
+  }
   .op__content {
     min-width: 0;
   }
@@ -29,34 +42,43 @@ export const operationStyles = css`
   .op__content > .msg:first-child {
     margin-top: 0;
   }
-  /* The message head (tabs, name, format) spans the full width; the tree and the example
-     panel start together underneath it. The split depends on the main column's width (a
-     container of its own), so beside a sidebar the panel stacks until both have room. */
-  .msg__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-    align-items: start;
+  .op__example {
+    margin-top: 24px;
   }
-  .msg__trees {
-    min-width: 0;
+  .sub-title .ex__show {
+    flex-basis: 100%;
+    justify-content: center;
   }
+  .op__desc .md p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  /* Wide main column: the example panel is a full-height dark column at the right edge of the
+     block, level with the breadcrumb (design reference). The split depends on the main
+     column's width, so beside a sidebar the panel stacks until both have room. */
   @container main (min-width: 1100px) {
-    .op--split .msg__grid {
+    .op--split {
+      display: grid;
       grid-template-columns: minmax(0, 1fr) var(--_example-width);
-      gap: 32px;
+      column-gap: 36px;
+      margin-right: calc(-1 * var(--_pad-x));
     }
-    .op__example {
+    .op--split .op__intro,
+    .op--split .op__content {
+      grid-column: 1;
+    }
+    .op--split .op__example {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      margin-top: 0;
+      background: var(--_ex-bg);
+      border-radius: var(--_radius) 0 0 var(--_radius);
+    }
+    .op--split .op__example .ex {
       position: sticky;
-      top: 16px;
+      top: 0;
+      border-radius: 0;
     }
-  }
-  .msg__head .ex__show {
-    margin-left: auto;
-  }
-  .op + .op {
-    padding-top: 40px;
-    border-top: 1px solid var(--_line);
   }
   .op__meta {
     display: flex;
@@ -230,7 +252,6 @@ function renderMessage(
   anchor: string,
   index: number,
   ctx: OperationContext,
-  panel: TemplateResult | typeof nothing,
   showExample: TemplateResult | typeof nothing,
 ): TemplateResult {
   const treeKey = `${anchor}--m${index}`;
@@ -263,28 +284,22 @@ function renderMessage(
         </div>`
       : nothing}
     <div id="${anchor}--message" role=${op.messages.length > 1 ? 'tabpanel' : nothing} aria-labelledby=${op.messages.length > 1 ? `${anchor}--tab-${index}` : nothing}>
-      <div class="msg__head">
-        <span class="label">Message</span>
-        <span class="msg__name">${name(message)}</span>
-        <span class="msg__format">${message.contentType} · ${message.schemaFormat}</span>
+      <h4 class="sub-title">
+        Message <span class="mono">${name(message)}</span>
+        <span class="sub-title__meta">${message.contentType} · ${schemaFormatLabel(message.schemaFormat)}</span>
         ${showExample}
-      </div>
+      </h4>
       ${message.summary ? html`<div class="msg__desc">${renderInline(message.summary)}</div>` : nothing}
       ${message.description ? html`<div class="msg__desc">${renderMarkdown(message.description)}</div>` : nothing}
-      <div class="msg__grid">
-        <div class="msg__trees">
-          ${message.payload
-            ? renderSchema(message.payload, { prefix: ctx.prefix, key: `${treeKey}--payload`, state: ctx.tree(`${treeKey}--payload`) })
-            : html`<p class="tree__empty">This message has no payload schema.</p>`}
-          ${message.headers
-            ? html`<div class="msg__part">
-                <div class="msg__head"><span class="label">Headers</span></div>
-                ${renderSchema(message.headers, { prefix: ctx.prefix, key: `${treeKey}--headers`, state: ctx.tree(`${treeKey}--headers`) })}
-              </div>`
-            : nothing}
-        </div>
-        ${panel !== nothing ? html`<div class="op__example">${panel}</div>` : nothing}
-      </div>
+      ${message.payload
+        ? renderSchema(message.payload, { prefix: ctx.prefix, key: `${treeKey}--payload`, state: ctx.tree(`${treeKey}--payload`) })
+        : html`<p class="tree__empty">This message has no payload schema.</p>`}
+      ${message.headers
+        ? html`<div class="msg__part">
+            <h4 class="sub-title">Headers</h4>
+            ${renderSchema(message.headers, { prefix: ctx.prefix, key: `${treeKey}--headers`, state: ctx.tree(`${treeKey}--headers`) })}
+          </div>`
+        : nothing}
     </div>
   </div>`;
 }
@@ -302,6 +317,7 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
   return html`
     <article class="op ${open ? 'op--split' : ''}" id=${anchor} aria-labelledby="${anchor}--heading">
       <div class="op__intro">
+        <div class="op__crumb"><span>Operations</span>${op.tags[0] ? html`<span>${capitalise(op.tags[0].name)}</span>` : nothing}</div>
         <div class="op__meta">
           <span class="badge badge--${direction}">${op.badgeLabel}</span>
           <span class="op__hint">${op.locationHint}</span>
@@ -323,7 +339,6 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
               anchor,
               index,
               ctx,
-              open ? renderExamplePanel(message, examples, exampleCtx, `${anchor}--example`) : nothing,
               examples.length > 0 && !open ? renderShowExample(exampleCtx) : nothing,
             )
           : html`<p class="tree__empty block">This operation has no messages.</p>`}
@@ -331,6 +346,7 @@ export function renderOperation(op: Operation, ctx: OperationContext): TemplateR
         ${renderBindings(bindings)}
         ${renderSecurity(op.security, `#${prefix}--servers`)}
       </div>
+      ${open && message ? html`<div class="op__example">${renderExamplePanel(message, examples, exampleCtx, `${anchor}--example`)}</div>` : nothing}
     </article>
   `;
 }
@@ -348,4 +364,8 @@ export function renderOperations(doc: Document, operations: Operation[], ctx: Op
       <div class="ops__list">${operations.map((op) => renderOperation(op, ctx))}</div>
     </section>
   `;
+}
+
+function capitalise(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }

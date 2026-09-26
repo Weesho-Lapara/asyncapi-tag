@@ -9,7 +9,7 @@ describe('buildNavItems', () => {
   it('lists sections, flat operations and the Components group', () => {
     const items = buildNavItems(ordersV3, ordersV3.operations, 'v', base);
     expect(items.map((i) => [i.kind, i.label, i.group])).toEqual([
-      ['section', 'Info', undefined],
+      ['section', 'Overview', undefined],
       ['section', 'Servers', undefined],
       ['operation', 'emitOrderPlaced', undefined],
       ['operation', 'onOrderShipped', undefined],
@@ -58,7 +58,7 @@ describe('search', () => {
     expect(r.items.map((i) => i.label)).toEqual(['emitOrderPlaced', 'onOrderShipped']);
     expect([r.shown, r.total, r.active]).toEqual([2, 2, true]);
     const kept = filterNav(items, 'shipped', true);
-    expect(kept.items.map((i) => i.label)).toEqual(['Info', 'Servers', 'onOrderShipped', 'Messages', 'Schemas']);
+    expect(kept.items.map((i) => i.label)).toEqual(['Overview', 'Servers', 'onOrderShipped', 'Messages', 'Schemas']);
     expect(kept.shown).toBe(1);
     const none = filterNav(items, 'zzz', false);
     expect(none.items).toEqual([]);

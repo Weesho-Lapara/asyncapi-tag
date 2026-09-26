@@ -152,7 +152,7 @@ export const detailStyles = css`
 export function renderParameters(parameters: Parameter[], anchor: string): TemplateResult | typeof nothing {
   if (parameters.length === 0) return nothing;
   return html`<div class="block" id="${anchor}--parameters">
-    <h4 class="block__title" tabindex="-1">Parameters</h4>
+    <h4 class="sub-title" tabindex="-1">Parameters</h4>
     <dl class="params">
       ${parameters.map((p) => {
         const facts: string[] = [];

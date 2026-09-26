@@ -22,9 +22,12 @@ export const exampleStyles = css`
   .ex__head {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 12px;
-    padding: 12px 16px 0;
+    align-items: baseline;
+    gap: 4px 10px;
+    padding: 18px 18px 0;
+  }
+  .ex__head .ex__label {
+    flex-basis: 100%;
   }
   .ex__label {
     font: 500 11px/1 var(--_font-body);
@@ -33,7 +36,7 @@ export const exampleStyles = css`
     color: var(--_ex-muted);
   }
   .ex__name {
-    font: 600 14px/1.4 var(--_font-heading);
+    font: 600 18px/1.3 var(--_font-heading);
     color: var(--_ex-heading);
   }
   .ex__generated {
@@ -48,28 +51,25 @@ export const exampleStyles = css`
     flex-wrap: wrap;
     align-items: center;
     gap: 6px 10px;
-    padding: 10px 12px 0 16px;
+    padding: 14px 18px 0;
   }
   .ex__tabs {
     display: inline-flex;
-    gap: 2px;
-    padding: 2px;
-    border-radius: var(--_radius-sm);
-    background: rgb(255 255 255 / 0.06);
+    gap: 4px;
   }
   .ex__tab {
-    min-height: 30px;
-    padding: 0 12px;
+    min-height: 34px;
+    padding: 0 10px;
     border: 0;
-    border-radius: calc(var(--_radius-sm) - 2px);
+    border-bottom: 2px solid transparent;
     background: none;
     color: var(--_ex-muted);
-    font: 500 12.5px/1 var(--_font-body);
+    font: 500 13px/1 var(--_font-body);
     cursor: pointer;
   }
   .ex__tab[aria-selected='true'] {
-    background: rgb(255 255 255 / 0.12);
     color: var(--_ex-heading);
+    border-bottom-color: var(--_ex-heading);
   }
   .ex__tab:focus-visible,
   .ex__copy:focus-visible,
@@ -122,10 +122,10 @@ export const exampleStyles = css`
     stroke-linejoin: round;
   }
   .ex__code {
-    margin: 10px 0 0;
-    padding: 12px 16px 14px 0;
+    margin: 8px 0 0;
+    padding: 14px 18px 18px 0;
     overflow: auto;
-    font: 12.5px/1.6 var(--_font-mono);
+    font: 12.5px/1.7 var(--_font-mono);
     border-top: 1px solid var(--_ex-divider);
     counter-reset: line;
   }
@@ -161,11 +161,15 @@ export const exampleStyles = css`
   .ex__foot {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 8px;
-    padding: 10px 16px 12px;
+    justify-content: space-between;
+    gap: 4px 12px;
+    padding: 12px 18px 14px;
     border-top: 1px solid var(--_ex-divider);
-    font: 12px/1.5 var(--_font-mono);
+    font: 12px/1.5 var(--_font-body);
     color: var(--_ex-muted);
+  }
+  .ex__foot code {
+    font: 12px/1.5 var(--_font-mono);
   }
   .ex__foot code {
     color: var(--_ex-ink);
@@ -331,7 +335,7 @@ export function renderExamplePanel(message: Message, examples: ResolvedExample[]
     </div>
     <pre class="ex__code" id="${panelId}--code" role=${hasHeaders ? 'tabpanel' : nothing} aria-labelledby=${hasHeaders ? `${panelId}--tab-${tab}` : nothing}><code>${highlight(text)}</code></pre>
     ${message.correlationId
-      ? html`<div class="ex__foot"><span>correlation id</span><code>${message.correlationId.location}</code></div>`
+      ? html`<div class="ex__foot"><span>Correlation ID</span><code>${message.correlationId.location}</code></div>`
       : nothing}
   </aside>`;
 }

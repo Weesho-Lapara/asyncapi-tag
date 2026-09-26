@@ -37,17 +37,40 @@ export const base = css`
 
   /* Content column padding: 36/44/48 desktop, 28/32/40 tablet, 20/16/32 phone (spec 4.5). */
   .content {
-    padding: 36px 44px 48px;
+    --_pad-x: 44px;
+    padding: 36px var(--_pad-x) 48px;
   }
   @container viewer (max-width: 1099px) {
     .content {
-      padding: 28px 32px 40px;
+      --_pad-x: 32px;
+      padding: 28px var(--_pad-x) 40px;
     }
   }
   @container viewer (max-width: 699px) {
     .content {
-      padding: 20px 16px 32px;
+      --_pad-x: 16px;
+      padding: 20px var(--_pad-x) 32px;
     }
+  }
+  h4.sub-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+    margin: 0 0 12px;
+    font: 600 18px/1.3 var(--_font-heading);
+    color: var(--_ink);
+  }
+  h4.sub-title .mono {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--_ink-2);
+  }
+  h4.sub-title .sub-title__meta {
+    margin-left: auto;
+    font: 400 12px/1.5 var(--_font-mono);
+    color: var(--_muted);
+    overflow-wrap: anywhere;
   }
 
   section + section {

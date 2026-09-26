@@ -52,7 +52,7 @@ export function renderInfo(doc: Document, anchorId: string): TemplateResult {
   }
   return html`
     <section class="info" aria-labelledby=${anchorId}>
-      <h2 class="section-title" id=${anchorId} tabindex="-1">Info</h2>
+      <h2 class="section-title" id=${anchorId} tabindex="-1">Overview</h2>
       <div class="info__lead">
         <h3 class="info__title">${doc.title}</h3>
         ${doc.version ? html`<span class="info__version">v${doc.version}</span>` : nothing}

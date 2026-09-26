@@ -182,6 +182,10 @@ export const sectionStyles = css`
     flex: none;
     min-width: 0;
   }
+  .selector__label {
+    font-size: 12.5px;
+    color: var(--_muted);
+  }
   .selector select {
     min-height: 40px;
     max-width: 34ch;
@@ -227,7 +231,7 @@ export interface SectionContext {
 export function renderServerSelector(doc: Document, selected: string, onChange: (id: string) => void, id: string): TemplateResult | typeof nothing {
   if (doc.servers.length < 2) return nothing;
   return html`<label class="selector">
-    <span class="visually-hidden" id="${id}--label">Server</span>
+    <span class="selector__label" id="${id}--label">Server</span>
     <select aria-labelledby="${id}--label" @change=${(e: Event) => onChange((e.target as HTMLSelectElement).value)}>
       <option value="" ?selected=${selected === ''}>All servers</option>
       ${doc.servers.map((s) => html`<option value=${s.id} ?selected=${s.id === selected}>${s.id} · ${s.protocol} · ${s.hostDisplay}</option>`)}
