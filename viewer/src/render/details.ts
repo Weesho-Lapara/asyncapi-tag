@@ -70,6 +70,17 @@ export const detailStyles = css`
   .chip__value {
     color: var(--_ink);
   }
+  .chip__desc {
+    flex-basis: 100%;
+    font-size: 12px;
+    color: var(--_ink-2);
+    max-width: 60ch;
+  }
+  .chip:has(.chip__desc) {
+    flex-wrap: wrap;
+    border-radius: var(--_radius);
+    padding: 6px 10px;
+  }
   .chip pre {
     margin: 0;
     font: 11.5px/1.4 var(--_font-mono);
@@ -164,6 +175,12 @@ export function renderParameters(parameters: Parameter[], anchor: string): Templ
 
 function chipValue(value: unknown): TemplateResult {
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return html`<span class="chip__value mono">${String(value)}</span>`;
+  // Some bindings (Kafka groupId, clientId) carry a schema instead of a value: show its type and description.
+  if (typeof value === 'object' && value !== null && !Array.isArray(value) && typeof (value as { type?: unknown }).type === 'string') {
+    const schema = value as { type: string; description?: unknown; enum?: unknown };
+    const facts = [schema.type, Array.isArray(schema.enum) ? `enum: ${schema.enum.map(String).join(' · ')}` : undefined].filter(Boolean).join(' · ');
+    return html`<span class="chip__value mono">${facts}</span>${typeof schema.description === 'string' ? html`<span class="chip__desc">${renderInline(schema.description)}</span>` : nothing}`;
+  }
   const text = JSON.stringify(value);
   if (text.length <= 40) return html`<span class="chip__value mono">${text}</span>`;
   return html`<pre class="chip__value">${JSON.stringify(value, null, 2)}</pre>`;
