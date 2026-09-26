@@ -38,5 +38,7 @@ site-*/
 # Viewer (Node project under viewer/); built files are copied into the wheel at build time
 viewer/node_modules/
 viewer/dist/
+viewer/test/coverage/corpus/
+viewer/test/coverage/corpus-v2/
 src/asyncapi_viewer/static/
 src/asyncapi_viewer/options.schema.json

@@ -56,6 +56,7 @@ python scripts/update_viewer.py [version]   # --check exits 1 when a newer viewe
 pip install -e ".[docs]" && mkdocs build --strict   # docs site; `mkdocs serve` to preview
 pip install zensical && zensical build             # same site under Zensical
 cd viewer && npm ci && npm run check && npm test && npm run build   # the 2.0 viewer (Node 22)
+cd viewer && npm run coverage            # normaliser over the AsyncAPI example corpus -> test/coverage/REPORT.md
 ```
 
 ## Conventions and constraints
