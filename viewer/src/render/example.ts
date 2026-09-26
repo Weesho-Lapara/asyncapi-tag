@@ -26,9 +26,6 @@ export const exampleStyles = css`
     gap: 4px 10px;
     padding: 18px 18px 0;
   }
-  .ex__head .ex__label {
-    flex-basis: 100%;
-  }
   .ex__label {
     font: 500 11px/1 var(--_font-body);
     text-transform: uppercase;
@@ -36,7 +33,7 @@ export const exampleStyles = css`
     color: var(--_ex-muted);
   }
   .ex__name {
-    font: 600 18px/1.3 var(--_font-heading);
+    font: 600 15px/1.4 var(--_font-heading);
     color: var(--_ex-heading);
   }
   .ex__generated {
