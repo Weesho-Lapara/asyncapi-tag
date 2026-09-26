@@ -31,6 +31,33 @@ These override the imported spec where they differ:
    in `problems[]` has been reviewed.
 6. **Names.** Element `<asyncapi-viewer>`, npm package `asyncapi-viewer`, PyPI `asyncapi-viewer`
    (see "Rename" below). The spec's `<asyncapi-tag-viewer>` is superseded.
+7. **CSS custom properties** use the prefix `--asyncapi-` (the spec's `--aat-` came from the old
+   name). The theme file targets the `asyncapi-viewer` element. Decided 2026-09-26.
+8. **Sidebar default** stays `false` in 2.0 (spec decision 2, confirmed 2026-09-26).
+9. **Generated examples** (overrides spec decision 3, section 3.3 and section 7): when a message has
+   no authored example, the viewer generates one from the schema so readers get a taste of real
+   traffic. Values come from, in order: the field's own `examples` or `default`, the first `enum`
+   value, `format` (plausible uuid, email, date-time, uri, ...), numeric bounds, then field-name
+   heuristics; never bare `"string"` or `0` when a hint exists. The panel label reads
+   "Generated from schema" so it is never mistaken for an authored example. Decided 2026-09-26.
+10. **Anchors and focus.** The default element id is `asyncapi-viewer-N` (what the Python side
+   already emits); anchors are `#<element id>--<section>--<item id>`. Section, operation, message and
+   schema headings are focus targets (`tabindex="-1"`): following a sidebar link or loading a URL
+   with such a hash scrolls to the heading and moves keyboard focus there. In the drawer, focus
+   returns to the menu button only when it closes without a choice. Decided 2026-09-26.
+11. **Sidebar as a generic list.** The sidebar renders one list of nav items
+   `{ kind: 'section' | 'operation' | 'message' | 'schema', label, anchor, group?, badge?,
+   search: string[] }` built once per render. Today it holds sections and operations; messages and
+   schemas can be added later without touching search, grouping or the current-item highlight.
+   Search (spec 4.9) is a live filter on that list: case-insensitive, the query is split on spaces
+   and every term must match one of heading, channel address (with `{params}`), operation id, or
+   message names and titles; results keep document order; groups with no matches disappear;
+   it composes with the server selector as an intersection; empty state "No operations match";
+   a polite live region says "N of M operations shown" (debounced); Escape clears the input, a
+   second Escape on an empty input closes the drawer; no `<mark>` highlighting. While a query is
+   active the section links (Info, Servers, Messages, Schemas) are hidden; the new option
+   `searchKeepSections` (boolean, default `false`, attribute `search-keep-sections`) keeps them
+   visible. Decided 2026-09-26.
 
 ### Work plan in session-sized chunks
 
